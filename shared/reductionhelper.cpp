@@ -73,12 +73,22 @@ void Image32Bpp::WriteData(std::ostream& file) const
     WriteNewLine(file);
 }
 
+void Image32Bpp::WriteCommonExport(std::ostream& file) const
+{
+    WriteDefine(file, name, "_SIZE", pixels.size());
+    WriteDefine(file, name, "_WIDTH", width);
+    WriteDefine(file, name, "_HEIGHT", height);
+}
+
 void Image32Bpp::WriteExport(std::ostream& file) const
 {
     WriteExtern(file, "const unsigned char", export_name, "", pixels.size());
-    WriteDefine(file, export_name, "_SIZE", pixels.size());
-    WriteDefine(file, export_name, "_WIDTH", width);
-    WriteDefine(file, export_name, "_HEIGHT", height);
+    if (!animated)
+    {
+        WriteDefine(file, export_name, "_SIZE", pixels.size());
+        WriteDefine(file, export_name, "_WIDTH", width);
+        WriteDefine(file, export_name, "_HEIGHT", height);
+    }
     WriteNewLine(file);
 }
 
@@ -128,12 +138,22 @@ void Image16Bpp::WriteData(std::ostream& file) const
     WriteNewLine(file);
 }
 
+void Image16Bpp::WriteCommonExport(std::ostream& file) const
+{
+    WriteDefine(file, name, "_SIZE", pixels.size());
+    WriteDefine(file, name, "_WIDTH", width);
+    WriteDefine(file, name, "_HEIGHT", height);
+}
+
 void Image16Bpp::WriteExport(std::ostream& file) const
 {
     WriteExtern(file, "const unsigned short", export_name, "", pixels.size());
-    WriteDefine(file, export_name, "_SIZE", pixels.size());
-    WriteDefine(file, export_name, "_WIDTH", width);
-    WriteDefine(file, export_name, "_HEIGHT", height);
+    if (!animated)
+    {
+        WriteDefine(file, export_name, "_SIZE", pixels.size());
+        WriteDefine(file, export_name, "_WIDTH", width);
+        WriteDefine(file, export_name, "_HEIGHT", height);
+    }
     WriteNewLine(file);
 }
 
@@ -273,15 +293,25 @@ void Image8Bpp::WriteData(std::ostream& file) const
     WriteNewLine(file);
 }
 
+void Image8Bpp::WriteCommonExport(std::ostream& file) const
+{
+    WriteDefine(file, name, "_SIZE", pixels.size() / 2);
+    WriteDefine(file, name, "_WIDTH", width);
+    WriteDefine(file, name, "_HEIGHT", height);
+}
+
 void Image8Bpp::WriteExport(std::ostream& file) const
 {
     // Sole owner of palette
     if (export_shared_info)
         palette->WriteExport(file);
-    WriteExtern(file, "const unsigned short", export_name, "", pixels.size()/2);
-    WriteDefine(file, export_name, "_SIZE", pixels.size()/2);
-    WriteDefine(file, export_name, "_WIDTH", width);
-    WriteDefine(file, export_name, "_HEIGHT", height);
+    WriteExtern(file, "const unsigned short", export_name, "", pixels.size() / 2);
+    if (!animated)
+    {
+        WriteDefine(file, export_name, "_SIZE", pixels.size() / 2);
+        WriteDefine(file, export_name, "_WIDTH", width);
+        WriteDefine(file, export_name, "_HEIGHT", height);
+    }
     WriteNewLine(file);
 }
 
@@ -735,15 +765,13 @@ void Tileset::Init8bpp(const std::vector<Image16Bpp>& images16)
     Image8BppScene scene(images16, name);
     palette = scene.palette;
 
-    const std::vector<std::unique_ptr<Image>>& images = scene.GetImages();
-
     GBATile nullTile;
     ImageTile nullImageTile;
     tiles.insert(nullTile);
     tilesExport.push_back(nullTile);
     matcher[nullImageTile] = nullTile;
 
-    for (unsigned int k = 0; k < images.size(); k++)
+    for (unsigned int k = 0; k < images16.size(); k++)
     {
         bool disjoint_error = false;
         const Image8Bpp& image = scene.GetImage(k);
@@ -943,6 +971,14 @@ void Map::WriteData(std::ostream& file) const
     WriteNewLine(file);
 }
 
+void Map::WriteCommonExport(std::ostream& file) const
+{
+    WriteDefine(file, name, "_WIDTH", width);
+    WriteDefine(file, name, "_HEIGHT", height);
+    WriteDefine(file, name, "_MAP_SIZE", Size());
+    WriteDefine(file, name, "_MAP_TYPE", Type(), 14);
+}
+
 void Map::WriteExport(std::ostream& file) const
 {
     // Sole owner of tileset.
@@ -950,10 +986,13 @@ void Map::WriteExport(std::ostream& file) const
         tileset->WriteExport(file);
 
     WriteExtern(file, "const unsigned short", export_name, "_map", Size());
-    WriteDefine(file, export_name, "_WIDTH", width);
-    WriteDefine(file, export_name, "_HEIGHT", height);
-    WriteDefine(file, export_name, "_MAP_SIZE", Size());
-    WriteDefine(file, export_name, "_MAP_TYPE", Type(), 14);
+    if (animated)
+    {
+        WriteDefine(file, export_name, "_WIDTH", width);
+        WriteDefine(file, export_name, "_HEIGHT", height);
+        WriteDefine(file, export_name, "_MAP_SIZE", Size());
+        WriteDefine(file, export_name, "_MAP_TYPE", Type(), 14);
+    }
     WriteNewLine(file);
 }
 
@@ -1064,19 +1103,28 @@ void Sprite::WriteTile(unsigned char* arr, int x, int y) const
     }
 }
 
+void Sprite::WriteCommonExport(std::ostream& file) const
+{
+    WriteDefine(file, name, "_SHAPE", shape, 14);
+    WriteDefine(file, name, "_SIZE", size, 14);
+}
+
 void Sprite::WriteExport(std::ostream& file) const
 {
     if (params.bpp == 4)
         WriteDefine(file, export_name, "_PALETTE", palette_bank, 12);
-    WriteDefine(file, export_name, "_SHAPE", shape, 14);
-    WriteDefine(file, export_name, "_SIZE", size, 14);
+    if (!animated)
+    {
+        WriteDefine(file, export_name, "_SHAPE", shape, 14);
+        WriteDefine(file, export_name, "_SIZE", size, 14);
+    }
     WriteDefine(file, export_name, "_ID", offset | (params.for_bitmap ? 512 : 0));
     WriteNewLine(file);
 }
 
 void Sprite::WriteData(std::ostream& file) const
 {
-
+    // Implemented in operator<<
 }
 
 std::ostream& operator<<(std::ostream& file, const Sprite& sprite)

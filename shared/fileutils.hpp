@@ -21,11 +21,9 @@ void WriteShortArray(std::ostream& file, const std::string& name, const std::str
                      const std::vector<Color>& data, unsigned int items_per_row);
 void WriteShortArray4Bit(std::ostream& file, const std::string& name, const std::string& append,
                      const std::vector<unsigned char>& data, unsigned int items_per_row);
-void WriteShortPtrArray(std::ostream& file, const std::string& name, const std::string& append,
-                        const std::vector<std::string>& names, unsigned short items_per_row);
-void WriteShortPtrArray(std::ostream& file, const std::string& name, const std::string& append,
-                        const std::vector<std::string>& names, const std::string& name_append,
-                        unsigned short items_per_row);
+void WriteAnimationArray(std::ostream& file, const std::string& type, const std::string& name,
+                         const std::string& append, const std::vector<std::string>& ptr_names,
+                         unsigned int items_per_row);
 
 
 void WriteCharArray(std::ostream& file, const std::string& name, const std::string& append,

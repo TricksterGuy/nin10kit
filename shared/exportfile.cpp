@@ -79,4 +79,16 @@ void ExportFile::AddImageInfo(const std::string& filename, int scene, int width,
 void ExportFile::Add(std::shared_ptr<Exportable>& image)
 {
     exportables.push_back(image);
+    // Get list of images this exportable contains
+    image->GetImages(images);
+}
+
+
+std::map<std::string, std::vector<Image*>> ExportFile::GetAnimatedImages() const
+{
+    std::map<std::string, std::vector<Image*>> ret;
+    /// TODO possibly sort with frame being key.
+    for (Image* image : images)
+        ret[image->name].push_back(image);
+    return ret;
 }

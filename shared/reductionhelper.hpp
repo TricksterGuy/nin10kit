@@ -27,6 +27,8 @@
 #include "color.hpp"
 #include "Logger.hpp"
 
+class Image;
+
 class Exportable
 {
     public:
@@ -34,6 +36,7 @@ class Exportable
         virtual ~Exportable() {};
         virtual void WriteData(std::ostream& file) const = 0;
         virtual void WriteExport(std::ostream& file) const = 0;
+        virtual void GetImages(std::vector<Image*>& images) {};
 };
 
 class Image : public Exportable
@@ -42,13 +45,20 @@ class Image : public Exportable
         Image(unsigned int _width, unsigned int _height, const std::string& _name = "", const std::string& _filename = "", unsigned int _frame = 0, bool _animated = false) :
             width(_width), height(_height), name(_name), filename(_filename), frame(_frame), animated(_animated)
         {
-            std::stringstream oss(name);
-            if (animated) oss << frame;
-            export_name = oss.str();
+            if (animated)
+            {
+                std::stringstream oss;
+                oss << name << frame;
+                export_name = oss.str();
+            }
+            else
+                export_name = name;
         }
         Image(const Image& image) : width(image.width), height(image.height), name(image.name), filename(image.filename), frame(image.frame),
             animated(image.animated), export_name(image.export_name) {}
         virtual ~Image() {}
+        void GetImages(std::vector<Image*>& images) {images.push_back(this);}
+        virtual void WriteCommonExport(std::ostream& file) const = 0;
         unsigned int width;
         unsigned int height;
         std::string name;
@@ -64,7 +74,11 @@ class Scene : public Exportable
     public:
         Scene(const std::string& _name) : name(_name) {}
         virtual ~Scene() {}
-        const std::vector<std::unique_ptr<Image>>& GetImages() const {return images;}
+        void GetImages(std::vector<Image*>& imagesList)
+        {
+            for (const auto& image : images)
+                imagesList.push_back(image.get());
+        }
         virtual void WriteData(std::ostream& file) const
         {
             for (const auto& image : images)
@@ -86,6 +100,7 @@ class Image32Bpp : public Image
         Image32Bpp(const Magick::Image& image, const std::string& name, const std::string& filename, unsigned int frame, bool animated);
         unsigned int Size() const {return width * height;};
         void WriteData(std::ostream& file) const;
+        void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         bool has_alpha;
         std::vector<unsigned char> pixels;
@@ -100,6 +115,7 @@ class Image16Bpp : public Image
         void GetColors(std::vector<Color>::iterator& color_ptr) const;
         unsigned int Size() const {return width * height;};
         void WriteData(std::ostream& file) const;
+        void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         Image16Bpp SubImage(unsigned int x, unsigned int y, unsigned int width, unsigned int height) const;
         std::vector<unsigned short> pixels;
@@ -139,6 +155,7 @@ class Image8Bpp : public Image
         Image8Bpp(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette);
         unsigned int Size() const {return width * height / 2;};
         void WriteData(std::ostream& file) const;
+        void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         std::vector<unsigned char> pixels;
         std::shared_ptr<Palette> palette;
@@ -259,6 +276,7 @@ class Map : public Image
         unsigned int Size() const {return data.size();};
         unsigned int Type() const {return (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1;};
         void WriteData(std::ostream& file) const;
+        void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         std::vector<unsigned short> data;
         std::shared_ptr<Tileset> tileset;
@@ -286,6 +304,7 @@ class Sprite : public Image
         unsigned int Size() const {return width * height;};
         void UsePalette(const PaletteBank& bank);
         void WriteData(std::ostream& file) const;
+        void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         void WriteTile(unsigned char* arr, int x, int y) const;
         std::vector<GBATile> data;

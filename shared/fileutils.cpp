@@ -102,27 +102,15 @@ void WriteElement(std::ostream& file, const std::string& data, unsigned int size
     }
 }
 
-void WriteShortPtrArray(std::ostream& file, const std::string& name, const std::string& append, const std::vector<std::string>& names, unsigned short items_per_row)
+void WriteAnimationArray(std::ostream& file, const std::string& type, const std::string& name,
+                         const std::string& append, const std::vector<std::string>& ptr_names,
+                         unsigned int items_per_row)
 {
-    VerboseLog("Writing short array %s%s size %zd", name.c_str(), append.c_str(), names.size());
-    file << "const unsigned short* " << name << append << "[" << names.size() << "] =\n{\n\t";
-    for (unsigned int i = 0; i < names.size(); i++)
+    VerboseLog("Writing Animation %s array %s%s size %zd", type.c_str(), name.c_str(), append.c_str(), ptr_names.size());
+    file << type << " " << name << append << "[" << ptr_names.size() << "] =\n{\n\t";
+    for (unsigned int i = 0; i < ptr_names.size(); i++)
     {
-        const std::string& data_read = names[i];
-        WriteElement(file, data_read, names.size(), i, items_per_row);
-    }
-    file << "\n};\n";
-}
-
-void WriteShortPtrArray(std::ostream& file, const std::string& name, const std::string& append, const std::vector<std::string>& names, const std::string& name_append,
-                        unsigned short items_per_row)
-{
-    VerboseLog("Writing short ptr array %s%s size %zd", name.c_str(), append.c_str(), names.size());
-    file << "const unsigned short* " << name << append << "[" << names.size() << "] =\n{\n\t";
-    for (unsigned int i = 0; i < names.size(); i++)
-    {
-        const std::string data_read = names[i] + name_append;
-        WriteElement(file, data_read, names.size(), i, items_per_row);
+        WriteElement(file, ptr_names[i], ptr_names.size(), i, items_per_row);
     }
     file << "\n};\n";
 }

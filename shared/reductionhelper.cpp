@@ -166,7 +166,7 @@ void ColorArray::Set(const std::vector<Color>& _colors)
 
 int ColorArray::Search(const Color& a) const
 {
-    register double bestd = DBL_MAX;
+    double bestd = DBL_MAX;
     int index = -1;
 
     if (colorIndexCache.find(a) != colorIndexCache.end())

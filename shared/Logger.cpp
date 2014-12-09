@@ -47,15 +47,7 @@ inline const char* GetLogColor(LogLevel level)
     }
 }
 
-void AbstractLogger::Log(LogLevel level, const std::string& format, ...)
-{
-    va_list argptr;
-    va_start(argptr, format);
-    Log(level, format, argptr);
-    va_end(argptr);
-}
-
-void AbstractLogger::Log(LogLevel level, const std::string& format, va_list ap)
+void AbstractLogger::Log(LogLevel level, const char* format, va_list ap)
 {
     if (level > log_level)
         return;
@@ -65,16 +57,16 @@ void AbstractLogger::Log(LogLevel level, const std::string& format, va_list ap)
     char buffer[128];
     strftime(buffer, 128, "%H:%M:%S", localtime(&curTime.tv_sec));
     char currentTime[128] = "";
-    snprintf(currentTime, 128, "%s:%ld", buffer, curTime.tv_usec);
+    snprintf(currentTime, 128, "%s:%ld", buffer, (long)curTime.tv_usec);
     (*out) << GetLogColor(level) << GetLogAbbrev(level) << "[" << currentTime << "] ";
 
     DoLog(level, format, ap);
 }
 
-void Logger::DoLog(LogLevel level, const std::string& format, va_list ap)
+void Logger::DoLog(LogLevel level, const char* format, va_list ap)
 {
     char buffer[1024];
-    vsnprintf(buffer, 1024, format.c_str(), ap);
+    vsnprintf(buffer, 1024, format, ap);
     (*out) << buffer << "\n";
     if (level == LogLevel::FATAL) exit(EXIT_FAILURE);
 }

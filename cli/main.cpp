@@ -150,8 +150,8 @@ bool Nin10KitApp::OnInit()
 
     // Give me the invocation
     std::ostringstream out;
-    for (int i = 1; i < wxAppConsole::argc; i++)
-        out << wxAppConsole::argv[i] << " ";
+    for (int i = 1; i < argc; i++)
+        out << argv[i].ToStdString() << " ";
 
     header.SetInvocation(out.str());
     implementation.SetInvocation(out.str());

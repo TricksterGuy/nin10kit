@@ -34,7 +34,8 @@ option(ENABLE_DEBUG "Build debug version" OFF)
 IF(ENABLE_DEBUG)
     set(CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
 ELSE()
-    set(CMAKE_CXX_FLAGS "-O3 -s -Wall -std=c++11")
+    set(CMAKE_CXX_FLAGS "-O3 -Wall -std=c++11")
+    set(CMAKE_EXE_LINKER_FLAGS "-s")
 ENDIF(ENABLE_DEBUG)
 
 # Source files definition
@@ -73,6 +74,8 @@ include_directories(${nin10kit_SOURCE_DIR}/shared)
 include_directories(${ImageMagick_INCLUDE_DIRS})
 link_directories(${nin10kit_SOURCE_DIR}/shared)
 
+add_definitions(-DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16)
+
 add_library(
 	shared_files
 	STATIC
@@ -81,7 +84,6 @@ add_library(
 
 target_link_libraries(
 	shared_files
-	${ImageMagick_LIBRARIES}
 )
 
 add_executable(
@@ -91,7 +93,9 @@ add_executable(
 
 target_link_libraries(
 	nin10kit
+	m
 	shared_files
+	${ImageMagick_LIBRARIES}
    	${wxWidgets_LIBRARIES}
 )
 

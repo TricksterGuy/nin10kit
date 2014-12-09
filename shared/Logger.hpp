@@ -19,9 +19,8 @@ class AbstractLogger
     public:
         AbstractLogger(std::ostream* target = &std::cerr) : out(target), log_level(LogLevel::INFO) {}
         virtual ~AbstractLogger() {}
-        void Log(LogLevel level, const std::string& format, ...);
-        void Log(LogLevel level, const std::string& format, va_list ap);
-        virtual void DoLog(LogLevel level, const std::string& format, va_list ap) {}
+        void Log(LogLevel level, const char* format, va_list ap);
+        virtual void DoLog(LogLevel level, const char* format, va_list ap) {}
         void SetLogTarget(std::ostream* stream) {out = stream;}
         void SetLogLevel(LogLevel level) {log_level = level;}
     protected:
@@ -33,7 +32,7 @@ class AbstractLogger
 class Logger : public AbstractLogger
 {
     public:
-        virtual void DoLog(LogLevel level, const std::string& format, va_list ap);
+        virtual void DoLog(LogLevel level, const char* format, va_list ap);
 };
 
 
@@ -41,7 +40,7 @@ extern std::unique_ptr<AbstractLogger> logger;
 
 void SetLogger(AbstractLogger* logobj);
 
-static inline void Log(LogLevel level, const std::string& format, ...)
+static inline void Log(LogLevel level, const char* format, ...)
 {
     va_list argptr;
     va_start(argptr, format);
@@ -49,12 +48,12 @@ static inline void Log(LogLevel level, const std::string& format, ...)
     va_end(argptr);
 }
 
-static inline void Log(LogLevel level, const std::string& format, va_list arg)
+static inline void Log(LogLevel level, const char* format, va_list arg)
 {
     logger->Log(level, format, arg);
 }
 
-static inline void FatalLog(const std::string& format, ...)
+static inline void FatalLog(const char* format, ...)
 {
     va_list argptr;
     va_start(argptr, format);
@@ -62,7 +61,7 @@ static inline void FatalLog(const std::string& format, ...)
     va_end(argptr);
 }
 
-static inline void DebugLog(const std::string& format, ...)
+static inline void DebugLog(const char* format, ...)
 {
     va_list argptr;
     va_start(argptr, format);
@@ -70,7 +69,7 @@ static inline void DebugLog(const std::string& format, ...)
     va_end(argptr);
 }
 
-static inline void WarnLog(const std::string& format, ...)
+static inline void WarnLog(const char* format, ...)
 {
     va_list argptr;
     va_start(argptr, format);
@@ -78,7 +77,7 @@ static inline void WarnLog(const std::string& format, ...)
     va_end(argptr);
 }
 
-static inline void InfoLog(const std::string& format, ...)
+static inline void InfoLog(const char* format, ...)
 {
     va_list argptr;
     va_start(argptr, format);
@@ -86,7 +85,7 @@ static inline void InfoLog(const std::string& format, ...)
     va_end(argptr);
 }
 
-static inline void VerboseLog(const std::string& format, ...)
+static inline void VerboseLog(const char* format, ...)
 {
     va_list argptr;
     va_start(argptr, format);

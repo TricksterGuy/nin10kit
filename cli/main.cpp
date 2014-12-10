@@ -48,16 +48,20 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
         wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
     // Modes
-    {wxCMD_LINE_OPTION, "mode", "mode", "Special Mode String (-mode=(0,3,4,tiles,map,sprites))",
+    {wxCMD_LINE_OPTION, "mode", "mode", "Special Mode String -mode=(one of 0,3,4,tiles,map,sprites,lut)",
         wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_OPTION, "device", "device", "Special Device String (-device=(gba, ds, 3ds))",
         wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_OPTION, "bpp", "bpp", "Bits per pixel only for use with -mode0 or -sprites (Default 8).",
         wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
+    // Lut options
+    {wxCMD_LINE_OPTION, "func", "func", "--func=function_name,input_type,output_type,start,end[,step] adds lookup table for function",
+        wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE},
+
     // General helpful options
     {wxCMD_LINE_OPTION, "output_dir", "output_dir", "output directory for exported files", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "names", "names", "(Usage -names=name1,name2) Renames output array names to names given. If this is used each image given must be renamed. "
+    {wxCMD_LINE_OPTION, "names", "names", "(Usage -names=name1,name2) Renames output array names to names given. If this is used each object/image given must be renamed. "
         "If not given then the file names of the images will be used to generate the name.", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_OPTION, "resize", "resize", "(Usage -resize=wxh,wxh2) Resize images to wxh must be given for all images "
     "(example -resize=10x12,,72x42 first image=10,12, second image is not resized, last image=72x42 )", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
@@ -119,7 +123,7 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
         "These values affects which colors are chosen by the median cut algorithm used to reduce the number "
         "of colors in the image.", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
 
-    {wxCMD_LINE_PARAM,  NULL, NULL, "output array name and input file(s)", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE},
+    {wxCMD_LINE_PARAM,  NULL, NULL, "output filename / input file(s)", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE},
     {wxCMD_LINE_NONE}
 };
 
@@ -210,6 +214,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     params.weights = parse.GetListInt("weights", {25, 25, 25, 25});
 
     std::string export_file = parser.GetParam(0).ToStdString();
+    params.export_file = Chop(export_file);
     params.filename = params.output_dir.empty() ? export_file : params.output_dir + Chop(export_file);
     params.symbol_base_name = Sanitize(export_file);
     InfoLog("Exporting to %s symbol base name is %s", params.filename.c_str(), params.symbol_base_name.c_str());
@@ -229,7 +234,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
         FatalLog("No mode set.");
 
     if (params.files.empty())
-        FatalLog("You must specify an output array/filename and a list of image files you want to export.");
+        FatalLog("You must specify an output filename and a list of image files you want to export.");
 
     if (params.names.empty())
     {

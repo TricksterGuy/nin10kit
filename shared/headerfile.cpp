@@ -12,7 +12,6 @@ HeaderFile header;
 void HeaderFile::Write(std::ostream& file)
 {
     ExportFile::Write(file);
-    const char* img_type = params.device == "3DS" ? "const unsigned char*" : "const unsigned short*";
 
     WriteHeaderGuard(file, params.symbol_base_name, "_H");
 
@@ -32,23 +31,23 @@ void HeaderFile::Write(std::ostream& file)
         WriteDefine(file, params.symbol_base_name, "_PALETTE_OFFSET ", params.offset);
         ok_newline = true;
     }
+    if (ok_newline) WriteNewLine(file);
+
+    for (const auto& exportable : exportables)
+        exportable->WriteExport(file);
+
     for (unsigned int i = 0; i < params.names.size(); i++)
     {
         const std::string& name = params.names[i];
         unsigned int frames = name_frames[name].size();
         if (frames <= 1) continue;
-        ok_newline = true;
+        const std::string& img_type = name_frames[name][0]->GetImageType();
+        WriteExtern(file, img_type, name, "_frames", frames);
+        WriteDefine(file, name, "_FRAMES", frames);
         // Write the common #defines here.
         name_frames[name][0]->WriteCommonExport(file);
-        WriteDefine(file, name, "_FRAMES", frames);
-        WriteExtern(file, img_type, name, "_frames", frames);
-
         WriteNewLine(file);
     }
-    if (ok_newline) WriteNewLine(file);
-
-    for (const auto& exportable : exportables)
-        exportable->WriteExport(file);
 
     WriteEndHeaderGuard(file);
     WriteNewLine(file);

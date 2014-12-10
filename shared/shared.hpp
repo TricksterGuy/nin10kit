@@ -24,6 +24,7 @@ struct ExportParams
     std::string mode;
     std::string device;
     std::string output_dir;
+    std::string export_file; // Export filename sans extension.
     std::string filename; // Full path to exported file.
     std::string symbol_base_name; // base name of generated symbols <sbn>_palette, <sbn>_map etc.
 

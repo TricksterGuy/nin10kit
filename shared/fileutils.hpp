@@ -36,5 +36,6 @@ void WriteNewLine(std::ostream& file);
 void WriteDefine(std::ostream& file, const std::string& name, const std::string& append, int value);
 void WriteDefine(std::ostream& file, const std::string& name, const std::string& append, int value, int shift);
 void WriteDefine(std::ostream& file, const std::string& name, const std::string& append, const std::string& value);
+void WriteInclude(std::ostream& file, const std::string& filename);
 
 #endif

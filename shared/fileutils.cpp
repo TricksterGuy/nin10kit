@@ -150,6 +150,11 @@ void WriteHeaderGuard(std::ostream& file, const std::string& name, const std::st
     file << "#define " << name_cap << append << "\n\n";
 }
 
+void WriteInclude(std::ostream& file, const std::string& filename)
+{
+    file << "#include \"" << filename << "\"\n";
+}
+
 void WriteEndHeaderGuard(std::ostream& file)
 {
     VerboseLog("Writing end of header guard");

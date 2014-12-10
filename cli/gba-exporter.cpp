@@ -8,6 +8,7 @@
 void DoMode0Export(const std::vector<Image16Bpp>& images);
 void DoMode3Export(const std::vector<Image16Bpp>& images);
 void DoMode4Export(const std::vector<Image16Bpp>& images);
+void DoPaletteExport(const std::vector<Image16Bpp>& images);
 void DoTilesetExport(const std::vector<Image16Bpp>& images);
 void DoMapExport(const std::vector<Image16Bpp>& images, const std::vector<Image16Bpp>& tilesets);
 void DoSpriteExport(const std::vector<Image16Bpp>& images);
@@ -45,6 +46,8 @@ void DoGBAExport(const std::vector<Image32Bpp>& images32, const std::vector<Imag
         DoTilesetExport(images);
     else if (params.mode == "MAP")
         DoMapExport(images, tilesets);
+    else if (params.mode == "PALETTE")
+        DoPaletteExport(images);
     else
         FatalLog("No/Invalid mode specified image not exported");
 }
@@ -101,6 +104,16 @@ void DoMode4Export(const std::vector<Image16Bpp>& images)
         header.Add(scene);
         implementation.Add(scene);
     }
+}
+
+void DoPaletteExport(const std::vector<Image16Bpp>& images)
+{
+    // Dummy scene
+    Image8BppScene scene(images, params.symbol_base_name);
+
+    auto exportable = std::static_pointer_cast<Exportable>(scene.palette);
+    header.Add(exportable);
+    implementation.Add(exportable);
 }
 
 void DoSpriteExport(const std::vector<Image16Bpp>& images)

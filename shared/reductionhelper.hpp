@@ -59,6 +59,8 @@ class Image : public Exportable
         virtual ~Image() {}
         void GetImages(std::vector<Image*>& images) {images.push_back(this);}
         virtual void WriteCommonExport(std::ostream& file) const = 0;
+        virtual std::string GetImageType() const {return "const unsigned short*";}
+        virtual std::string GetExportName() const {return export_name;}
         unsigned int width;
         unsigned int height;
         std::string name;
@@ -102,6 +104,7 @@ class Image32Bpp : public Image
         void WriteData(std::ostream& file) const;
         void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
+        virtual std::string GetImageType() const {return "const unsigned char*";}
         bool has_alpha;
         std::vector<unsigned char> pixels;
 };
@@ -306,6 +309,8 @@ class Sprite : public Image
         void WriteData(std::ostream& file) const;
         void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
+        virtual std::string GetImageType() const {return "const unsigned short";}
+        virtual std::string GetExportName() const;
         void WriteTile(unsigned char* arr, int x, int y) const;
         std::vector<GBATile> data;
         std::shared_ptr<Palette> palette;

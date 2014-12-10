@@ -1029,8 +1029,8 @@ Sprite::Sprite(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette
     unsigned int key = (log2(width) << 2) | log2(height);
     shape = sprite_shapes[key];
     size = sprite_sizes[key];
-    if (size == -1)
-        FatalLog("Invalid sprite size, (%d %d) Please fix", width, height);
+    if (size == -1 || image.width & 7 || image.height & 7)
+        FatalLog("Invalid sprite size, (%d %d) Please fix", image.width, image.height);
 
     for (unsigned int i = 0; i < data.size(); i++)
     {
@@ -1047,8 +1047,8 @@ Sprite::Sprite(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.
     unsigned int key = (log2(width) << 2) | log2(height);
     shape = sprite_shapes[key];
     size = sprite_sizes[key];
-    if (size == -1)
-        FatalLog("Invalid sprite size, (%d %d) Please fix", width, height);
+    if (size == -1 || image.width & 7 || image.height & 7)
+        FatalLog("Invalid sprite size, (%d %d) Please fix", image.width, image.height);
 
     // bpp reduce minus one for the transparent color
     int num_colors = (1 << bpp) - 1;
@@ -1120,6 +1120,11 @@ void Sprite::WriteExport(std::ostream& file) const
     }
     WriteDefine(file, export_name, "_ID", offset | (params.for_bitmap ? 512 : 0));
     WriteNewLine(file);
+}
+
+std::string Sprite::GetExportName() const
+{
+    return ToUpper(export_name) + "_ID";
 }
 
 void Sprite::WriteData(std::ostream& file) const

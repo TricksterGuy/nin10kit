@@ -1115,8 +1115,8 @@ void Sprite::WriteExport(std::ostream& file) const
         WriteDefine(file, export_name, "_PALETTE", palette_bank, 12);
     if (!animated)
     {
-        WriteDefine(file, export_name, "_SHAPE", shape, 14);
-        WriteDefine(file, export_name, "_SIZE", size, 14);
+        WriteDefine(file, export_name, "_SPRITE_SHAPE", shape, 14);
+        WriteDefine(file, export_name, "_SPRITE_SIZE", size, 14);
     }
     WriteDefine(file, export_name, "_ID", offset | (params.for_bitmap ? 512 : 0));
     WriteNewLine(file);

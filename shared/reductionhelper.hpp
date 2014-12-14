@@ -25,19 +25,8 @@
 #define SIZE_SBB_SHORTS 1024
 
 #include "color.hpp"
-#include "Logger.hpp"
-
-class Image;
-
-class Exportable
-{
-    public:
-        Exportable() {}
-        virtual ~Exportable() {};
-        virtual void WriteData(std::ostream& file) const = 0;
-        virtual void WriteExport(std::ostream& file) const = 0;
-        virtual void GetImages(std::vector<Image*>& images) {};
-};
+#include "exportable.hpp"
+#include "logger.hpp"
 
 class Image : public Exportable
 {
@@ -57,7 +46,6 @@ class Image : public Exportable
         Image(const Image& image) : width(image.width), height(image.height), name(image.name), filename(image.filename), frame(image.frame),
             animated(image.animated), export_name(image.export_name) {}
         virtual ~Image() {}
-        void GetImages(std::vector<Image*>& images) {images.push_back(this);}
         virtual void WriteCommonExport(std::ostream& file) const = 0;
         virtual std::string GetImageType() const {return "const unsigned short*";}
         virtual std::string GetExportName() const {return export_name;}
@@ -76,11 +64,7 @@ class Scene : public Exportable
     public:
         Scene(const std::string& _name) : name(_name) {}
         virtual ~Scene() {}
-        void GetImages(std::vector<Image*>& imagesList)
-        {
-            for (const auto& image : images)
-                imagesList.push_back(image.get());
-        }
+        std::vector<std::unique_ptr<Image>>& GetImages() {return images;}
         virtual void WriteData(std::ostream& file) const
         {
             for (const auto& image : images)

@@ -18,9 +18,9 @@
 #include "headerfile.hpp"
 #include "fileutils.hpp"
 #include "implementationfile.hpp"
-#include "Logger.hpp"
+#include "logger.hpp"
 #include "reductionhelper.hpp"
-#include "Scanner.hpp"
+#include "scanner.hpp"
 #include "shared.hpp"
 #include "version.h"
 

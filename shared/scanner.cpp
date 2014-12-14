@@ -1,7 +1,7 @@
-#include "Scanner.hpp"
-#include "Logger.hpp"
+#include "scanner.hpp"
+#include "logger.hpp"
 
-bool Scanner::Next(int32_t& var, int base)
+bool Scanner::Next(int& var, int base)
 {
     if (!HasMoreTokens()) return false;
 
@@ -10,11 +10,11 @@ bool Scanner::Next(int32_t& var, int base)
     long ret;
     if (!token.ToLong(&ret, base)) return false;
 
-    var = (int32_t) ret;
+    var = ret;
     return true;
 }
 
-bool Scanner::Next(uint32_t& var, int base)
+bool Scanner::Next(unsigned int& var, int base)
 {
     if (!HasMoreTokens()) return false;
 
@@ -23,7 +23,7 @@ bool Scanner::Next(uint32_t& var, int base)
     unsigned long ret;
     if (!token.ToULong(&ret, base)) return false;
 
-    var = (uint32_t) ret;
+    var = ret;
     return true;
 }
 
@@ -37,6 +37,18 @@ bool Scanner::Next(float& var)
     if (!token.ToDouble(&ret)) return false;
 
     var = (float) ret;
+
+    return true;
+}
+
+bool Scanner::Next(double& var)
+{
+    if (!HasMoreTokens()) return false;
+
+    wxString token = GetNextToken();
+    VerboseLog("Read double %s", static_cast<const char*>(token.c_str()));
+
+    if (!token.ToDouble(&var)) return false;
 
     return true;
 }

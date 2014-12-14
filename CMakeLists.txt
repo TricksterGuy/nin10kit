@@ -48,10 +48,11 @@ set(SRC_SHARED
     shared/headerfile.cpp
     shared/histogram.cpp
     shared/implementationfile.cpp
-    shared/Logger.cpp
+    shared/logger.cpp
+    shared/lutgen.cpp
     shared/mediancut.cpp
     shared/reductionhelper.cpp
-    shared/Scanner.cpp
+    shared/scanner.cpp
     shared/shared.cpp
 )
 

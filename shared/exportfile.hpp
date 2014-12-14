@@ -36,8 +36,6 @@ class ExportFile
         int transparent_color;
         std::string mode;
         std::vector<std::shared_ptr<Exportable>> exportables;
-        // Owned by above vector. An exportable may have multiple images.
-        std::vector<Image*> images;
 
         std::map<std::string, std::vector<Image*>> GetAnimatedImages() const;
 };

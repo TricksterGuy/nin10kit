@@ -14,20 +14,20 @@
 
 const int sprite_shapes[16] =
 {
-//h =  1,  2, 4,  8
-    0,  2, 2, -1, // width = 1
-    1,  0, 2, -1, // width = 2
-    1,  1, 0,  2, // width = 4
-    -1, -1, 1,  0  // width = 8
+//h = 1,  2, 4,  8
+      0,  2, 2, -1, // width = 1
+      1,  0, 2, -1, // width = 2
+      1,  1, 0,  2, // width = 4
+     -1, -1, 1,  0  // width = 8
 };
 
 const int sprite_sizes[16] =
 {
-//h =  1,  2, 4,  8
-    0,  0, 1, -1, // width = 1
-    0,  1, 2, -1, // width = 2
-    1,  2, 2,  3, // width = 4
-    -1, -1, 3,  3  // width = 8
+//h = 1,  2, 4,  8
+      0,  0, 1, -1, // width = 1
+      0,  1, 2, -1, // width = 2
+      1,  2, 2,  3, // width = 4
+     -1, -1, 3,  3  // width = 8
 };
 
 Image32Bpp::Image32Bpp(const Magick::Image& image, const std::string& name, const std::string& filename, unsigned int frame, bool animated) :
@@ -1115,8 +1115,8 @@ void Sprite::WriteExport(std::ostream& file) const
         WriteDefine(file, export_name, "_PALETTE", palette_bank, 12);
     if (!animated)
     {
-        WriteDefine(file, export_name, "_SHAPE", shape, 14);
-        WriteDefine(file, export_name, "_SIZE", size, 14);
+        WriteDefine(file, export_name, "_SPRITE_SHAPE", shape, 14);
+        WriteDefine(file, export_name, "_SPRITE_SIZE", size, 14);
     }
     WriteDefine(file, export_name, "_ID", offset | (params.for_bitmap ? 512 : 0));
     WriteNewLine(file);

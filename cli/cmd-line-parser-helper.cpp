@@ -1,6 +1,6 @@
 #include "cmd-line-parser-helper.hpp"
-#include "Scanner.hpp"
-#include "Logger.hpp"
+#include "scanner.hpp"
+#include "logger.hpp"
 
 bool CmdLineParserHelper::GetSwitch(const std::string& param)
 {

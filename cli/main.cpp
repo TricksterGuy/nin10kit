@@ -250,7 +250,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
 
     for (const auto& resize_str : resizes)
     {
-        int32_t w = -1, h = -1;
+        int w = -1, h = -1;
         if (!resize_str.empty())
         {
             Scanner scan(resize_str, "x");

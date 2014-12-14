@@ -33,7 +33,7 @@ const std::map<std::string, LutFunc> function_map =
     {"lgamma", lgamma},
 };
 
-const std::map<std::string, int32_t> type_map = {
+const std::map<std::string, int> type_map = {
     {"char",    0},
     {"byte",    0},
     {"short",   1},
@@ -45,8 +45,8 @@ unsigned char parse_fixed_type(const std::string& type_str)
 {
     Scanner scan(type_str, ".");
     std::string type;
-    int32_t size;
-    int32_t fixed_size = 0;
+    int size;
+    int fixed_size = 0;
 
     if (!scan.Next(type))
         FatalLog("Unable to parse type string %s", type_str.c_str());

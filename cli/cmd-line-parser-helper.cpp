@@ -64,7 +64,7 @@ std::vector<int> CmdLineParserHelper::GetListInt(const std::string& param, const
     Scanner scan(list.ToStdString(), ",");
     while (scan.HasMoreTokens())
     {
-        int32_t var;
+        int var;
         if (!scan.Next(var))
             FatalLog("Error parsing param %s", param.c_str());
         ret.push_back(var);

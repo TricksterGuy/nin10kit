@@ -8,6 +8,7 @@
 
 #include "headerfile.hpp"
 #include "implementationfile.hpp"
+#include "lutgen.hpp"
 #include "reductionhelper.hpp"
 
 struct resize
@@ -28,6 +29,7 @@ struct ExportParams
     std::string filename; // Full path to exported file.
     std::string symbol_base_name; // base name of generated symbols <sbn>_palette, <sbn>_map etc.
 
+    std::vector<LutSpecification> functions;
     std::vector<std::string> files;
     std::vector<std::string> tilesets;
     std::vector<Image32Bpp> images;

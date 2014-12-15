@@ -19,6 +19,7 @@
 #include "fileutils.hpp"
 #include "implementationfile.hpp"
 #include "logger.hpp"
+#include "lutgen.hpp"
 #include "reductionhelper.hpp"
 #include "scanner.hpp"
 #include "shared.hpp"
@@ -27,6 +28,7 @@
 void DoGBAExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
 void DoDSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
 void Do3DSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
+void DoLUTExport(const std::vector<LutSpecification>& functions);
 
 class Nin10KitApp : public wxAppConsole
 {
@@ -56,8 +58,8 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
         wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
     // Lut options
-    {wxCMD_LINE_OPTION, "func", "func", "--func=function_name,input_type,output_type,start,end[,step] adds lookup table for function",
-        wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE},
+    {wxCMD_LINE_OPTION, "func", "func", "--func=function_name,type,start,end,step[,in_degrees=false] adds lookup table for function",
+        wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
 
     // General helpful options
     {wxCMD_LINE_OPTION, "output_dir", "output_dir", "output directory for exported files", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
@@ -191,6 +193,8 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     params.device = ToUpper(parse.GetString("device", "GBA"));
     params.bpp = parse.GetInt("bpp", 8);
 
+    std::string function = parse.GetString("func");
+
     // Helpful options
     params.output_dir = parse.GetString("output_dir");
     params.names = parse.GetListString("names");
@@ -232,6 +236,31 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
 
     if (params.mode.empty())
         FatalLog("No mode set.");
+
+    if (params.mode == "LUT")
+    {
+        if (!params.files.empty())
+            WarnLog("Ignoring files passed in, currently generating look up tables");
+
+        if (function.empty())
+            FatalLog("Must specify function to generate look up table for.");
+
+        params.functions.push_back(LutSpecification(function));
+
+        if (params.names.empty())
+        {
+            for (const auto& func : params.functions)
+                params.names.push_back(func.function + "_table");
+        }
+
+        if (params.names.size() != params.functions.size())
+            FatalLog("Incorrect number of override names given %d != %d, this must be equal to the number of lut functions", params.names.size(), params.functions.size());
+
+        return true;
+    }
+
+    if (!params.functions.empty())
+        WarnLog("Ignoring functions passed in, currently exporting images");
 
     if (params.files.empty())
         FatalLog("You must specify an output filename and a list of image files you want to export.");
@@ -362,7 +391,9 @@ bool Nin10KitApp::DoExportImages()
     header.SetMode(params.mode);
     implementation.SetMode(params.mode);
 
-    if (params.device == "GBA")
+    if (params.mode == "LUT")
+        DoLUTExport(params.functions);
+    else if (params.device == "GBA")
         DoGBAExport(params.images, params.tileset_images);
     else if (params.device == "DS")
         DoDSExport(params.images, params.tileset_images);

@@ -1,8 +1,13 @@
 #include "lutgen.hpp"
 
 #include <cmath>
-#include "scanner.hpp"
+#include <iomanip>
+#include <sstream>
+
+#include "fileutils.hpp"
 #include "logger.hpp"
+#include "scanner.hpp"
+#include "shared.hpp"
 
 const std::map<std::string, LutFunc> function_map =
 {
@@ -33,46 +38,57 @@ const std::map<std::string, LutFunc> function_map =
     {"lgamma", lgamma},
 };
 
-const std::map<std::string, int> type_map = {
-    {"char",    0},
-    {"byte",    0},
-    {"short",   1},
-    {"int",     2},
-    {"long",    3},
+const std::map<std::string, LutType> type_map = {
+    {"char",  LutType::CHAR},
+    {"byte",  LutType::CHAR},
+    {"short", LutType::SHORT},
+    {"int",   LutType::INT},
+    {"long",  LutType::LONG},
 };
 
-unsigned char parse_fixed_type(const std::string& type_str)
+const std::map<LutType, std::string> type_map_rev = {
+    {LutType::CHAR, "char"},
+    {LutType::SHORT, "short"},
+    {LutType::INT, "int"},
+    {LutType::LONG, "long"},
+};
+
+std::string form_fixed_string(int64_t fixed, const LutIOType& lut_type)
 {
-    Scanner scan(type_str, ".");
-    std::string type;
-    int size;
-    int fixed_size = 0;
+    std::stringstream str;
+    int pad = (lut_type.GetLength() + 3) / 4;
+    if (pad == 0) pad = 1;
+    uint64_t mask = (1L << lut_type.GetLength()) - 1;
+    str << "((" << (fixed >> lut_type.GetLength()) << " << " << lut_type.GetLength() << ") | 0x" << std::setfill('0')
+        << std::setw(pad) << std::hex << (fixed & mask) << ")";
+    return str.str();
+}
 
+LutSpecification::LutSpecification(const std::string& spec)
+{
+    Scanner scan(spec, ",");
+    if (!scan.Next(function))
+        FatalLog("Could not parse function name %s", spec.c_str());
     if (!scan.Next(type))
-        FatalLog("Unable to parse type string %s", type_str.c_str());
-
+        FatalLog("Could not parse type %s", spec.c_str());
+    if (!scan.Next(begin))
+        FatalLog("Could not parse begin %s", spec.c_str());
+    if (!scan.Next(end))
+        FatalLog("Could not parse end %s", spec.c_str());
+    if (!scan.Next(step))
+        FatalLog("Could not parse step %s", spec.c_str());
     if (scan.HasMoreTokens())
     {
-        if (!scan.Next(fixed_size))
-            FatalLog("Unable to parse type string %s", type_str.c_str());
+        if (!scan.Next(in_degrees))
+            FatalLog("Could not parse in_degrees %s", spec.c_str());
     }
-
-    if (type_map.find(type) == type_map.end())
-        FatalLog("Valid data types are char, byte, short, int, and long. %s given", type.c_str());
-    size = type_map.at(type);
-
-    int num_bits = 2 << (size + 3);
-    if (fixed_size >= num_bits);
-        FatalLog("Invalid number given for fixed point %d given >= %d bits", fixed_size, num_bits);
-
-    return size << 6 | fixed_size;
 }
 
 LutFunc::LutFunc(MathFunction func, bool in_radians, bool out_radians) : function(func), input_radians(in_radians), output_radians(out_radians)
 {
 }
 
-double LutFunc::operator()(double value, bool in_degrees)
+double LutFunc::operator()(double value, bool in_degrees) const
 {
     // If function accepts radians and value given is in degrees
     if (input_radians && in_degrees)
@@ -84,7 +100,66 @@ double LutFunc::operator()(double value, bool in_degrees)
     return out;
 }
 
-LutGenerator::LutGenerator(const std::string& _name, const std::string& function_name, bool _in_degrees) : name(_name), in_degrees(_in_degrees)
+LutIOType::LutIOType(const std::string& type_spec) : fixed_length(0)
+{
+    Scanner scan(type_spec, ".");
+    std::string type_str;
+
+    if (!scan.Next(type_str))
+        FatalLog("Unable to parse type string %s", type_spec.c_str());
+
+    if (scan.HasMoreTokens())
+    {
+        if (!scan.Next(fixed_length))
+            FatalLog("Unable to parse type string %s", type_str.c_str());
+    }
+
+    if (type_map.find(type_str) == type_map.end())
+        FatalLog("Valid data types are char, byte, short, int, and long. %s given", type_str.c_str());
+    type = type_map.at(type_str);
+
+    unsigned int num_bits = 2 << ((unsigned int)type + 3);
+    if (fixed_length >= num_bits)
+        FatalLog("Invalid number given for fixed point %d given >= %d bits", fixed_length, num_bits);
+}
+
+double LutIOType::ConvertToDouble(int64_t fixed) const
+{
+    ///TODO fix this
+    double answer = fixed >> fixed_length;
+    int64_t fractional = fixed & ((1 << fixed_length) - 1);
+    double current = 1.0;
+    for (int i = fixed_length; i >= 0; i--)
+    {
+        current /= 2;
+        if (fractional & (1 << i))
+            answer += current;
+    }
+    return answer;
+}
+
+int64_t LutIOType::ConvertToFixed(double fpoint) const
+{
+    int64_t integral = ((int64_t)fpoint) << fixed_length;
+    int64_t fractional = 0;
+    // fpoint should be a decimal
+    fpoint -= (int64_t)fpoint;
+    double current = 1.0;
+    for (unsigned int i = 0; i < fixed_length; i++)
+    {
+        fractional <<= 1;
+        current /= 2;
+        if (fpoint >= current)
+        {
+            fpoint -= current;
+            fractional |= 1;
+        }
+    }
+    return integral | fractional;
+}
+
+
+LutGenerator::LutGenerator(const std::string& name, const std::string& function_name, bool _in_degrees) : Exportable(name), in_degrees(_in_degrees)
 {
     if (function_map.find(function_name) == function_map.end())
         FatalLog("No function named %s can not export LUT", function_name.c_str());
@@ -92,12 +167,16 @@ LutGenerator::LutGenerator(const std::string& _name, const std::string& function
     function = function_map.at(function_name);
 }
 
-FixedLutGenerator::FixedLutGenerator(const std::string& name, const std::string& function, int64_t _begin, int64_t _end, int64_t _step,
-                                     const std::string& input, const std::string& output, bool in_degrees) :
-                                     LutGenerator(name, function, in_degrees), begin(_begin), end(_end), step(_step)
+FixedLutGenerator::FixedLutGenerator(const std::string& name, const std::string& function, double _begin, double _end, double _step,
+                                     const std::string& output, bool in_degrees) :
+                                     LutGenerator(name, function, in_degrees), type(output), begin(_begin), end(_end), step(_step)
 {
-    input_type = parse_fixed_type(input);
-    output_type = parse_fixed_type(output);
+    if (step == 0)
+        FatalLog("Step must be a nonzero value");
+    if (begin >= end)
+        FatalLog("Begin must be less than end");
+    if ((end - begin) / step > LUT_ENTRIES_MAX && !params.force)
+        FatalLog("Will generate %d entries in look up table. If you are sure about this use -force.", end - begin / step);
 }
 
 FixedLutGenerator::~FixedLutGenerator()
@@ -105,14 +184,30 @@ FixedLutGenerator::~FixedLutGenerator()
 
 }
 
-void FixedLutGenerator::WriteData(std::ostream& file) const
-{
-
-}
-
 void FixedLutGenerator::WriteExport(std::ostream& file) const
 {
-
+    unsigned long num_entries = (end - begin) / step;
+    WriteExtern(file, "const " + type_map_rev.at(type.GetType()), name, "", num_entries);
+    WriteDefine(file, name, "_SIZE", num_entries);
+    WriteDefine(file, name, "_BEGIN", form_fixed_string(type.ConvertToFixed(begin), type));
+    WriteDefine(file, name, "_END", form_fixed_string(type.ConvertToFixed(end), type));
+    WriteDefine(file, name, "_STEP", form_fixed_string(type.ConvertToFixed(step), type));
+    WriteNewLine(file);
 }
 
-
+void FixedLutGenerator::WriteData(std::ostream& file) const
+{
+    unsigned int size = (end - begin) / step;
+    double current = begin;
+    file << "const " << type_map_rev.at(type.GetType()) << " " << name << "[" << size << "] =\n{\n\t";
+    for (unsigned int i = 0; i < size; i++)
+    {
+        current = fma(i, step, begin);
+        double out = function(current, in_degrees);
+        int64_t out_value = type.ConvertToFixed(out);
+        VerboseLog("%s(%f) => %f => %ld in_degrees:%d", name.c_str(), current, out, out_value, in_degrees);
+        WriteElement(file, form_fixed_string(out_value, type), size, i, 10);
+    }
+    file << "\n};\n";
+    WriteNewLine(file);
+}

@@ -62,6 +62,7 @@ set(SRC_NIN10KIT
 	cli/ds-exporter.cpp
 	cli/gba-exporter.cpp
 	cli/cmd-line-parser-helper.cpp
+	cli/lut-exporter.cpp
 )
 
 #set(SRC_NIN10KITGUI

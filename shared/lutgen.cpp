@@ -92,7 +92,7 @@ double LutFunc::operator()(double value, bool in_degrees) const
 {
     // If function accepts radians and value given is in degrees
     if (input_radians && in_degrees)
-        value *= 180 / PI;
+        value *= PI / 180;
     double out = function(value);
     // If function outputs radians and value we want to be in degrees
     if (output_radians && in_degrees)
@@ -118,7 +118,7 @@ LutIOType::LutIOType(const std::string& type_spec) : fixed_length(0)
         FatalLog("Valid data types are char, byte, short, int, and long. %s given", type_str.c_str());
     type = type_map.at(type_str);
 
-    unsigned int num_bits = 2 << ((unsigned int)type + 3);
+    unsigned int num_bits = 1 << ((unsigned int)type + 3);
     if (fixed_length >= num_bits)
         FatalLog("Invalid number given for fixed point %d given >= %d bits", fixed_length, num_bits);
 }
@@ -140,6 +140,8 @@ double LutIOType::ConvertToDouble(int64_t fixed) const
 
 int64_t LutIOType::ConvertToFixed(double fpoint) const
 {
+    bool negate = fpoint < 0;
+    fpoint = fabs(fpoint);
     int64_t integral = ((int64_t)fpoint) << fixed_length;
     int64_t fractional = 0;
     // fpoint should be a decimal
@@ -155,7 +157,10 @@ int64_t LutIOType::ConvertToFixed(double fpoint) const
             fractional |= 1;
         }
     }
-    return integral | fractional;
+    uint64_t num_bits = 1 << ((unsigned int)type + 3);
+    int64_t answer = integral | fractional;
+    if (negate) answer = (-answer) & ((1L << num_bits) - 1);
+    return answer;
 }
 
 
@@ -186,7 +191,7 @@ FixedLutGenerator::~FixedLutGenerator()
 
 void FixedLutGenerator::WriteExport(std::ostream& file) const
 {
-    unsigned long num_entries = (end - begin) / step;
+    unsigned long num_entries = (end - begin) / step + 1;
     WriteExtern(file, "const " + type_map_rev.at(type.GetType()), name, "", num_entries);
     WriteDefine(file, name, "_SIZE", num_entries);
     WriteDefine(file, name, "_BEGIN", form_fixed_string(type.ConvertToFixed(begin), type));
@@ -197,7 +202,7 @@ void FixedLutGenerator::WriteExport(std::ostream& file) const
 
 void FixedLutGenerator::WriteData(std::ostream& file) const
 {
-    unsigned int size = (end - begin) / step;
+    unsigned int size = (end - begin) / step + 1;
     double current = begin;
     file << "const " << type_map_rev.at(type.GetType()) << " " << name << "[" << size << "] =\n{\n\t";
     for (unsigned int i = 0; i < size; i++)

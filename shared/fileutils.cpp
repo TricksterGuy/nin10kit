@@ -63,13 +63,10 @@ void WriteShortArray(std::ostream& file, const std::string& name, const std::str
 {
     VerboseLog("Writing short array (from Colors) %s%s size %zd", name.c_str(), append.c_str(), data.size());
     char buffer[7];
-    int x, y, z;
     file << "const unsigned short " << name << append << "[" << data.size() << "] =\n{\n\t";
     for (unsigned int i = 0; i < data.size(); i++)
     {
-        const Color& color = data[i];
-        color.Get(x, y, z);
-        unsigned short data_read = x | (y << 5) | (z << 10);
+        unsigned short data_read = data[i].GetBGR15();
         snprintf(buffer, 7, "0x%04x", data_read);
         WriteElement(file, buffer, data.size(), i, items_per_row);
     }

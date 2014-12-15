@@ -9,6 +9,7 @@
 
 #include "reductionhelper.hpp"
 
+/** Base class for a file created by this program.*/
 class ExportFile
 {
     public:
@@ -36,7 +37,6 @@ class ExportFile
         int transparent_color;
         std::string mode;
         std::vector<std::shared_ptr<Exportable>> exportables;
-
         std::map<std::string, std::vector<Image*>> GetAnimatedImages() const;
 };
 

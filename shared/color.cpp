@@ -1,12 +1,9 @@
 #include "color.hpp"
-
-#include <functional>
-
 #include "cpercep.hpp"
 
 Color::Color(unsigned short color_data)
 {
-    Set(color_data);
+    SetBGR15(color_data);
 }
 
 bool Color::operator<(const Color& right) const
@@ -25,18 +22,16 @@ void Color::Set(int a, int b, int c)
     z = c;
 }
 
-void Color::Set(unsigned short color_data)
+void Color::SetBGR15(unsigned short color_data)
 {
     x = color_data & 0x1f;
     y = (color_data >> 5) & 0x1f;
     z = (color_data >> 10) & 0x1f;
 }
 
-void Color::Get(int& a, int& b, int& c) const
+unsigned short Color::GetBGR15() const
 {
-    a = x;
-    b = y;
-    c = z;
+    return ((int)x) | ((int)y << 5) | ((int)z << 10);
 }
 
 /** Distance in perception.

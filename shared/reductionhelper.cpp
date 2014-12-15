@@ -31,7 +31,7 @@ const int sprite_sizes[16] =
 };
 
 Image32Bpp::Image32Bpp(const Magick::Image& image, const std::string& name, const std::string& filename, unsigned int frame, bool animated) :
-    Image(image.columns(), image.rows(), name, filename, frame, animated), has_alpha(false), pixels(3 * width * height)
+    Image(image.columns(), image.rows(), name, filename, frame, animated), pixels(3 * width * height), has_alpha(false)
 {
     unsigned int num_pixels = width * height;
     const Magick::PixelPacket* imageData = image.getConstPixels(0, 0, image.columns(), image.rows());
@@ -187,19 +187,9 @@ int ColorArray::Search(const Color& a) const
     colorIndexCache[a] = index;
 
     if (bestd != 0)
-    {
-        int x, y, z;
-        a.Get(x, y, z);
-        unsigned short c = x | (y << 5) | (z << 10);
-        VerboseLog("Color remap: Color %d given to palette bank not an exact match.", c);
-    }
+        VerboseLog("Color remap: Color %d given to palette bank not an exact match.", a.GetBGR15());
 
     return index;
-}
-
-int ColorArray::Search(unsigned short color_data) const
-{
-    return Search(Color(color_data));
 }
 
 bool ColorArray::Contains(const ColorArray& palette) const
@@ -221,7 +211,7 @@ void ColorArray::Add(const Color& c)
     }
 }
 
-Palette::Palette(const std::vector<Color>& colors, const std::string& _name) : ColorArray(colors), name(_name)
+Palette::Palette(const std::vector<Color>& colors, const std::string& name) : ColorArray(colors), Exportable(name)
 {
     if (colors.size() + params.offset > 256)
         FatalLog("Too many colors in palette. Found %d colors, offset is %d.", colors.size() + params.offset, params.offset);
@@ -315,7 +305,7 @@ void Image8Bpp::WriteExport(std::ostream& file) const
     WriteNewLine(file);
 }
 
-Image8BppScene::Image8BppScene(const std::vector<Image16Bpp>& images16, const std::string& _name) : Scene(_name), palette(NULL)
+Image8BppScene::Image8BppScene(const std::vector<Image16Bpp>& images16, const std::string& name) : Scene(name), palette(NULL)
 {
     unsigned int total_pixels = 0;
     for (unsigned int i = 0; i < images16.size(); i++)
@@ -365,7 +355,7 @@ void Image8BppScene::WriteExport(std::ostream& file) const
 int PaletteBank::CanMerge(const ColorArray& palette) const
 {
     std::set<Color> tmpset(colorSet);
-    for (const auto& color : palette.colors)
+    for (const auto& color : palette.GetColors())
         tmpset.insert(color);
 
     return 16 - tmpset.size();
@@ -373,21 +363,19 @@ int PaletteBank::CanMerge(const ColorArray& palette) const
 
 void PaletteBank::Merge(const ColorArray& palette)
 {
-    for (const auto& color : palette.colors)
+    for (const auto& color : palette.GetColors())
         Add(color);
 }
 
 std::ostream& operator<<(std::ostream& file, const PaletteBank& bank)
 {
     char buffer[7];
-    std::vector<Color> colors = bank.colors;
+
+    std::vector<Color> colors = bank.GetColors();
     colors.resize(16);
     for (unsigned int i = 0; i < colors.size(); i++)
     {
-        int x, y, z;
-        const Color& color = colors[i];
-        color.Get(x, y, z);
-        unsigned short data_read = x | (y << 5) | (z << 10);
+        unsigned short data_read = colors[i].GetBGR15();
         snprintf(buffer, 7, "0x%04x", data_read);
         WriteElement(file, buffer, colors.size(), i, 8);
     }
@@ -395,13 +383,13 @@ std::ostream& operator<<(std::ostream& file, const PaletteBank& bank)
     return file;
 }
 
-PaletteBankManager::PaletteBankManager(const std::string& _name) : name(_name), banks(16)
+PaletteBankManager::PaletteBankManager(const std::string& name) : Exportable(name), banks(16)
 {
     for (unsigned int i = 0; i < banks.size(); i++)
         banks[i].id = i;
 }
 
-PaletteBankManager::PaletteBankManager(const std::string& _name, const std::vector<PaletteBank>& paletteBanks) : name(_name), banks(paletteBanks)
+PaletteBankManager::PaletteBankManager(const std::string& _name, const std::vector<PaletteBank>& paletteBanks) : Exportable(_name), banks(paletteBanks)
 {
 }
 
@@ -470,7 +458,7 @@ Tile<unsigned char>::Tile(std::shared_ptr<ImageTile>& imageTile, int _bpp) : dat
     for (unsigned int i = 0; i < TILE_SIZE; i++)
     {
         unsigned short pix = imgdata[i];
-        data[i] = (pix != params.transparent_color) ? palette.Search(pix) : 0;
+        data[i] = (pix != params.transparent_color) ? palette.Search(Color(pix)) : 0;
     }
 
     sourceTile = imageTile;
@@ -484,7 +472,8 @@ void Tile<unsigned char>::Set(const Image16Bpp& image, const Palette& global_pal
     {
         int x = i % 8;
         int y = i / 8;
-        data[i] = global_palette.Search(image.pixels[(tiley * 8 + y) * image.width + tilex * 8 + x]);
+        Color color(image.pixels[(tiley * 8 + y) * image.width + tilex * 8 + x]);
+        data[i] = global_palette.Search(color);
     }
 }
 
@@ -509,7 +498,7 @@ void Tile<unsigned char>::UsePalette(const PaletteBank& bank)
         data[i] = remapping[data[i]];
     }
 
-    palette.Set(bank.colors);
+    palette.Set(bank.GetColors());
 }
 
 template <>
@@ -541,7 +530,7 @@ bool TilesPaletteSizeComp(const GBATile& i, const GBATile& j)
     return i.palette.Size() > j.palette.Size();
 }
 
-Tileset::Tileset(const std::vector<Image16Bpp>& images, const std::string& _name, int _bpp) : name(_name), bpp(_bpp), paletteBanks(name)
+Tileset::Tileset(const std::vector<Image16Bpp>& images, const std::string& name, int _bpp) : Exportable(name), bpp(_bpp), paletteBanks(name)
 {
     switch(bpp)
     {
@@ -557,7 +546,7 @@ Tileset::Tileset(const std::vector<Image16Bpp>& images, const std::string& _name
     }
 }
 
-Tileset::Tileset(const Image16Bpp& image, int _bpp) : name(image.name), bpp(_bpp), paletteBanks(name)
+Tileset::Tileset(const Image16Bpp& image, int _bpp) : Exportable(image), bpp(_bpp), paletteBanks(name)
 {
     std::vector<Image16Bpp> images;
     images.push_back(image);
@@ -673,7 +662,7 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
     std::set<Color> bigPalette;
     for (const auto& tile : gbaTiles)
     {
-        const std::vector<Color>& tile_palette = tile.palette.colors;
+        const std::vector<Color>& tile_palette = tile.palette.GetColors();
         bigPalette.insert(tile_palette.begin(), tile_palette.end());
     }
 
@@ -975,8 +964,8 @@ void Map::WriteCommonExport(std::ostream& file) const
 {
     WriteDefine(file, name, "_WIDTH", width);
     WriteDefine(file, name, "_HEIGHT", height);
-    WriteDefine(file, name, "_MAP_SIZE", Size());
-    WriteDefine(file, name, "_MAP_TYPE", Type(), 14);
+    WriteDefine(file, name, "_MAP_SIZE", data.size());
+    WriteDefine(file, name, "_MAP_TYPE", (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1, 14);
 }
 
 void Map::WriteExport(std::ostream& file) const
@@ -985,13 +974,13 @@ void Map::WriteExport(std::ostream& file) const
     if (export_shared_info)
         tileset->WriteExport(file);
 
-    WriteExtern(file, "const unsigned short", export_name, "_map", Size());
+    WriteExtern(file, "const unsigned short", export_name, "_map", data.size());
     if (animated)
     {
         WriteDefine(file, export_name, "_WIDTH", width);
         WriteDefine(file, export_name, "_HEIGHT", height);
-        WriteDefine(file, export_name, "_MAP_SIZE", Size());
-        WriteDefine(file, export_name, "_MAP_TYPE", Type(), 14);
+        WriteDefine(file, export_name, "_MAP_SIZE", data.size());
+        WriteDefine(file, export_name, "_MAP_TYPE", (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1, 14);
     }
     WriteNewLine(file);
 }
@@ -1073,7 +1062,7 @@ Sprite::Sprite(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.
     for (unsigned int i = 0; i < size; i++)
     {
         unsigned short pix = imgdata[i];
-        data4bpp[i] = (pix != params.transparent_color) ? palette->Search(pix) : 0;
+        data4bpp[i] = (pix != params.transparent_color) ? palette->Search(Color(pix)) : 0;
     }
 
     for (unsigned int i = 0; i < data.size(); i++)
@@ -1090,7 +1079,7 @@ void Sprite::UsePalette(const PaletteBank& bank)
 {
     for (auto& tile : data)
         tile.UsePalette(bank);
-    palette->Set(bank.colors);
+    palette->Set(bank.GetColors());
 }
 
 void Sprite::WriteTile(unsigned char* arr, int x, int y) const
@@ -1125,11 +1114,6 @@ void Sprite::WriteExport(std::ostream& file) const
 std::string Sprite::GetExportName() const
 {
     return ToUpper(export_name) + "_ID";
-}
-
-void Sprite::WriteData(std::ostream& file) const
-{
-    // Implemented in operator<<
 }
 
 std::ostream& operator<<(std::ostream& file, const Sprite& sprite)
@@ -1310,7 +1294,7 @@ void SpriteSheet::PlaceSprites()
         if (AssignBlockIfAvailable(size, sprite, i))
             continue;
 
-        if (size.isBiggestSize())
+        if (size.IsBiggestSize())
             FatalLog("Out of sprite memory could not allocate sprite %s size (%d,%d)", sprite.name.c_str(), sprite.width, sprite.height);
 
         slice.push_front(size);
@@ -1537,7 +1521,7 @@ void SpriteScene::Init4bpp(const std::vector<Image16Bpp>& images16)
     std::set<Color> bigPalette;
     for (const auto& sprite : sprites)
     {
-        const std::vector<Color>& sprite_palette = sprite->palette->colors;
+        const std::vector<Color>& sprite_palette = sprite->palette->GetColors();
         bigPalette.insert(sprite_palette.begin(), sprite_palette.end());
     }
 

@@ -5,12 +5,14 @@
 class Exportable
 {
     public:
-        Exportable() {}
+        Exportable(const std::string& _name = "") : name(_name) {}
         virtual ~Exportable() {};
         /** Writes array and other declarations */
         virtual void WriteData(std::ostream& file) const = 0;
         /** Writes externs and other defines */
         virtual void WriteExport(std::ostream& file) const = 0;
+        /** Symbol base name (image name) */
+        std::string name;
 };
 
 #endif

@@ -10,8 +10,8 @@ class Color
         explicit Color(unsigned short color_data);
         bool operator<(const Color& rhs) const;
         void Set(int a, int b, int c);
-        void Set(unsigned short color_data);
-        void Get(int& a, int& b, int& c) const;
+        unsigned short GetBGR15() const;
+        void SetBGR15(unsigned short gba_color);
         double Distance(const Color& other) const;
         double x, y, z;
 };

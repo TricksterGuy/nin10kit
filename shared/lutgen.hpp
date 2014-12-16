@@ -52,8 +52,6 @@ enum class LutType
     SHORT = 1,
     INT = 2,
     LONG = 3,
-    FLOAT = 4,
-    DOUBLE = 5,
 };
 
 /** Class for specifying input/output types for look up table */
@@ -61,7 +59,7 @@ class LutIOType
 {
     public:
         /** Constructor
-          * @param type String in format {type.fixed_length or type or float or double}
+          * @param type String in format {type.fixed_length or type}
           */
         LutIOType(const std::string& type);
         LutType GetType() const {return type;}
@@ -106,20 +104,5 @@ class FixedLutGenerator : public LutGenerator
         double end;
         double step;
 };
-
-class FloatLutGenerator : public LutGenerator
-{
-    public:
-        FloatLutGenerator(const std::string& name, const std::string& function, double begin, double end, double step,
-                          const std::string& input = "int", const std::string& output = "short8", bool in_degrees = false);
-        ~FloatLutGenerator();
-    protected:
-    private:
-        double begin;
-        double end;
-        double step;
-
-};
-
 
 #endif

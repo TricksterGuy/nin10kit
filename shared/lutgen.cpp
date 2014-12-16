@@ -59,8 +59,11 @@ std::string form_fixed_string(int64_t fixed, const LutIOType& lut_type)
     int pad = (lut_type.GetLength() + 3) / 4;
     if (pad == 0) pad = 1;
     uint64_t mask = (1L << lut_type.GetLength()) - 1;
-    str << "((" << (fixed >> lut_type.GetLength()) << " << " << lut_type.GetLength() << ") | 0x" << std::setfill('0')
-        << std::setw(pad) << std::hex << (fixed & mask) << ")";
+    if (lut_type.GetLength() > 0)
+        str << "((" << (fixed >> lut_type.GetLength()) << " << " << lut_type.GetLength() << ") | 0x" << std::setfill('0')
+            << std::setw(pad) << std::hex << (fixed & mask) << ")";
+    else
+        str << fixed;
     return str.str();
 }
 

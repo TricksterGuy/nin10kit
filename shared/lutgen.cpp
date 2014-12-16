@@ -84,6 +84,14 @@ LutSpecification::LutSpecification(const std::string& spec)
     }
 }
 
+std::string LutSpecification::str() const
+{
+    std::stringstream out;
+    out << "Function: " << function << " Type: " << type << " Range: [" << begin << ", " << end << "] Step: " << step;
+    return out.str();
+}
+
+
 LutFunc::LutFunc(MathFunction func, bool in_radians, bool out_radians) : function(func), input_radians(in_radians), output_radians(out_radians)
 {
 }

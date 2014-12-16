@@ -26,23 +26,32 @@ void ExportFile::Write(std::ostream& file)
     if (!invocation.empty())
         file << " * Invocation command was nin10kit " << invocation << "\n";
     file << " * Time-stamp: " << str << "\n";
-    file << " * \n";
-    file << " * Image Information\n";
-    file << " * -----------------\n";
-    for (unsigned int i = 0; i < imageInfos.size() ; i++)
-        file << " * " << imageInfos[i] << "\n";
+    if (!imageInfos.empty())
+    {
+        file << " * \n";
+        file << " * Image Information\n";
+        file << " * -----------------\n";
+        for (const auto& imageInfo : imageInfos)
+            file << " * " << imageInfo << "\n";
+    }
     if (!tilesets.empty())
     {
         file << " * \n";
         file << " * Using tilesets\n";
         file << " * --------------\n";
-        for (unsigned int i = 0; i < tilesets.size(); i++)
-        {
-            file << " * " << tilesets[i] << "\n";
-        }
+        for (const auto& tileset : tilesets)
+            file << " * " << tileset << "\n";
     }
     if (params.transparent_color != -1)
         file << " * Transparent color: 0x" << std::hex << transparent_color << std::dec << "\n";
+    if (!luts.empty())
+    {
+        file << " * \n";
+        file << " * Look Up Table Information\n";
+        file << " * -------------------------\n";
+        for (const auto& lut : luts)
+            file << " * " << lut.str() << "\n";
+    }
     file << " * \n";
     file << " * Quote/Fortune of the Day!\n";
     file << " * -------------------------\n";
@@ -76,11 +85,15 @@ void ExportFile::AddImageInfo(const std::string& filename, int scene, int width,
     imageInfos.push_back(buffer);
 }
 
+void ExportFile::AddLutInfo(const LutSpecification& spec)
+{
+    luts.push_back(spec);
+}
+
 void ExportFile::Add(std::shared_ptr<Exportable>& image)
 {
     exportables.push_back(image);
 }
-
 
 std::map<std::string, std::vector<Image*>> ExportFile::GetAnimatedImages() const
 {

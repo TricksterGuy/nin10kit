@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "lutgen.hpp"
 #include "reductionhelper.hpp"
 
 /** Base class for a file created by this program.*/
@@ -23,6 +24,7 @@ class ExportFile
 
         void AddLine(const std::string& line);
         void AddImageInfo(const std::string& filename, int scene, int width, int height, bool frame);
+        void AddLutInfo(const LutSpecification& spec);
         void Add(std::shared_ptr<Exportable>& image);
 
         virtual void Write(std::ostream& file);
@@ -32,6 +34,7 @@ class ExportFile
         std::vector<std::string> lines;
         std::vector<std::string> imageInfos;
         std::vector<std::string> tilesets;
+        std::vector<LutSpecification> luts;
 
     protected:
         int transparent_color;

@@ -16,6 +16,7 @@ class LutSpecification
 {
     public:
         LutSpecification(const std::string& spec);
+        std::string str() const;
         std::string function;
         std::string type;
         double begin;

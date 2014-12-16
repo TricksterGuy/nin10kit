@@ -194,6 +194,7 @@ void FixedLutGenerator::WriteExport(std::ostream& file) const
     unsigned long num_entries = (end - begin) / step + 1;
     WriteExtern(file, "const " + type_map_rev.at(type.GetType()), name, "", num_entries);
     WriteDefine(file, name, "_SIZE", num_entries);
+    WriteDefine(file, name, "_FIXED_LENGTH", type.GetLength());
     WriteDefine(file, name, "_BEGIN", form_fixed_string(type.ConvertToFixed(begin), type));
     WriteDefine(file, name, "_END", form_fixed_string(type.ConvertToFixed(end), type));
     WriteDefine(file, name, "_STEP", form_fixed_string(type.ConvertToFixed(step), type));

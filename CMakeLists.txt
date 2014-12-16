@@ -65,8 +65,10 @@ set(SRC_NIN10KIT
 	cli/lut-exporter.cpp
 )
 
-#set(SRC_NIN10KITGUI
-#)
+set(SRC_NIN10KITGUI
+    gui/nin10kit.cpp
+    gui/nin10kitapp.cpp
+)
 
 find_package(wxWidgets REQUIRED core base)
 include(${wxWidgets_USE_FILE})
@@ -101,16 +103,16 @@ target_link_libraries(
    	${wxWidgets_LIBRARIES}
 )
 
-#add_executable(
-#	nin10gui
-#    ${SRC_NIN10GUI}
-#)
+add_executable(
+	nin10kitgui
+    ${SRC_NIN10KITGUI}
+)
 
-#target_link_libraries(
-#	nin10gui
-#	shared_files
-#   ${wxWidgets_LIBRARIES}
-#)
+target_link_libraries(
+	nin10kitgui
+	shared_files
+   ${wxWidgets_LIBRARIES}
+)
 
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/nin10kit DESTINATION bin)
-#install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/nin10gui DESTINATION bin)
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/nin10gui DESTINATION bin)

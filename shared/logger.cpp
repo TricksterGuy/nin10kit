@@ -41,7 +41,7 @@ inline const char* GetLogColor(LogLevel level)
         case LogLevel::INFO:
             return "";
         case LogLevel::VERBOSE:
-            return "\033[2;36";
+            return "\033[2;34m";
         default:
             return "";
     }
@@ -58,7 +58,7 @@ void AbstractLogger::Log(LogLevel level, const char* format, va_list ap)
     strftime(buffer, 128, "%H:%M:%S", localtime(&curTime.tv_sec));
     char currentTime[128] = "";
     snprintf(currentTime, 128, "%s:%ld", buffer, (long)curTime.tv_usec);
-    (*out) << GetLogColor(level) << GetLogAbbrev(level) << "[" << currentTime << "] ";
+    (*out) << GetLogColor(level) << GetLogAbbrev(level) << "[" << currentTime << "]\033[0m";
 
     DoLog(level, format, ap);
 }

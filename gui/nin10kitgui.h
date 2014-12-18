@@ -5,19 +5,19 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __NIN10KIT_H__
-#define __NIN10KIT_H__
+#ifndef __NIN10KITGUI_H__
+#define __NIN10KITGUI_H__
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-#include <wx/sizer.h>
+#include <wx/listctrl.h>
 #include <wx/gdicmn.h>
-#include <wx/scrolwin.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/string.h>
+#include <wx/sizer.h>
 #include <wx/panel.h>
 #include <wx/stattext.h>
 #include <wx/choice.h>
@@ -33,23 +33,23 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class Nin10KitFrame
+/// Class Nin10KitGUI
 ///////////////////////////////////////////////////////////////////////////////
-class Nin10KitFrame : public wxFrame 
+class Nin10KitGUI : public wxFrame 
 {
 	private:
 	
 	protected:
 		wxSplitterWindow* m_splitter1;
 		wxPanel* m_panel1;
-		wxScrolledWindow* imagesWindow;
+		wxListCtrl* imagesList;
 		wxPanel* m_panel2;
 		wxStaticText* m_staticText7;
 		wxChoice* mode;
 		wxButton* m_button2;
 		wxButton* m_button3;
 		wxStaticText* m_staticText1;
-		wxStaticText* imageFilename;
+		wxTextCtrl* imageFilename;
 		wxStaticText* m_staticText3;
 		wxTextCtrl* imageName;
 		wxStaticText* m_staticText5;
@@ -58,13 +58,16 @@ class Nin10KitFrame : public wxFrame
 		wxSpinCtrl* imageHeight;
 		wxStaticText* m_staticText4;
 		wxCheckBox* imageAnimated;
+		wxButton* m_button6;
 		wxButton* m_button1;
 		wxButton* m_button4;
 		wxButton* m_button5;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnImageSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnLoadImages( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteAllImages( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateCurrentImage( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteCurrentImage( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditor( wxCommandEvent& event ) { event.Skip(); }
@@ -72,16 +75,16 @@ class Nin10KitFrame : public wxFrame
 	
 	public:
 		
-		Nin10KitFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Nin10Kit"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 640,480 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		Nin10KitGUI( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Nin10Kit"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 640,480 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		
-		~Nin10KitFrame();
+		~Nin10KitGUI();
 		
 		void m_splitter1OnIdle( wxIdleEvent& )
 		{
 			m_splitter1->SetSashPosition( 320 );
-			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( Nin10KitFrame::m_splitter1OnIdle ), NULL, this );
+			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( Nin10KitGUI::m_splitter1OnIdle ), NULL, this );
 		}
 	
 };
 
-#endif //__NIN10KIT_H__
+#endif //__NIN10KITGUI_H__

@@ -40,7 +40,11 @@ ENDIF(ENABLE_DEBUG)
 
 # Source files definition
 set(SRC_SHARED
+	shared/3ds-exporter.cpp
+	shared/ds-exporter.cpp
+	shared/gba-exporter.cpp
 	shared/color.cpp
+	shared/cmd-line-parser-helper.cpp
     shared/cpercep.cpp
     shared/dither.cpp
     shared/exportfile.cpp
@@ -58,16 +62,15 @@ set(SRC_SHARED
 
 set(SRC_NIN10KIT
 	cli/main.cpp
-	cli/3ds-exporter.cpp
-	cli/ds-exporter.cpp
-	cli/gba-exporter.cpp
-	cli/cmd-line-parser-helper.cpp
 	cli/lut-exporter.cpp
 )
 
 set(SRC_NIN10KITGUI
     gui/nin10kit.cpp
     gui/nin10kitapp.cpp
+    gui/nin10kitgui.cpp
+    gui/imageutil.cpp
+    gui/exporter.cpp
 )
 
 find_package(wxWidgets REQUIRED core base)
@@ -110,8 +113,10 @@ add_executable(
 
 target_link_libraries(
 	nin10kitgui
+	m
 	shared_files
-   ${wxWidgets_LIBRARIES}
+	${ImageMagick_LIBRARIES}
+    ${wxWidgets_LIBRARIES}
 )
 
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/nin10kit DESTINATION bin)

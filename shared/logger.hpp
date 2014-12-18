@@ -35,7 +35,6 @@ class Logger : public AbstractLogger
         virtual void DoLog(LogLevel level, const char* format, va_list ap);
 };
 
-
 extern std::unique_ptr<AbstractLogger> logger;
 
 void SetLogger(AbstractLogger* logobj);
@@ -92,5 +91,16 @@ static inline void VerboseLog(const char* format, ...)
     Log(LogLevel::VERBOSE, format, argptr);
     va_end(argptr);
 }
+
+/** Object that only exists to print out start and end of event call in a function */
+class EventLog
+{
+    public:
+        EventLog(const char* function) : func(function) {VerboseLog("start: %s", func);}
+        ~EventLog() {VerboseLog("end: %s", func);}
+    private:
+        const char* func;
+};
+
 
 #endif

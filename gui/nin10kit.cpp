@@ -1,204 +1,158 @@
-///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun  6 2014)
-// http://www.wxformbuilder.org/
-//
-// PLEASE DO "NOT" EDIT THIS FILE!
-///////////////////////////////////////////////////////////////////////////
+#include "nin10kit.hpp"
 
-#include "nin10kit.h"
+#include <wx/filedlg.h>
+#include <wx/msgdlg.h>
 
-///////////////////////////////////////////////////////////////////////////
+#include "exporter.hpp"
+#include "imageutil.hpp"
+#include "logger.hpp"
 
-Nin10KitFrame::Nin10KitFrame( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+static inline long GetSelectedIndex(wxListCtrl* listControl)
 {
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	wxBoxSizer* bSizer1;
-	bSizer1 = new wxBoxSizer( wxVERTICAL );
-	
-	m_splitter1 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
-	m_splitter1->Connect( wxEVT_IDLE, wxIdleEventHandler( Nin10KitFrame::m_splitter1OnIdle ), NULL, this );
-	
-	m_panel1 = new wxPanel( m_splitter1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer2;
-	bSizer2 = new wxBoxSizer( wxVERTICAL );
-	
-	imagesWindow = new wxScrolledWindow( m_panel1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
-	imagesWindow->SetScrollRate( 5, 5 );
-	wxFlexGridSizer* imagesSizer;
-	imagesSizer = new wxFlexGridSizer( 0, 2, 0, 0 );
-	imagesSizer->SetFlexibleDirection( wxBOTH );
-	imagesSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	
-	imagesWindow->SetSizer( imagesSizer );
-	imagesWindow->Layout();
-	imagesSizer->Fit( imagesWindow );
-	bSizer2->Add( imagesWindow, 1, wxEXPAND | wxALL, 0 );
-	
-	
-	m_panel1->SetSizer( bSizer2 );
-	m_panel1->Layout();
-	bSizer2->Fit( m_panel1 );
-	m_panel2 = new wxPanel( m_splitter1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* bSizer3;
-	bSizer3 = new wxBoxSizer( wxVERTICAL );
-	
-	wxBoxSizer* bSizer5;
-	bSizer5 = new wxBoxSizer( wxHORIZONTAL );
-	
-	
-	bSizer3->Add( bSizer5, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 0 );
-	
-	wxBoxSizer* bSizer6;
-	bSizer6 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_staticText7 = new wxStaticText( m_panel2, wxID_ANY, _("Mode:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText7->Wrap( -1 );
-	bSizer6->Add( m_staticText7, 0, wxALL|wxALIGN_CENTER_VERTICAL, 8 );
-	
-	wxString modeChoices[] = { _("GBA Mode 3 - 16 Bpp Bitmap BGR"), _("GBA Mode 4 - 8 Bpp Bitmap w/ Palette"), _("GBA Mode 0 - 8 Bpp Map+Tileset w/ Palette"), _("GBA Mode 0 - 4 Bpp Map+Tileset w/ 16 Palette Banks"), _("GBA Sprites - 8 Bpp Sprites w/ Palette"), _("GBA Sprites - 4 Bpp Sprites w/ 16 Palette Banks") };
-	int modeNChoices = sizeof( modeChoices ) / sizeof( wxString );
-	mode = new wxChoice( m_panel2, wxID_ANY, wxDefaultPosition, wxDefaultSize, modeNChoices, modeChoices, 0 );
-	mode->SetSelection( 0 );
-	bSizer6->Add( mode, 1, wxALL, 8 );
-	
-	
-	bSizer3->Add( bSizer6, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	wxBoxSizer* bSizer8;
-	bSizer8 = new wxBoxSizer( wxHORIZONTAL );
-	
-	
-	bSizer8->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	m_button2 = new wxButton( m_panel2, wxID_ANY, _("Load Images"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer8->Add( m_button2, 0, wxALL, 5 );
-	
-	m_button3 = new wxButton( m_panel2, wxID_ANY, _("Delete All Images"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer8->Add( m_button3, 0, wxALL, 5 );
-	
-	
-	bSizer3->Add( bSizer8, 0, wxEXPAND, 5 );
-	
-	
-	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer1;
-	sbSizer1 = new wxStaticBoxSizer( new wxStaticBox( m_panel2, wxID_ANY, _("Image Info") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer2;
-	fgSizer2 = new wxFlexGridSizer( 5, 2, 0, 0 );
-	fgSizer2->AddGrowableCol( 1 );
-	fgSizer2->SetFlexibleDirection( wxBOTH );
-	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticText1 = new wxStaticText( m_panel2, wxID_ANY, _("Filename:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1->Wrap( -1 );
-	fgSizer2->Add( m_staticText1, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL, 8 );
-	
-	imageFilename = new wxStaticText( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	imageFilename->Wrap( -1 );
-	fgSizer2->Add( imageFilename, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 8 );
-	
-	m_staticText3 = new wxStaticText( m_panel2, wxID_ANY, _("Name:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText3->Wrap( -1 );
-	fgSizer2->Add( m_staticText3, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL, 8 );
-	
-	imageName = new wxTextCtrl( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer2->Add( imageName, 0, wxEXPAND|wxALL, 8 );
-	
-	m_staticText5 = new wxStaticText( m_panel2, wxID_ANY, _("Size (W x H):"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText5->Wrap( -1 );
-	fgSizer2->Add( m_staticText5, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 8 );
-	
-	wxBoxSizer* bSizer4;
-	bSizer4 = new wxBoxSizer( wxHORIZONTAL );
-	
-	imageWidth = new wxSpinCtrl( m_panel2, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 0, 8192, 0 );
-	imageWidth->SetMaxSize( wxSize( 80,-1 ) );
-	
-	bSizer4->Add( imageWidth, 0, wxALL, 8 );
-	
-	m_staticText6 = new wxStaticText( m_panel2, wxID_ANY, _("X"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText6->Wrap( -1 );
-	bSizer4->Add( m_staticText6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 8 );
-	
-	imageHeight = new wxSpinCtrl( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 8192, 0 );
-	imageHeight->SetMaxSize( wxSize( 80,-1 ) );
-	
-	bSizer4->Add( imageHeight, 0, wxALL, 8 );
-	
-	
-	fgSizer2->Add( bSizer4, 1, wxEXPAND, 5 );
-	
-	m_staticText4 = new wxStaticText( m_panel2, wxID_ANY, _("Animated:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText4->Wrap( -1 );
-	fgSizer2->Add( m_staticText4, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL, 8 );
-	
-	imageAnimated = new wxCheckBox( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	imageAnimated->Enable( false );
-	
-	fgSizer2->Add( imageAnimated, 0, wxALL, 5 );
-	
-	
-	fgSizer2->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	m_button1 = new wxButton( m_panel2, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer2->Add( m_button1, 0, wxALL|wxALIGN_RIGHT, 8 );
-	
-	
-	sbSizer1->Add( fgSizer2, 1, wxEXPAND, 0 );
-	
-	
-	bSizer3->Add( sbSizer1, 0, wxEXPAND, 8 );
-	
-	
-	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	wxBoxSizer* bSizer9;
-	bSizer9 = new wxBoxSizer( wxHORIZONTAL );
-	
-	
-	bSizer9->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	m_button4 = new wxButton( m_panel2, wxID_ANY, _("Export"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer9->Add( m_button4, 0, wxALL, 5 );
-	
-	m_button5 = new wxButton( m_panel2, wxID_ANY, _("Edit"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer9->Add( m_button5, 0, wxALL, 5 );
-	
-	
-	bSizer3->Add( bSizer9, 0, wxEXPAND, 5 );
-	
-	
-	m_panel2->SetSizer( bSizer3 );
-	m_panel2->Layout();
-	bSizer3->Fit( m_panel2 );
-	m_splitter1->SplitVertically( m_panel1, m_panel2, 320 );
-	bSizer1->Add( m_splitter1, 1, wxEXPAND, 5 );
-	
-	
-	this->SetSizer( bSizer1 );
-	this->Layout();
-	
-	this->Centre( wxBOTH );
-	
-	// Connect Events
-	m_button2->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitFrame::OnLoadImages ), NULL, this );
-	m_button3->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitFrame::OnDeleteAllImages ), NULL, this );
-	m_button1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitFrame::OnDeleteCurrentImage ), NULL, this );
-	m_button4->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitFrame::OnExport ), NULL, this );
-	m_button5->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitFrame::OnEditor ), NULL, this );
+    long itemIndex = -1;
+    for (;;)
+    {
+        itemIndex = listControl->GetNextItem(itemIndex, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+        if (itemIndex == -1) break;
+        return itemIndex;
+    }
+    return itemIndex;
+}
+
+Nin10KitFrame::Nin10KitFrame() : Nin10KitGUI(NULL), imageList(new wxImageList(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT))
+{
+    imagesList->SetImageList(imageList.get(), wxIMAGE_LIST_NORMAL);
 }
 
 Nin10KitFrame::~Nin10KitFrame()
 {
-	// Disconnect Events
-	m_button2->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitFrame::OnLoadImages ), NULL, this );
-	m_button3->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitFrame::OnDeleteAllImages ), NULL, this );
-	m_button1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitFrame::OnDeleteCurrentImage ), NULL, this );
-	m_button4->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitFrame::OnExport ), NULL, this );
-	m_button5->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitFrame::OnEditor ), NULL, this );
-	
+
+}
+
+void Nin10KitFrame::OnLoadImages(wxCommandEvent& event)
+{
+    EventLog l(__func__);
+    std::unique_ptr<wxFileDialog> filedlg(new wxFileDialog(this, _("Open Images"), "", "", wxFileSelectorDefaultWildcardStr,
+                                                           wxFD_FILE_MUST_EXIST | wxFD_CHANGE_DIR | wxFD_MULTIPLE | wxFD_PREVIEW | wxFD_OPEN));
+    if (filedlg->ShowModal() == wxID_CANCEL)
+    {
+        WarnLog("No images given");
+        return;
+    }
+
+    wxArrayString files;
+    filedlg->GetPaths(files);
+
+    for (const auto& wxFile : files)
+    {
+        std::string file = wxFile.ToStdString();
+        InfoLog("Got file: %s", file.c_str());
+        if (images.find(file) != images.end())
+        {
+            WarnLog("File %s already loaded ignoring", file.c_str());
+            continue;
+        }
+        filenames.push_back(file);
+        images.emplace(file, file);
+        const ImageInfo& info = images.at(file);
+        imageList->Add(info.GetThumbnail());
+        long index = imagesList->GetItemCount();
+        imagesList->InsertItem(index, info.GetName(), index);
+    }
+}
+
+void Nin10KitFrame::OnImageSelected(wxListEvent& event)
+{
+    EventLog l(__func__);
+    //Ignoring event.GetSelection as it is always 0.
+    long index = GetSelectedIndex(imagesList);
+    if (index == -1)
+    {
+        WarnLog("No item selected ignoring");
+        return;
+    }
+
+    const std::string& filename = filenames[index];
+    const ImageInfo& info = images.at(filename);
+    InfoLog("Selected %d %s %s", index, filename.c_str(), info.GetName().c_str());
+
+    imageFilename->SetValue(filename);
+    imageName->SetValue(info.GetName());
+    imageWidth->SetValue(info.GetWidth());
+    imageHeight->SetValue(info.GetHeight());
+    imageAnimated->SetValue(info.IsAnimated());
+}
+
+void Nin10KitFrame::OnDeleteAllImages(wxCommandEvent& event)
+{
+    EventLog l(__func__);
+    InfoLog("Delete all items");
+    imagesList->DeleteAllItems();
+    imageList->RemoveAll();
+    filenames.clear();
+    images.clear();
+}
+
+void Nin10KitFrame::OnUpdateCurrentImage(wxCommandEvent& event)
+{
+    EventLog l(__func__);
+    long item = GetSelectedIndex(imagesList);
+    if (item == -1)
+    {
+        WarnLog("No item selected ignoring");
+        return;
+    }
+
+    const std::string& filename = filenames[item];
+    ImageInfo& info = images.at(filename);
+    InfoLog("Updating %ld %s %s", item, filename.c_str(), info.GetName().c_str());
+
+    info.SetName(imageName->GetValue().ToStdString());
+    info.SetWidth(imageWidth->GetValue());
+    info.SetHeight(imageHeight->GetValue());
+    InfoLog("Updated %ld %s %s", item, filename.c_str(), info.GetName().c_str());
+    imagesList->SetItemText(item, info.GetName());
+    imagesList->Refresh();
+}
+
+void Nin10KitFrame::OnDeleteCurrentImage(wxCommandEvent& event)
+{
+    EventLog l(__func__);
+    long item = GetSelectedIndex(imagesList);
+    if (item == -1)
+    {
+        WarnLog("No item selected ignoring");
+        return;
+    }
+
+    imagesList->DeleteItem(item);
+    imageList->Remove(item);
+    InfoLog("Updating %ld %s %s", item, filenames[item].c_str(), images.at(filenames[item]).GetName().c_str());
+    images.erase(filenames[item]);
+    filenames.erase(filenames.begin() + item);
+}
+
+void Nin10KitFrame::OnExport(wxCommandEvent& event)
+{
+    EventLog l(__func__);
+    if (filenames.empty())
+    {
+        WarnLog("No images loaded not exporting");
+        return;
+    }
+    std::string filename = wxSaveFileSelector(_("Export Images"), "", "", this).ToStdString();
+    if (filename.empty())
+    {
+        WarnLog("Filename empty not saving");
+        return;
+    }
+
+    InfoLog("Saving exported file to %s", filename.c_str());
+    DoExport(mode->GetSelection(), filename, filenames, images);
+}
+
+void Nin10KitFrame::OnEditor(wxCommandEvent& event)
+{
+    EventLog l(__func__);
+    wxMessageBox(_("Please pay me 20 dolla for the full version"), _("GET OUT MY STORE"));
 }

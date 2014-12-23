@@ -18,6 +18,20 @@ void InitFiles(std::ofstream& file_c, std::ofstream& file_h, const std::string& 
         FatalLog("Could not open files for writing");
 }
 
+void WriteBeginArray(std::ostream& file, const std::string& type, const std::string& name, const std::string& append, unsigned int size)
+{
+    VerboseLog("Writing begin %s array %s%s size %zd", type.c_str(), name.c_str(), append.c_str(), size);
+
+    file << type << " " << name << append << "[" << size << "] =\n{\n\t";
+}
+
+void WriteEndArray(std::ostream& file)
+{
+    VerboseLog("Writing end array");
+
+    file << "\n};\n";
+}
+
 void WriteShortArray(std::ostream& file, const std::string& name, const std::string& append, const std::vector<unsigned short>& data, unsigned int items_per_row)
 {
     VerboseLog("Writing short array %s%s size %zd", name.c_str(), append.c_str(), data.size());
@@ -58,34 +72,6 @@ void WriteShortArray4Bit(std::ostream& file, const std::string& name, const std:
     }
     file << "\n};\n";
 }
-
-void WriteShortArray(std::ostream& file, const std::string& name, const std::string& append, const std::vector<Color>& data, unsigned int items_per_row)
-{
-    VerboseLog("Writing short array (from Colors) %s%s size %zd", name.c_str(), append.c_str(), data.size());
-    char buffer[7];
-    file << "const unsigned short " << name << append << "[" << data.size() << "] =\n{\n\t";
-    for (unsigned int i = 0; i < data.size(); i++)
-    {
-        unsigned short data_read = data[i].GetBGR15();
-        snprintf(buffer, 7, "0x%04x", data_read);
-        WriteElement(file, buffer, data.size(), i, items_per_row);
-    }
-    file << "\n};\n";
-}
-
-void WriteCharArray(std::ostream& file, const std::string& name, const std::string& append, const std::vector<unsigned char>& data, unsigned int items_per_row)
-{
-    VerboseLog("Writing char array %s%s size %zd", name.c_str(), append.c_str(), data.size());
-    char buffer[5];
-    file << "const unsigned char " << name << append << "[" << data.size() << "] =\n{\n\t";
-    for (unsigned int i = 0; i < data.size(); i++)
-    {
-        snprintf(buffer, 5, "0x%02x", data[i]);
-        WriteElement(file, buffer, data.size(), i, items_per_row);
-    }
-    file << "\n};\n";
-}
-
 
 void WriteElement(std::ostream& file, const std::string& data, unsigned int size, unsigned int counter,
                   unsigned int items_per_row)

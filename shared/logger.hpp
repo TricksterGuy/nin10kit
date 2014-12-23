@@ -102,5 +102,4 @@ class EventLog
         const char* func;
 };
 
-
 #endif

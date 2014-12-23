@@ -31,7 +31,7 @@ const int sprite_sizes[16] =
 };
 
 Image32Bpp::Image32Bpp(const Magick::Image& image, const std::string& name, const std::string& filename, unsigned int frame, bool animated) :
-    Image(image.columns(), image.rows(), name, filename, frame, animated), pixels(3 * width * height), has_alpha(false)
+    Image(image.columns(), image.rows(), name, filename, frame, animated), pixels(width * height), has_alpha(false)
 {
     unsigned int num_pixels = width * height;
     const Magick::PixelPacket* imageData = image.getConstPixels(0, 0, image.columns(), image.rows());
@@ -41,35 +41,43 @@ Image32Bpp::Image32Bpp(const Magick::Image& image, const std::string& name, cons
     for (unsigned int i = 0; i < num_pixels; i++)
     {
         const Magick::PixelPacket& packet = imageData[i];
-        int r, g, b;
+        unsigned char r, g, b, a;
         if (depth == 8)
         {
             r = packet.red;
             g = packet.green;
             b = packet.blue;
+            a = packet.opacity;
         }
         else if (depth == 16)
         {
             r = (packet.red >> 8) & 0xFF;
             g = (packet.green >> 8) & 0xFF;
             b = (packet.blue >> 8) & 0xFF;
+            a = (packet.opacity >> 8) * 0xFF;
         }
         else
         {
             // To get rid of warning
-            b = g = r = 0;
+            b = g = r = a = 0;
             FatalLog("Image quantum not supported");
         }
 
-        pixels[3 * i] = b;
-        pixels[3 * i + 1] = g;
-        pixels[3 * i + 2] = r;
+        pixels[i] = Color(r, g, b, a);
     }
 }
 
 void Image32Bpp::WriteData(std::ostream& file) const
 {
-    WriteCharArray(file, export_name, "", pixels, 10);
+    char buffer[32];
+    WriteBeginArray(file, "const unsigned char", export_name, "", pixels.size() * 3);
+    for (unsigned int i = 0; i < pixels.size(); i++)
+    {
+        const Color& color = pixels[i];
+        snprintf(buffer, 32, "0x%02x,0x%02x,0x%02x", color.b, color.g, color.r);
+        WriteElement(file, buffer, pixels.size() * 3, i * 3, 24);
+    }
+    WriteEndArray(file);
     WriteNewLine(file);
 }
 
@@ -95,46 +103,33 @@ void Image32Bpp::WriteExport(std::ostream& file) const
 Image16Bpp::Image16Bpp(const Image32Bpp& image) : Image(image), pixels(width * height)
 {
     unsigned int num_pixels = width * height;
-    const std::vector<unsigned char>& pixels32 = image.pixels;
+    const std::vector<Color>& pixels32 = image.pixels;
 
     for (unsigned int i = 0; i < num_pixels; i++)
     {
-        char r, g, b;
-        r = (pixels32[3 * i + 2] >> 3) & 0x1F;
-        g = (pixels32[3 * i + 1] >> 3) & 0x1F;
-        b = (pixels32[3 * i] >> 3) & 0x1F;
-        pixels[i] = r | g << 5 | b << 10;
+        pixels[i].SetBGR15(pixels32[i]);
     }
 }
 
 void Image16Bpp::GetColors(std::vector<Color>& colors) const
 {
-    for (unsigned int i = 0; i < width * height; i++)
+    for (const auto& color : pixels)
     {
-        short pix = pixels[i];
-        if (pix != params.transparent_color)
-        {
-            colors.push_back(Color(pix));
-        }
+        if (params.transparent_color != color)
+            colors.push_back(color);
     }
-}
-
-Image16Bpp Image16Bpp::SubImage(unsigned int x, unsigned int y, unsigned int swidth, unsigned int sheight) const
-{
-    Image16Bpp sub(swidth, sheight);
-    for (unsigned int i = 0; i < sheight; i++)
-    {
-        for (unsigned int j = 0; j < swidth; j++)
-        {
-            sub.pixels[i * swidth + j] = pixels[(i + y) * width + j + x];
-        }
-    }
-    return sub;
 }
 
 void Image16Bpp::WriteData(std::ostream& file) const
 {
-    WriteShortArray(file, export_name, "", pixels, 10);
+    char buffer[7];
+    WriteBeginArray(file, "const unsigned short", export_name, "", pixels.size());
+    for (unsigned int i = 0; i < pixels.size(); i++)
+    {
+        snprintf(buffer, 7, "0x%04x", pixels[i].GetBGR15());
+        WriteElement(file, buffer, pixels.size(), i, 16);
+    }
+    WriteEndArray(file);
     WriteNewLine(file);
 }
 
@@ -174,20 +169,20 @@ int ColorArray::Search(const Color& a) const
 
     for (unsigned int i = 0; i < colors.size(); i++)
     {
-        double dist = 0;
         const Color& b = colors[i];
-        dist = a.Distance(b);
+        double dist = a.Distance(b);
         if (dist < bestd)
         {
             index = i;
             bestd = dist;
+            if (bestd == 0) break;
         }
     }
 
     colorIndexCache[a] = index;
 
-    if (bestd != 0)
-        VerboseLog("Color remap: Color %d given to palette bank not an exact match.", a.GetBGR15());
+    //if (bestd != 0)
+    //    VerboseLog("Color remap: Color 0x%08x given to palette not an exact match. palette entry: %d - 0x%08x.  dist: %f.", a.GetARGB(), index, colors[index].GetARGB(), bestd);
 
     return index;
 }
@@ -219,7 +214,14 @@ Palette::Palette(const std::vector<Color>& colors, const std::string& name) : Co
 
 void Palette::WriteData(std::ostream& file) const
 {
-    WriteShortArray(file, name, "_palette", colors, 10);
+    char buffer[7];
+    WriteBeginArray(file, "const unsigned short", name, "_palette", colors.size());
+    for (unsigned int i = 0; i < colors.size(); i++)
+    {
+        snprintf(buffer, 7, "0x%04x", colors[i].GetBGR15());
+        WriteElement(file, buffer, colors.size(), i, 16);
+    }
+    WriteEndArray(file);
     WriteNewLine(file);
 }
 
@@ -230,7 +232,7 @@ void Palette::WriteExport(std::ostream& file) const
     WriteNewLine(file);
 }
 
-Image8Bpp::Image8Bpp(const Image16Bpp& image) : Image(image), pixels(width * height), palette(NULL), export_shared_info(true)
+Image8Bpp::Image8Bpp(const Image16Bpp& image) : Image(image), pixels(width * height), palette(new Palette(export_name)), export_shared_info(true)
 {
     // If the image width is odd error out
     if (width & 1)
@@ -239,25 +241,8 @@ Image8Bpp::Image8Bpp(const Image16Bpp& image) : Image(image), pixels(width * hei
     std::vector<Color> pixels16;
     image.GetColors(pixels16);
 
-    // If transparent color is present add to palette, but only if offset is not 0
-    int palette_size = params.palette;
-    std::vector<Color> paletteColors(palette_size);
-    if (params.offset == 0)
-    {
-        palette_size--;
-        paletteColors.push_back(Color(params.transparent_color));
-    }
-
-    MedianCut(pixels16, palette_size, paletteColors, params.weights.data());
-
-    palette.reset(new Palette(paletteColors, export_name));
-    RiemersmaDither(image, *this, params.transparent_color, params.dither, params.dither_level);
-    if (params.offset > 0)
-    {
-        for (unsigned char& pix : pixels)
-            if (pix)
-                pix += params.offset;
-    }
+    GetPalette(pixels16, params.palette, params.transparent_color, params.offset, *palette);
+    DitherAndReduceImage(image, params.transparent_color, params.dither, params.dither_level, params.offset, *this);
 }
 
 Image8Bpp::Image8Bpp(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette) : Image(image), pixels(width * height), palette(global_palette), export_shared_info(false)
@@ -265,13 +250,7 @@ Image8Bpp::Image8Bpp(const Image16Bpp& image, std::shared_ptr<Palette>& global_p
     if (width & 1)
         FatalLog("Image: %s width is not a multiple of 2. Please fix", name.c_str());
 
-    RiemersmaDither(image, *this, params.transparent_color, params.dither, params.dither_level);
-    if (params.offset > 0)
-    {
-        for (unsigned char& pix : pixels)
-            if (pix)
-                pix += params.offset;
-    }
+    DitherAndReduceImage(image, params.transparent_color, params.dither, params.dither_level, params.offset, *this);
 }
 
 void Image8Bpp::WriteData(std::ostream& file) const
@@ -279,7 +258,7 @@ void Image8Bpp::WriteData(std::ostream& file) const
     // Sole owner of palette
     if (export_shared_info)
         palette->WriteData(file);
-    WriteShortArray(file, export_name, "", pixels, 10);
+    WriteShortArray(file, export_name, "", pixels, 16);
     WriteNewLine(file);
 }
 
@@ -305,30 +284,16 @@ void Image8Bpp::WriteExport(std::ostream& file) const
     WriteNewLine(file);
 }
 
-Image8BppScene::Image8BppScene(const std::vector<Image16Bpp>& images16, const std::string& name) : Scene(name), palette(NULL)
+Image8BppScene::Image8BppScene(const std::vector<Image16Bpp>& images16, const std::string& name) : Scene(name), palette(new Palette(name))
 {
-    unsigned int total_pixels = 0;
-    for (unsigned int i = 0; i < images16.size(); i++)
-        total_pixels += images16[i].width * images16[i].height;
-
-    std::vector<Color> pixels(total_pixels);
+    std::vector<Color> pixels;
     for (unsigned int i = 0; i < images16.size(); i++)
         images16[i].GetColors(pixels);
 
-    // If transparent color is present add to palette
-    std::vector<Color> paletteColors;
-    paletteColors.reserve(params.palette);
-    if (params.offset == 0)
-    {
-        params.palette -= 1;
-        paletteColors.push_back(Color(params.transparent_color));
-    }
-
-    MedianCut(pixels, params.palette, paletteColors, params.weights.data());
-    palette.reset(new Palette(paletteColors, name));
+    GetPalette(pixels, params.palette, params.transparent_color, params.offset, *palette);
 
     images.reserve(images16.size());
-    for (unsigned int i = 0; i < images.size(); i++)
+    for (unsigned int i = 0; i < images16.size(); i++)
         images.emplace_back(new Image8Bpp(images16[i], palette));
 }
 
@@ -369,14 +334,13 @@ void PaletteBank::Merge(const ColorArray& palette)
 
 std::ostream& operator<<(std::ostream& file, const PaletteBank& bank)
 {
-    char buffer[7];
-
     std::vector<Color> colors = bank.GetColors();
     colors.resize(16);
+
+    char buffer[7];
     for (unsigned int i = 0; i < colors.size(); i++)
     {
-        unsigned short data_read = colors[i].GetBGR15();
-        snprintf(buffer, 7, "0x%04x", data_read);
+        snprintf(buffer, 7, "0x%04x", colors[i].GetBGR15());
         WriteElement(file, buffer, colors.size(), i, 8);
     }
 
@@ -413,104 +377,151 @@ void PaletteBankManager::WriteExport(std::ostream& file) const
     WriteNewLine(file);
 }
 
-template <>
-Tile<unsigned short>::Tile() : id(0), data(TILE_SIZE), bpp(16), palette_bank(0)
+ImageTile::ImageTile(const Image16Bpp& image, int tilex, int tiley, int border) : id(0), pixels(TILE_SIZE)
 {
-}
-
-template <>
-Tile<unsigned short>::Tile(const std::vector<unsigned short>& image, int pitch, int tilex, int tiley, int border, int ignored) : data(TILE_SIZE), palette_bank(0)
-{
-    Set(image, pitch, tilex, tiley, border, 16);
-}
-
-template <>
-Tile<unsigned short>::Tile(const unsigned short* image, int pitch, int tilex, int tiley, int border, int ignored) : data(TILE_SIZE), palette_bank(0)
-{
-    Set(image, pitch, tilex, tiley, border, 16);
-}
-
-template <>
-Tile<unsigned char>::Tile(std::shared_ptr<ImageTile>& imageTile, int _bpp) : data(TILE_SIZE), bpp(_bpp)
-{
-    // bpp reduce minus one for the transparent color
-    int num_colors = (1 << bpp) - 1;
-    const unsigned short* imgdata = imageTile->data.data();
-    int weights[4] = {25, 25, 25, 25};
-
-    std::vector<Color> pixels;
-    pixels.reserve(TILE_SIZE);
-
-    std::vector<Color> paletteArray;
-    paletteArray.reserve(1 << bpp);
-
-    for (unsigned int i = 0; i < TILE_SIZE; i++)
+    for (int i = 0; i < 8; i++)
     {
-        unsigned short pix = imgdata[i];
-        if (pix != params.transparent_color)
-            pixels.push_back(Color(pix));
+        for (int j = 0; j < 8; j++)
+            pixels[i * 8 + j] = image.pixels[(tiley * (8+border) + i) * image.width + tilex * (8+border) + j];
     }
-    paletteArray.push_back(Color(params.transparent_color));
-    MedianCut(pixels, num_colors, paletteArray, weights);
-
-    palette.Set(paletteArray);
-
-    for (unsigned int i = 0; i < TILE_SIZE; i++)
-    {
-        unsigned short pix = imgdata[i];
-        data[i] = (pix != params.transparent_color) ? palette.Search(Color(pix)) : 0;
-    }
-
-    sourceTile = imageTile;
 }
 
-template <>
-void Tile<unsigned char>::Set(const Image16Bpp& image, const Palette& global_palette, int tilex, int tiley)
+bool ImageTile::operator==(const ImageTile& other) const
 {
-    bpp = 8;
-    for (unsigned int i = 0; i < TILE_SIZE; i++)
+    return IsEqual(other);
+}
+
+bool ImageTile::operator<(const ImageTile& other) const
+{
+    return pixels < other.pixels;
+}
+
+bool ImageTile::IsEqual(const ImageTile& other) const
+{
+    return pixels == other.pixels;
+}
+
+bool ImageTile::IsSameAs(const ImageTile& other) const
+{
+    bool same, sameh, samev, samevh;
+    same = sameh = samev = samevh = true;
+    for (int i = 0; i < TILE_SIZE; i++)
     {
         int x = i % 8;
         int y = i / 8;
-        Color color(image.pixels[(tiley * 8 + y) * image.width + tilex * 8 + x]);
-        data[i] = global_palette.Search(color);
+        same = same && pixels[i] == other.pixels[i];
+        samev = samev && pixels[i] == other.pixels[(7 - y) * 8 + x];
+        sameh = sameh && pixels[i] == other.pixels[y * 8 + (7 - x)];
+        samevh = samevh && pixels[i] == other.pixels[(7 - y) * 8 + (7 - x)];
+    }
+    return same || samev || sameh || samevh;
+}
+
+
+Tile::Tile(const Image16Bpp& image, int tilex, int tiley, int border, int _bpp) : id(0), pixels(TILE_SIZE), bpp(_bpp), palette_bank(-1),
+    sourceTile(new ImageTile(image, tilex, tiley, border))
+{
+    const std::vector<Color>& imgdata = sourceTile->pixels;
+    unsigned int num_colors = 1 << bpp;
+
+    GetPalette(imgdata, num_colors, params.transparent_color, 0, palette);
+    QuantizeImage(imgdata, num_colors, params.transparent_color, 0, palette, pixels);
+}
+
+Tile::Tile(const Image8Bpp& image, int tilex, int tiley, int border, int _bpp) : id(0), pixels(TILE_SIZE), bpp(_bpp), palette_bank(-1), palette(*image.palette)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+            pixels[i * 8 + j] = image.pixels[(tiley * (8+border) + i) * image.width + tilex * (8+border) + j];
     }
 }
 
-template <>
-void Tile<unsigned char>::UsePalette(const PaletteBank& bank)
+Tile::Tile(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette, int tilex, int tiley, int border) : id(0), pixels(TILE_SIZE), bpp(8), palette_bank(-1),
+    palette(*global_palette), sourceTile(new ImageTile(image, tilex, tiley, border))
+{
+    const std::vector<Color>& imgdata = sourceTile->pixels;
+    unsigned int num_colors = 1 << bpp;
+
+    QuantizeImage(imgdata, num_colors, params.transparent_color, 0, palette, pixels);
+}
+
+Tile::Tile(std::shared_ptr<ImageTile>& imageTile, int _bpp) : id(0), pixels(TILE_SIZE), bpp(_bpp), palette_bank(-1), sourceTile(imageTile)
+{
+    const std::vector<Color>& imgdata = sourceTile->pixels;
+    unsigned int num_colors = 1 << bpp;
+
+    GetPalette(imgdata, num_colors, params.transparent_color, 0, palette);
+    QuantizeImage(imgdata, num_colors, params.transparent_color, 0, palette, pixels);
+}
+
+bool Tile::operator<(const Tile& other) const
+{
+    return pixels < other.pixels;
+}
+
+bool Tile::operator==(const Tile& other) const
+{
+    return IsEqual(other);
+}
+
+bool Tile::IsEqual(const Tile& other) const
+{
+    return pixels == other.pixels;
+}
+
+bool Tile::IsSameAs(const Tile& other) const
+{
+    bool same, sameh, samev, samevh;
+    same = sameh = samev = samevh = true;
+    for (int i = 0; i < TILE_SIZE; i++)
+    {
+        int x = i % 8;
+        int y = i / 8;
+        same = same && pixels[i] == other.pixels[i];
+        samev = samev && pixels[i] == other.pixels[(7 - y) * 8 + x];
+        sameh = sameh && pixels[i] == other.pixels[y * 8 + (7 - x)];
+        samevh = samevh && pixels[i] == other.pixels[(7 - y) * 8 + (7 - x)];
+    }
+    return same || samev || sameh || samevh;
+}
+
+void Tile::UsePalette(const PaletteBank& bank)
 {
     if (bpp == 8)
-        FatalLog("Code error not implemented");
+    {
+        FatalLog("Calling UsePalette on a tile whose bpp is 8. This shouldn't happen");
+        return;
+    }
 
     std::map<int, int> remapping;
     for (unsigned int i = 0; i < palette.Size(); i++)
     {
-        Color old = palette.At(i);
+        const Color& old = palette.At(i);
         remapping[i] = bank.Search(old);
     }
 
     for (unsigned int i = 0; i < TILE_SIZE; i++)
     {
-        if (remapping.find(data[i]) == remapping.end())
+        if (remapping.find(pixels[i]) == remapping.end())
             FatalLog("Somehow tile contains invalid indicies. This shouldn't happen");
 
-        data[i] = remapping[data[i]];
+        pixels[i] = remapping[pixels[i]];
     }
 
+    palette_bank = bank.id;
     palette.Set(bank.GetColors());
 }
 
-template <>
-std::ostream& operator<<(std::ostream& file, const Tile<unsigned char>& tile)
+std::ostream& operator<<(std::ostream& file, const Tile& tile)
 {
     char buffer[7];
-    const std::vector<unsigned char>& data = tile.data;
+    const std::vector<unsigned char>& pixels = tile.pixels;
     if (tile.bpp == 8)
     {
         for (unsigned int i = 0; i < TILE_SIZE_SHORTS_8BPP; i++)
         {
-            snprintf(buffer, 7, "0x%02x%02x", data[2 * i + 1], data[2 * i]);
+            snprintf(buffer, 7, "0x%02x%02x", pixels[2 * i + 1], pixels[2 * i]);
             WriteElement(file, buffer, TILE_SIZE_SHORTS_8BPP, i, 8);
         }
     }
@@ -518,14 +529,14 @@ std::ostream& operator<<(std::ostream& file, const Tile<unsigned char>& tile)
     {
         for (unsigned int i = 0; i < TILE_SIZE_SHORTS_4BPP; i++)
         {
-            snprintf(buffer, 7, "0x%01x%01x%01x%01x", data[4 * i + 3], data[4 * i + 2], data[4 * i + 1], data[4 * i]);
+            snprintf(buffer, 7, "0x%01x%01x%01x%01x", pixels[4 * i + 3], pixels[4 * i + 2], pixels[4 * i + 1], pixels[4 * i]);
             WriteElement(file, buffer, TILE_SIZE_SHORTS_4BPP, i, 8);
         }
     }
     return file;
 }
 
-bool TilesPaletteSizeComp(const GBATile& i, const GBATile& j)
+bool TilesPaletteSizeComp(const Tile& i, const Tile& j)
 {
     return i.palette.Size() > j.palette.Size();
 }
@@ -564,14 +575,11 @@ Tileset::Tileset(const Image16Bpp& image, int _bpp) : Exportable(image), bpp(_bp
     }
 }
 
-int Tileset::Search(const GBATile& tile) const
+int Tileset::Search(const Tile& tile) const
 {
-    const std::set<GBATile>::const_iterator foundTile = tiles.find(tile);
+    const std::set<Tile>::const_iterator foundTile = tiles.find(tile);
     if (foundTile != tiles.end())
-    {
-        std::cout << "found\n" << *foundTile << "\n";
         return foundTile->id;
-    }
 
     return -1;
 }
@@ -587,10 +595,10 @@ int Tileset::Search(const ImageTile& tile) const
 
 bool Tileset::Match(const ImageTile& tile, int& tile_id, int& pal_id) const
 {
-    const std::map<ImageTile, GBATile>::const_iterator foundTile = matcher.find(tile);
+    const std::map<ImageTile, Tile>::const_iterator foundTile = matcher.find(tile);
     if (foundTile != matcher.end())
     {
-        const GBATile& tile = foundTile->second;
+        const Tile& tile = foundTile->second;
         tile_id = tile.id;
         pal_id = tile.palette_bank;
         return true;
@@ -606,8 +614,8 @@ void Tileset::WriteData(std::ostream& file) const
     else
         paletteBanks.WriteData(file);
 
-    std::vector<GBATile>::const_iterator tile_ptr = tilesExport.begin();
-    file << "const unsigned short " << name << "_tiles[" << Size() << "] =\n{\n\t";
+    WriteBeginArray(file, "const unsigned short", name, "_tiles", Size());
+    std::vector<Tile>::const_iterator tile_ptr = tilesExport.begin();
     for (unsigned int i = 0; i < tilesExport.size(); i++)
     {
         file << *tile_ptr;
@@ -615,7 +623,7 @@ void Tileset::WriteData(std::ostream& file) const
             file << ",\n\t";
         ++tile_ptr;
     }
-    file << "\n};\n";
+    WriteEndArray(file);
     WriteNewLine(file);
 }
 
@@ -641,20 +649,18 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
     Tileset tileset16bpp(images, name, 16);
     std::set<ImageTile> imageTiles = tileset16bpp.itiles;
 
-    GBATile nullTile;
-    nullTile.id = 0;
-    nullTile.bpp = 4;
-    ImageTile nullImageTile;
+    const Tile& nullTile = Tile::GetNullTile4();
+    const ImageTile& nullImageTile = ImageTile::GetNullTile();
     tiles.insert(nullTile);
     tilesExport.push_back(nullTile);
-    matcher[nullImageTile] = nullTile;
+    matcher.insert(std::pair<ImageTile, Tile>(nullImageTile, nullTile));
 
     // Reduce each tile to 4bpp
-    std::vector<GBATile> gbaTiles;
+    std::vector<Tile> gbaTiles;
     for (std::set<ImageTile>::const_iterator i = imageTiles.begin(); i != imageTiles.end(); ++i)
     {
         std::shared_ptr<ImageTile> src(new ImageTile(*i));
-        GBATile tile(src, 4);
+        Tile tile(src, 4);
         gbaTiles.push_back(tile);
     }
 
@@ -675,8 +681,6 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
     // But deal with nulltile
     for (unsigned int i = 0; i < paletteBanks.Size(); i++)
         paletteBanks[i].Add(Color());
-    nullTile.palette_bank = 0;
-
 
     // Construct palette banks, assign bank id to tile, remap tile to palette bank given, assign tile ids
     for (auto& tile : gbaTiles)
@@ -716,7 +720,7 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
         tile.UsePalette(paletteBanks[pbank]);
 
         // Assign tile id
-        std::set<GBATile>::const_iterator it = tiles.find(tile);
+        std::set<Tile>::const_iterator it = tiles.find(tile);
         if (it == tiles.end())
         {
             tile.id = tiles.size();
@@ -728,8 +732,8 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
             tile.id = it->id;
         }
 
-        // Form mapping from ImageTile to GBATile
-        matcher[*tile.sourceTile] = tile;
+        // Form mapping from ImageTile to Tile
+        matcher.insert(std::pair<ImageTile, Tile>(*tile.sourceTile, tile));
     }
 
     int tile_size = TILE_SIZE_BYTES_4BPP;
@@ -754,11 +758,11 @@ void Tileset::Init8bpp(const std::vector<Image16Bpp>& images16)
     Image8BppScene scene(images16, name);
     palette = scene.palette;
 
-    GBATile nullTile;
-    ImageTile nullImageTile;
+    const Tile& nullTile = Tile::GetNullTile8();
+    const ImageTile& nullImageTile = ImageTile::GetNullTile();
     tiles.insert(nullTile);
     tilesExport.push_back(nullTile);
-    matcher[nullImageTile] = nullTile;
+    matcher.insert(std::pair<ImageTile, Tile>(nullImageTile, nullTile));
 
     for (unsigned int k = 0; k < images16.size(); k++)
     {
@@ -776,16 +780,16 @@ void Tileset::Init8bpp(const std::vector<Image16Bpp>& images16)
         {
             int tilex = i % tilesX;
             int tiley = i / tilesX;
-            GBATile tile(image.pixels, image.width, tilex, tiley, params.border);
-            std::set<GBATile>::iterator foundTile = tiles.find(tile);
+            Tile tile(image, tilex, tiley, params.border);
+            std::set<Tile>::iterator foundTile = tiles.find(tile);
             if (foundTile == tiles.end())
             {
                 tile.id = tiles.size();
                 tiles.insert(tile);
                 tilesExport.push_back(tile);
                 // Add matcher data
-                ImageTile imageTile(image16.pixels, image.width, tilex, tiley, params.border);
-                matcher[imageTile] = tile;
+                ImageTile imageTile(image16, tilex, tiley, params.border);
+                matcher.insert(std::pair<ImageTile, Tile>(imageTile, tile));
             }
             else if (offsets.size() > 1 && !disjoint_error)
             {
@@ -814,13 +818,12 @@ void Tileset::Init8bpp(const std::vector<Image16Bpp>& images16)
 void Tileset::Init16bpp(const std::vector<Image16Bpp>& images)
 {
     int tile_width = 8 + params.border;
-    ImageTile nullTile;
+    const ImageTile& nullTile = ImageTile::GetNullTile();
     itiles.insert(nullTile);
 
     for (unsigned int k = 0; k < images.size(); k++)
     {
         const Image16Bpp& image = images[k];
-        const std::vector<unsigned short>& pixels = image.pixels;
 
         unsigned int tilesX = image.width / tile_width;
         unsigned int tilesY = image.height / tile_width;
@@ -831,7 +834,7 @@ void Tileset::Init16bpp(const std::vector<Image16Bpp>& images)
         {
             int tilex = i % tilesX;
             int tiley = i / tilesX;
-            ImageTile tile(pixels, image.width, tilex, tiley, params.border);
+            ImageTile tile(image, tilex, tiley, params.border);
             std::set<ImageTile>::iterator foundTile = itiles.find(tile);
             if (foundTile == itiles.end())
             {
@@ -876,13 +879,11 @@ Map::Map(const Image16Bpp& image, std::shared_ptr<Tileset>& global_tileset) : Im
 
 void Map::Init4bpp(const Image16Bpp& image)
 {
-    const std::vector<unsigned short>& pixels = image.pixels;
-
     for (unsigned int i = 0; i < data.size(); i++)
     {
         int tilex = i % width;
         int tiley = i / width;
-        ImageTile imageTile(pixels, image.width, tilex, tiley);
+        ImageTile imageTile(image, tilex, tiley);
         int tile_id = 0;
         int pal_id = 0;
 
@@ -892,26 +893,21 @@ void Map::Init4bpp(const Image16Bpp& image)
             WarnLog("Image: %s No match for palette for tile starting at (%d %d) px, using palette 0 instead.", image.name.c_str(), tilex * 8, tiley * 8);
         }
         data[i] = pal_id << 12 | tile_id;
-
     }
 }
 
 void Map::Init8bpp(const Image16Bpp& image)
 {
-    const std::vector<unsigned short>& pixels = image.pixels;
-
     for (unsigned int i = 0; i < data.size(); i++)
     {
         int tilex = i % width;
         int tiley = i / width;
-        ImageTile tile(pixels, image.width, tilex, tiley);
+        ImageTile tile(image, tilex, tiley);
         int tile_id = 0;
         int pal_id = 0;
 
         if (!tileset->Match(tile, tile_id, pal_id))
-        {
             WarnLog("Image: %s No match for tile starting at (%d %d) px, using empty tile instead.", image.name.c_str(), tilex * 8, tiley * 8);
-        }
 
         data[i] = tile_id;
     }
@@ -927,7 +923,7 @@ void Map::WriteData(std::ostream& file) const
     int type = (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1;
     int num_blocks = (type == 0 ? 1 : (type < 3 ? 2 : 4));
 
-    file << "const unsigned short " << export_name << "_map[" << num_blocks * 32 * 32 << "] =\n{\n\t";
+    WriteBeginArray(file, "const unsigned short", export_name, "_map", num_blocks * 32 * 32);
     for (int i = 0; i < num_blocks; i++)
     {
         // Case for each possible value of num_blocks
@@ -956,7 +952,7 @@ void Map::WriteData(std::ostream& file) const
             }
         }
     }
-    file << "\n};\n";
+    WriteEndArray(file);
     WriteNewLine(file);
 }
 
@@ -1012,7 +1008,7 @@ void MapScene::WriteExport(std::ostream& file) const
 }
 
 Sprite::Sprite(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette) :
-    Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated), data(width * height), palette(global_palette),
+    Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated), palette(global_palette),
     palette_bank(-1), size(0), shape(0), offset(0)
 {
     unsigned int key = (log2(width) << 2) | log2(height);
@@ -1021,17 +1017,13 @@ Sprite::Sprite(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette
     if (size == -1 || image.width & 7 || image.height & 7)
         FatalLog("Invalid sprite size, (%d %d) Please fix", image.width, image.height);
 
-    for (unsigned int i = 0; i < data.size(); i++)
-    {
-        int tilex = i % width;
-        int tiley = i / width;
-
-        data[i].Set(image, *global_palette, tilex, tiley);
-    }
+    data.reserve(width * height);
+    for (unsigned int i = 0; i < width * height; i++)
+        data.emplace_back(image, global_palette, i % width, i / width);
 }
 
 Sprite::Sprite(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
-    data(width * height), palette_bank(-1), size(0), shape(0), offset(0)
+    palette(new Palette()), palette_bank(-1), size(0), shape(0), offset(0)
 {
     unsigned int key = (log2(width) << 2) | log2(height);
     shape = sprite_shapes[key];
@@ -1039,40 +1031,13 @@ Sprite::Sprite(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.
     if (size == -1 || image.width & 7 || image.height & 7)
         FatalLog("Invalid sprite size, (%d %d) Please fix", image.width, image.height);
 
-    // bpp reduce minus one for the transparent color
-    int num_colors = (1 << bpp) - 1;
-    const unsigned short* imgdata = image.pixels.data();
-    unsigned int size = image.pixels.size();
+    GetPalette(image.pixels, 0, params.transparent_color, 0, *palette);
+    // Is actually an 8 or 4bpp image
+    Image8Bpp image8(image, palette);
 
-    std::vector<Color> pixels(size);
-    std::vector<Color> paletteArray(num_colors + 1);
-
-    for (unsigned int i = 0; i < size; i++)
-    {
-        unsigned short pix = imgdata[i];
-        if (pix != params.transparent_color)
-            pixels.push_back(Color(pix));
-    }
-    paletteArray.push_back(Color(params.transparent_color));
-    MedianCut(pixels, num_colors, paletteArray, params.weights.data());
-
-    palette.reset(new Palette(paletteArray, ""));
-
-    std::vector<unsigned char> data4bpp(size);
-    for (unsigned int i = 0; i < size; i++)
-    {
-        unsigned short pix = imgdata[i];
-        data4bpp[i] = (pix != params.transparent_color) ? palette->Search(Color(pix)) : 0;
-    }
-
-    for (unsigned int i = 0; i < data.size(); i++)
-    {
-        int tilex = i % width;
-        int tiley = i / width;
-
-        data[i].Set(data4bpp, image.width, tilex, tiley, 0, 4);
-        data[i].palette = *palette;
-    }
+    data.reserve(width * height);
+    for (unsigned int i = 0; i < width * height; i++)
+        data.emplace_back(image8, i % width, i / width, 0, bpp);
 }
 
 void Sprite::UsePalette(const PaletteBank& bank)
@@ -1085,10 +1050,10 @@ void Sprite::UsePalette(const PaletteBank& bank)
 void Sprite::WriteTile(unsigned char* arr, int x, int y) const
 {
     int index = y * width + x;
-    const GBATile& tile = data[index];
+    const Tile& tile = data[index];
     for (unsigned int i = 0; i < TILE_SIZE; i++)
     {
-        arr[i] = tile.data[i];
+        arr[i] = tile.pixels[i];
     }
 }
 
@@ -1370,19 +1335,6 @@ void SpriteSheet::SliceBlock(const BlockSize& size, const std::list<BlockSize>& 
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, int _bpp) : Scene(_name), bpp(_bpp), paletteBanks(name),
     is2d(_is2d), spriteSheetGiven(false)
 {
-    if (images.size() == 1 && (images[0].width > 64 || images[0].height > 64))
-    {
-        spriteSheetGiven = true;
-        is2d = !(images[0].width == 8 || images[0].height == 8);
-        WarnLog("[WARNING] Spritesheet detected.\n"
-                "If you formed your sprites in a single sprite sheet please note that \n"
-                "the program will automatically build the spritesheet for you and export.\n"
-                "Just pass in the images you want to use as sprites and let me do the rest.\n"
-                "Override: using sprite mode %s.", (is2d ? "2D" : "1D"));
-        InitSpriteSheet(images[0]);
-        return;
-    }
-
     switch(bpp)
     {
         case 4:
@@ -1462,14 +1414,14 @@ void SpriteScene::WriteData(std::ostream& file) const
     }
     else
     {
-        file << "const unsigned short " << name << "[" << Size() << "] =\n{\n\t";
+        WriteBeginArray(file, "const unsigned short", name, "", Size());
         for (unsigned int i = 0; i < images.size(); i++)
         {
             file << GetSprite(i);
             if (i != images.size() - 1)
                 file << ",\n\t";
         }
-        file << "\n};\n";
+        WriteEndArray(file);
         WriteNewLine(file);
     }
 }
@@ -1588,22 +1540,37 @@ void SpriteScene::Init8bpp(const std::vector<Image16Bpp>& images16)
         images.emplace_back(new Sprite(image, palette));
 }
 
-void SpriteScene::InitSpriteSheet(const Image16Bpp& sheet)
+void GetPalette(const std::vector<Color>& image, unsigned int num_colors, const Color& transparent, unsigned int offset, Palette& palette)
 {
-    std::vector<Image16Bpp> tiles;
-    int tilesX = sheet.width / 8;
-    int tilesY = sheet.height / 8;
-    tiles.reserve(tilesX * tilesY);
-    for (int y = 0; y < tilesY; y++)
+    std::vector<Color> pixels;
+    for (const auto& color : image)
     {
-        for (int x = 0; x < tilesX; x++)
-        {
-            tiles.push_back(sheet.SubImage(x * 8, y * 8, 8, 8));
-        }
+        if (color != transparent)
+            pixels.push_back(color);
     }
 
-    if (bpp == 4)
-        Init4bpp(tiles);
-    else
-        Init8bpp(tiles);
+    std::vector<Color> paletteArray;
+    if (!offset)
+        paletteArray.push_back(transparent);
+
+    MedianCut(pixels, num_colors - 1, paletteArray, params.weights.data());
+    palette.Set(paletteArray);
+}
+
+void QuantizeImage(const std::vector<Color>& image, unsigned int num_colors, const Color& transparent, unsigned int offset, Palette& palette, std::vector<unsigned char>& indexed)
+{
+    GetPalette(image, num_colors, transparent, offset, palette);
+    for (const auto& color : image)
+        indexed.push_back((color == transparent) ? 0 : palette.Search(color) + offset);
+}
+
+void DitherAndReduceImage(const Image16Bpp& image, const Color& transparent, bool dither, double dither_level, unsigned int offset, Image8Bpp& indexedImage)
+{
+    RiemersmaDither(image, indexedImage, transparent, dither, dither_level);
+    if (offset > 0)
+    {
+        for (unsigned char& pix : indexedImage.pixels)
+            if (pix)
+                pix += offset;
+    }
 }

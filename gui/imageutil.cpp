@@ -18,3 +18,24 @@ wxBitmap MagickToBitmap(Magick::Image image, int width, int height)
     image.write(0, 0, image.columns(), image.rows(), "RGB", Magick::CharPixel, rgb);
     return wxBitmap(wxImage(width, height, rgb));
 }
+
+void TransferToWx(const Image16Bpp& image, wxImage& wx)
+{
+    wx.Create(image.width, image.height);
+
+    for (unsigned int i = 0; i < image.height; i++)
+    {
+        for (unsigned int j = 0; j < image.width; j++)
+        {
+            //Color c = image.At(j, i);
+            unsigned char r, g, b;
+            //c.GetRGB24(r, g, b);
+            wx.SetRGB(j, i, r, g, b);
+        }
+    }
+}
+
+void TransferToNin10Kit(const wxImage& wx, Image16Bpp& image)
+{
+
+}

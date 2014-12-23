@@ -1,53 +1,63 @@
 #include "color.hpp"
 #include "cpercep.hpp"
+#include "logger.hpp"
 
-Color::Color(unsigned short color_data)
+bool Color::operator==(const Color& other) const
 {
-    SetBGR15(color_data);
+    return r == other.r && g == other.g && b == other.b;
 }
 
 bool Color::operator<(const Color& right) const
 {
     bool less;
-    less = x < right.x;
-    if (x == right.x) less = y < right.y;
-    if (x == right.x && y == right.y) less = z < right.z;
+    less = r < right.r;
+    if (r == right.r) less = g < right.g;
+    if (r == right.r && g == right.g) less = b < right.b;
     return less;
 }
 
-void Color::Set(int a, int b, int c)
+Color Color::FromBGR15(unsigned short color_data)
 {
-    x = a;
-    y = b;
-    z = c;
+    return Color((color_data & 0x1f) << 3, ((color_data >> 5) & 0x1f) << 3, ((color_data >> 10) & 0x1f) << 3);
 }
 
 void Color::SetBGR15(unsigned short color_data)
 {
-    x = color_data & 0x1f;
-    y = (color_data >> 5) & 0x1f;
-    z = (color_data >> 10) & 0x1f;
+    r = (color_data & 0x1f) << 3;
+    g = ((color_data >> 5) & 0x1f) << 3;
+    b = ((color_data >> 10) & 0x1f) << 3;
+}
+
+void Color::SetBGR15(const Color& other)
+{
+    r = other.r & 0xf8;
+    g = other.g & 0xf8;
+    b = other.b & 0xf8;
 }
 
 unsigned short Color::GetBGR15() const
 {
-    return ((int)x) | ((int)y << 5) | ((int)z << 10);
+    return ((r >> 3) & 0x1f) | (((g >> 3) & 0x1f) << 5) | (((b >> 3) & 0x1f) << 10);
 }
 
-/** Distance in perception.
-  */
+void Color::GetBGR15(unsigned char& x, unsigned char& y, unsigned char& z) const
+{
+    x = (r >> 3) & 0x1f;
+    y = (g >> 3) & 0x1f;
+    z = (b >> 3) & 0x1f;
+}
+
 double Color::Distance(const Color& other) const
 {
-    double ox, oy, oz;
-    double l, a, b, ol, oa, ob;
+    unsigned char ro, go, bo;
+    double l, a, lb, ol, oa, ob;
 
-    ox = other.x;
-    oy = other.y;
-    oz = other.z;
+    ro = other.r;
+    go = other.g;
+    bo = other.b;
 
-    cpercep_rgb_to_space(x * 255.0 / 31, y * 255.0 / 31, z * 255.0 / 31, &l, &a, &b);
-    cpercep_rgb_to_space(ox * 255.0 / 31, oy * 255.0 / 31, oz * 255.0 / 31, &ol, &oa, &ob);
+    cpercep_rgb_to_space(r, g, b, &l, &a, &lb);
+    cpercep_rgb_to_space(ro, go, bo, &ol, &oa, &ob);
 
-    return cpercep_distance_space(l, a, b, ol, oa, ob);
-
+    return cpercep_distance_space(l, a, lb, ol, oa, ob);
 }

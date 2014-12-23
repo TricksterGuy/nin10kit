@@ -42,8 +42,9 @@ void ExportFile::Write(std::ostream& file)
         for (const auto& tileset : tilesets)
             file << " * " << tileset << "\n";
     }
-    if (params.transparent_color != -1)
-        file << " * Transparent color: 0x" << std::hex << transparent_color << std::dec << "\n";
+    ///TODO x
+    //if (params.transparent_given)
+    //    file << " * Transparent color: " << transparent_color << "\n";
     if (!luts.empty())
     {
         file << " * \n";

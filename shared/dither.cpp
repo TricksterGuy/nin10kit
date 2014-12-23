@@ -3,17 +3,19 @@
 #include <algorithm>
 #include <cmath>
 
+#include "logger.hpp"
+
 #ifndef CLAMP
-#define CLAMP(x) (((x) < 0.0) ? 0.0 : (((x) > 31) ? 31 : (x)))
+#define CLAMP(x) (((x) < 0.0) ? 0.0 : (((x) > 255) ? 255 : (x)))
 #endif
 
 struct DitherImage
 {
-    DitherImage(const Image16Bpp& _inImage, Image8Bpp& _outImage, unsigned short _transparent, int _dither, float _ditherlevel) :
+    DitherImage(const Image16Bpp& _inImage, Image8Bpp& _outImage, const Color& _transparent, int _dither, float _ditherlevel) :
         inImage(_inImage), outImage(_outImage), transparent(_transparent), x(0), y(0), dither(_dither), ditherlevel(_ditherlevel) {};
     const Image16Bpp& inImage;
     Image8Bpp& outImage;
-    unsigned short transparent;
+    Color transparent;
     unsigned int x, y;
     int dither;
     float ditherlevel;
@@ -28,25 +30,26 @@ enum
     RIGHT,
 };
 
-int Dither(const unsigned short& data, std::shared_ptr<Palette> palette, unsigned short transparent, int dither, float ditherlevel)
+int Dither(const Color& color, std::shared_ptr<Palette>& palette, const Color& transparent, int dither, float ditherlevel)
 {
     static int ex = 0, ey = 0, ez = 0;
-    if (data == transparent) return 0;
+    if (color == transparent) return 0;
 
-    Color color(data);
-    Color newColor(CLAMP(color.x + ex), CLAMP(color.y + ey), CLAMP(color.z + ez));
+    Color newColor(CLAMP(color.r + ex), CLAMP(color.g + ey), CLAMP(color.b + ez));
     int index = palette->Search(newColor);
     newColor = palette->At(index);
 
     if (dither)
     {
-        ex += color.x - newColor.x;
-        ey += color.y - newColor.y;
-        ez += color.z - newColor.z;
+        ex += color.r - newColor.r;
+        ey += color.g - newColor.g;
+        ez += color.b - newColor.b;
         ex *= ditherlevel;
         ey *= ditherlevel;
         ez *= ditherlevel;
     }
+
+    VerboseLog("Color 0x%08x -> 0x%08x %d %d %d %f", color.GetARGB(), newColor.GetARGB(), ex, ey, ez, ditherlevel);
 
     return index;
 }
@@ -156,7 +159,7 @@ void Hilbert(DitherImage& dither, int level, int direction)
     }
 }
 
-void RiemersmaDither(const Image16Bpp& inImage, Image8Bpp& outImage, unsigned short transparent, int dither, float ditherlevel)
+void RiemersmaDither(const Image16Bpp& inImage, Image8Bpp& outImage, const Color& transparent, int dither, float ditherlevel)
 {
     DitherImage dimage(inImage, outImage, transparent, dither, ditherlevel);
     int size = ceil(log2(std::max(inImage.width, inImage.height)));

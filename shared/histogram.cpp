@@ -7,23 +7,23 @@ bool ColorCompare::operator()(Color left, Color right)
     bool less;
     switch(index)
     {
-    case 0:
-        less = left.x < right.x;
-        if (left.x == right.x) less = left.y < right.y;
-        if (left.x == right.x && left.y == right.y) less = left.z < right.z;
-        break;
-    case 1:
-        less = left.y < right.y;
-        if (left.y == right.y) less = left.x < right.x;
-        if (left.x == right.x && left.y == right.y) less = left.z < right.z;
-        break;
-    case 2:
-        less = left.z < right.z;
-        if (left.z == right.z) less = left.x < right.x;
-        if (left.x == right.x && left.z == right.z) less = left.y < right.y;
-        break;
-    default:
-        less = false;
+        case 0:
+            less = left.r < right.r;
+            if (left.r == right.r) less = left.g < right.g;
+            if (left.r == right.r && left.g == right.g) less = left.b < right.b;
+            break;
+        case 1:
+            less = left.g < right.g;
+            if (left.g == right.g) less = left.r < right.r;
+            if (left.r == right.r && left.g == right.g) less = left.b < right.b;
+            break;
+        case 2:
+            less = left.b < right.b;
+            if (left.b == right.b) less = left.r < right.r;
+            if (left.r == right.r && left.b == right.b) less = left.g < right.g;
+            break;
+        default:
+            less = false;
     }
     return less;
 }
@@ -52,7 +52,6 @@ Histogram::Histogram(Histogram& hist, const std::vector<Color>& keys)
     std::vector<Color>::const_iterator i;
     for (i = colors.begin(); i != colors.end(); ++i)
         data[*i] = hist.data[*i];
-
 }
 
 /** @brief Histogram
@@ -116,15 +115,15 @@ Color Histogram::GetAverageColor() const
     {
         Color current = i->first;
         size_t population = i->second;
-        sumx += current.x * population;
-        sumy += current.y * population;
-        sumz += current.z * population;
+        sumx += current.r * population;
+        sumy += current.g * population;
+        sumz += current.b * population;
         sump += population;
     }
 
-    out.x = sumx / sump;
-    out.y = sumy / sump;
-    out.z = sumz / sump;
+    out.r = sumx / sump;
+    out.g = sumy / sump;
+    out.b = sumz / sump;
     return out;
 }
 

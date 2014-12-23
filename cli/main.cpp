@@ -92,10 +92,10 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
         "Only for mode4 exports. (Usage -palette=X). Will restrict the palette to X entries rather than 256. "
         "Useful when combined with -start.",
         wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_SWITCH, "split", "split",
+    {wxCMD_LINE_OPTION, "split", "split",
         "Only for mode0/4 exports.  Exports each individual image with its own palette (and tileset).  Useful for sets of screens. "
         "Or videos (this program even supports video formats).",
-        wxCMD_LINE_VAL_NONE, wxCMD_LINE_PARAM_OPTIONAL},
+         wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
     // Mode 0 exclusive options
     {wxCMD_LINE_OPTION, "split_sbb", "split_sbb", "(Usage -split_sbb=1-4) Given a big map image (>1024,1024) split it into multiple maps."
@@ -105,17 +105,17 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
         wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_OPTION, "border", "border", "Border around each tile in tileset image",
         wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_SWITCH, "force", "force",
+    {wxCMD_LINE_OPTION, "force", "force",
         "For mode 0 4bpp export only. If a problem occurs that could result in a major loss of quality, forces the program to export anyway (NOT IMPLEMENTED YET).",
-        wxCMD_LINE_VAL_NONE, wxCMD_LINE_PARAM_OPTIONAL},
+        wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
     // Sprite exclusive options
-    {wxCMD_LINE_SWITCH, "export_2d", "export_2d",
+    {wxCMD_LINE_OPTION, "export_2d", "export_2d",
         "For sprites export only. Exports sprites for use in sprite 2d mode (Default false).",
-        wxCMD_LINE_VAL_NONE, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_SWITCH, "for_bitmap", "for_bitmap",
+        wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "for_bitmap", "for_bitmap",
         "For sprites export only.  Exports sprites for use in modes 3 and 4 (Default false).",
-        wxCMD_LINE_VAL_NONE, wxCMD_LINE_PARAM_OPTIONAL},
+        wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
     // Advanced Mode 4 options Use at your own risk.
     {wxCMD_LINE_OPTION, "weights", "weights",
@@ -199,21 +199,23 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     params.output_dir = parse.GetString("output_dir");
     params.names = parse.GetListString("names");
     std::vector<std::string> resizes = parse.GetListString("resize");
-    params.transparent_color = parse.GetHexInt("transparent", -1);
-    params.dither = parse.GetSwitch("dither");
+    int transparent = parse.GetHexInt("transparent", -1, 0, 0xFFFFFF);
+    params.transparent_given = transparent != -1;
+    params.transparent_color = Color(transparent);
+    params.dither = parse.GetBoolean("dither", true);
     params.dither_level = parse.GetInt("dither_level", 80, 0, 100) / 100.0f;
 
     params.offset = parse.GetInt("start", 0, 0, 255);
     params.palette = parse.GetInt("palette", 256, 1, 256);
-    params.split = parse.GetSwitch("split");
+    params.split = parse.GetBoolean("split", false);
 
-    params.split_sbb = parse.GetSwitch("split_sbb");
+    params.split_sbb = parse.GetBoolean("split_sbb", false);
     params.tilesets = parse.GetListString("tileset");
     params.border = parse.GetInt("border", 0, 0);
-    params.force = parse.GetSwitch("force");
+    params.force = parse.GetBoolean("force", false);
 
-    params.export_2d = parse.GetSwitch("export_2d");
-    params.for_bitmap = parse.GetSwitch("for_bitmap");
+    params.export_2d = parse.GetBoolean("export_2d", false);
+    params.for_bitmap = parse.GetBoolean("for_bitmap", false);
 
     params.weights = parse.GetListInt("weights", {25, 25, 25, 25});
 

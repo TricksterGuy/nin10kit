@@ -7,6 +7,13 @@ bool CmdLineParserHelper::GetSwitch(const std::string& param)
     return parser.Found(param);
 }
 
+bool CmdLineParserHelper::GetBoolean(const std::string& param, bool def_value)
+{
+    long ret;
+    if (!parser.Found(param, &ret)) return def_value;
+    return ret != 0;
+}
+
 int CmdLineParserHelper::GetInt(const std::string& param, int def_value, int min, int max)
 {
     long ret;

@@ -6,6 +6,7 @@
 
 #include <Magick++.h>
 
+#include "color.hpp"
 #include "headerfile.hpp"
 #include "implementationfile.hpp"
 #include "lutgen.hpp"
@@ -38,7 +39,8 @@ struct ExportParams
 
     // Optional stuff
     std::vector<resize> resizes;
-    int transparent_color;
+    bool transparent_given;
+    Color transparent_color;
 
     // Palette options
     unsigned int offset;

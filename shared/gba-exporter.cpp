@@ -23,7 +23,7 @@ void DoGBAExport(const std::vector<Image32Bpp>& images32, const std::vector<Imag
     for (const auto& image : tilesets32)
         tilesets.push_back(Image16Bpp(image));
 
-    if (params.transparent_color != -1)
+    /*if (params.transparent_color != -1)
     {
         int color = params.transparent_color;
         char r = (color >> 19) & 0x1F;
@@ -32,7 +32,7 @@ void DoGBAExport(const std::vector<Image32Bpp>& images32, const std::vector<Imag
         unsigned short gba_color = r | g << 5 | b << 10;
         header.SetTransparent(gba_color);
         implementation.SetTransparent(gba_color);
-    }
+    }*/
 
     if (params.mode == "0")
         DoMode0Export(images);

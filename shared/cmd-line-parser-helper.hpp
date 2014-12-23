@@ -15,6 +15,8 @@ class CmdLineParserHelper
         ~CmdLineParserHelper() {}
         /** Get value of boolean switch */
         bool GetSwitch(const std::string& param);
+        /** Get value of boolean passed into param */
+        bool GetBoolean(const std::string& param, bool def_value = false);
         /** Get value of integer passed into param */
         int GetInt(const std::string& param, int def_value = 0, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max());
         /** Get value of integer passed as hex into param */

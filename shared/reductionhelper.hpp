@@ -13,13 +13,13 @@
 
 #include <Magick++.h>
 
+#define TOTAL_TILE_MEMORY_BYTES 65536
 #define TILE_SIZE 64
 #define PALETTE_SIZE 16
 #define TILE_SIZE_BYTES_8BPP 64
 #define TILE_SIZE_BYTES_4BPP 32
 #define TILE_SIZE_SHORTS_8BPP 32
 #define TILE_SIZE_SHORTS_4BPP 16
-#define TOTAL_TILE_MEMORY_BYTES 65536
 #define SIZE_CBB_BYTES (8192 * 2)
 #define SIZE_SBB_BYTES (1024 * 2)
 #define SIZE_SBB_SHORTS 1024
@@ -53,8 +53,6 @@ class Image : public Exportable
         virtual std::string GetImageType() const {return "const unsigned short*";}
         /** Gets the symbol base name for this image */
         virtual std::string GetExportName() const {return export_name;}
-        /** Size of image in pixels/tiles */
-        //virtual unsigned int Size() const {return width * height;};
         /** Width of image in either pixels or tiles */
         unsigned int width;
         /** Height of image in either pixels or tiles */
@@ -104,7 +102,7 @@ class Image32Bpp : public Image
         void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         virtual std::string GetImageType() const {return "const unsigned char*";}
-        std::vector<unsigned char> pixels;
+        std::vector<Color> pixels;
         bool has_alpha;
 };
 
@@ -115,16 +113,12 @@ class Image16Bpp : public Image
 {
     public:
         Image16Bpp(const Image32Bpp& image);
-        ///TODO remove
-        Image16Bpp(unsigned int width, unsigned int height) : Image(width, height) {}
         void WriteData(std::ostream& file) const;
         void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         /** Gets array of colors excluding transparent color */
         void GetColors(std::vector<Color>& colors) const;
-        ///TODO remove should use Tile class for this
-        Image16Bpp SubImage(unsigned int x, unsigned int y, unsigned int width, unsigned int height) const;
-        std::vector<unsigned short> pixels;
+        std::vector<Color> pixels;
 };
 
 /** Base class for palettes/palette banks.  Represents a set of colors. */
@@ -135,7 +129,7 @@ class ColorArray
         /** Sets array to contain colors passed in */
         void Set(const std::vector<Color>& _colors);
         /** Gets color at palette index */
-        Color At(int index) const {return colors[index];}
+        const Color& At(int index) const {return colors[index];}
         /** Search palette for color passed in returns the closest palette index that matches the color */
         int Search(const Color& color) const;
         /** Are all colors contained in the palette? */
@@ -158,7 +152,7 @@ class ColorArray
 class Palette : public ColorArray, public Exportable
 {
     public:
-        Palette() {} // Used by Tile constructor
+        Palette(const std::string& name = "") : Exportable(name) {} // Used by Tile constructor
         Palette(const std::vector<Color>& _colors, const std::string& _name);
         void WriteData(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
@@ -196,8 +190,7 @@ class Image8BppScene : public Scene
         std::shared_ptr<Palette> palette;
 };
 
-/** Represents a palette bank for 4 bpp exports.
-  */
+/** Represents a palette bank for 4 bpp exports. */
 class PaletteBank : public ColorArray
 {
     public:
@@ -222,47 +215,65 @@ class PaletteBankManager : public Exportable
         std::vector<PaletteBank> banks;
 };
 
-// TODO rewrite class passing in images to clean up.
-/** This class represents a Tile of any bpp */
-template <class T>
+/** This class represents a one to one mapping between an Image and Tile. */
+class ImageTile
+{
+    public:
+        ImageTile(const Image16Bpp& image, int tilex, int tiley, int border = 0);
+        ~ImageTile() {};
+        bool IsEqual(const ImageTile& other) const;
+        bool IsSameAs(const ImageTile& other) const;
+        bool operator<(const ImageTile& other) const;
+        bool operator==(const ImageTile& other) const;
+        static const ImageTile& GetNullTile()
+        {
+            static ImageTile nullTile;
+            return nullTile;
+        }
+        int id;
+        std::vector<Color> pixels;
+    private:
+        ImageTile() : id(0), pixels(TILE_SIZE) {}
+};
+
+/* */
 class Tile
 {
     public:
-        typedef Tile<unsigned char> GBATile;
-        typedef Tile<unsigned short> ImageTile;
-
-        Tile();
-        Tile(const Tile<T>& tile);
-        Tile(const std::vector<T>& image, int pitch, int tilex, int tiley, int border = 0, int bpp = 8);
-        Tile(const T* image, int pitch, int tilex, int tiley, int border = 0, int bpp = 8);
+        Tile(const Image16Bpp& image, int tilex, int tiley, int border = 0, int bpp = 8);
+        Tile(const Image8Bpp& image, int tilex, int tiley, int border = 0, int bpp = 8);
+        Tile(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette, int tilex, int tiley, int border = 0);
         Tile(std::shared_ptr<ImageTile>& imageTile, int bpp);
-        // Constructs tile from image using global palette.
-        Tile(const Image16Bpp& image, const Palette& global_palette, int tilex, int tiley);
         ~Tile() {};
-        void Set(const std::vector<T>& image, int pitch, int tilex, int tiley, int border = 0, int bpp = 8);
-        void Set(const T* image, int pitch, int tilex, int tiley, int border = 0, int bpp = 8);
-        // 8bpp Set.  Constructs tile from image using global palette.
-        void Set(const Image16Bpp& image, const Palette& global_palette, int tilex, int tiley);
+        bool IsEqual(const Tile& other) const;
+        bool IsSameAs(const Tile& other) const;
+        bool operator<(const Tile& other) const;
+        bool operator==(const Tile& other) const;
+        /* Set to use palette bank only for 4bpp tiles */
         void UsePalette(const PaletteBank& bank);
-        bool IsEqual(const Tile<T>& other) const;
-        bool IsSameAs(const Tile<T>& other) const;
-        bool operator<(const Tile<T>& other) const;
-        bool operator==(const Tile<T>& other) const;
+        static const Tile& GetNullTile8()
+        {
+            static Tile nullTile(8);
+            return nullTile;
+        }
+        static const Tile& GetNullTile4()
+        {
+            static Tile nullTile(4);
+            return nullTile;
+        }
         int id;
-        std::vector<T> data;
+        std::vector<unsigned char> pixels;
         int bpp;
-        unsigned char palette_bank;
+        int palette_bank;
         Palette palette;
         std::shared_ptr<ImageTile> sourceTile;
 
-    template <class U>
-    friend std::ostream& operator<<(std::ostream& file, const Tile<U>& tile);
+    friend std::ostream& operator<<(std::ostream& file, const Tile& tile);
+    private:
+        Tile(int _bpp) : id(0), pixels(TILE_SIZE), bpp(_bpp), palette_bank(0) {}
 };
 
-/** Tile that represents an actual tile for use on gba */
-typedef Tile<unsigned char> GBATile;
-/** Tile that represents an unreduced tile from image */
-typedef Tile<unsigned short> ImageTile;
+bool TilesPaletteSizeComp(const Tile& i, const Tile& j);
 
 /** Class represents a set of 8x8 pixel tiles */
 class Tileset : public Exportable
@@ -270,22 +281,21 @@ class Tileset : public Exportable
     public:
         Tileset(const std::vector<Image16Bpp>& images, const std::string& name, int bpp);
         Tileset(const Image16Bpp& image, int bpp);
-        int Search(const GBATile& tile) const;
+        int Search(const Tile& tile) const;
         int Search(const ImageTile& tile) const;
-        // Match Imagetile to GBATile (only for bpp = 4)
+        // Match Imagetile to Tile (only for bpp = 4)
         bool Match(const ImageTile& tile, int& tile_id, int& pal_id) const;
         unsigned int Size() const {return tiles.size() * ((bpp == 4) ? TILE_SIZE_SHORTS_4BPP : (bpp == 8) ? TILE_SIZE_SHORTS_8BPP : 1);};
         void WriteData(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
-        std::string name;
         int bpp;
         // Only one of two will be used bpp = 4 or 8: tiles 16: itiles
-        std::set<GBATile> tiles;
+        std::set<Tile> tiles;
         std::set<ImageTile> itiles;
         // Bookkeeping matcher used when bpp = 4 or 8
-        std::map<ImageTile, GBATile> matcher;
+        std::map<ImageTile, Tile> matcher;
         // Tiles sorted by id for export.
-        std::vector<GBATile> tilesExport;
+        std::vector<Tile> tilesExport;
         // Only one max will be used bpp = 4: paletteBanks 8: palette 16: neither
         std::shared_ptr<Palette> palette;
         PaletteBankManager paletteBanks;
@@ -328,7 +338,7 @@ class MapScene : public Scene
 };
 
 /** A GBA Sprite image
-  * Sprites are composed of a set of GBATiles in 4 or 8bpp mode
+  * Sprites are composed of a set of Tiles in 4 or 8bpp mode
   * Sprites can only be sized (8x8 8x16 8x32 16x8 32x8 16x16 16x32 32x16 32x32 32x64 64x32 64x64
   */
 class Sprite : public Image
@@ -345,7 +355,7 @@ class Sprite : public Image
         virtual std::string GetImageType() const {return "const unsigned short";}
         virtual std::string GetExportName() const;
         void WriteTile(unsigned char* arr, int x, int y) const;
-        std::vector<GBATile> data;
+        std::vector<Tile> data;
         std::shared_ptr<Palette> palette;
         int palette_bank;
         int size;
@@ -435,135 +445,11 @@ class SpriteScene : public Scene
     private:
         void Init4bpp(const std::vector<Image16Bpp>& images);
         void Init8bpp(const std::vector<Image16Bpp>& images);
-        void InitSpriteSheet(const Image16Bpp& image);
 };
 
-template <class T>
-Tile<T>::Tile() : id(0), data(TILE_SIZE), bpp(8), palette_bank(0)
-{
-}
-
-template <class T>
-Tile<T>::Tile(const Tile<T>& tile) : id(tile.id), data(tile.data), bpp(tile.bpp), palette_bank(tile.palette_bank), palette(tile.palette), sourceTile(tile.sourceTile)
-{
-}
-
-template <class T>
-Tile<T>::Tile(std::shared_ptr<ImageTile>& imageTile, int bpp)
-{
-    FatalLog("Code error not implemented");
-}
-
-template <class T>
-Tile<T>::Tile(const Image16Bpp& image, const Palette& global_palette, int tilex, int tiley) : data(TILE_SIZE), bpp(8)
-{
-    Set(image, global_palette, tilex, tiley);
-}
-
-template <class T>
-Tile<T>::Tile(const std::vector<T>& image, int pitch, int tilex, int tiley, int border, int bpp) : data(TILE_SIZE)
-{
-    Set(image, pitch, tilex, tiley, border, bpp);
-}
-
-template <class T>
-Tile<T>::Tile(const T* image, int pitch, int tilex, int tiley, int border, int bpp) : data(TILE_SIZE)
-{
-    Set(image, pitch, tilex, tiley, border, bpp);
-}
-
-template <class T>
-void Tile<T>::Set(const std::vector<T>& image, int pitch, int tilex, int tiley, int border, int bpp)
-{
-    this->bpp = bpp;
-    T* ptr = data.data();
-
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j++)
-        {
-            ptr[i * 8 + j] = image[(tiley * (8+border) + i) * pitch + tilex * (8+border) + j];
-        }
-    }
-}
-
-template <class T>
-void Tile<T>::Set(const T* image, int pitch, int tilex, int tiley, int border, int bpp)
-{
-    this->bpp = bpp;
-    T* ptr = data.data();
-
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j++)
-        {
-            ptr[i * 8 + j] = image[(tiley * (8+border) + i) * pitch + tilex * (8+border) + j];
-        }
-    }
-}
-
-template <class T>
-void Tile<T>::Set(const Image16Bpp& image, const Palette& global_palette, int tilex, int tiley)
-{
-    FatalLog("Code error not implemented");
-}
-
-template <class T>
-void Tile<T>::UsePalette(const PaletteBank& bank)
-{
-    FatalLog("Code error not implemented");
-}
-
-template <class T>
-bool Tile<T>::IsEqual(const Tile<T>& other) const
-{
-    return data == other.data;
-}
-
-template <class T>
-bool Tile<T>::operator==(const Tile<T>& other) const
-{
-    return IsEqual(other);
-}
-
-template <class T>
-bool Tile<T>::operator<(const Tile<T>& other) const
-{
-    return data < other.data;
-}
-
-template <class T>
-bool Tile<T>::IsSameAs(const Tile<T>& other) const
-{
-    bool same, sameh, samev, samevh;
-    same = sameh = samev = samevh = true;
-    for (int i = 0; i < TILE_SIZE; i++)
-    {
-        int x = i % 8;
-        int y = i / 8;
-        same = same && data[i] == other.data[i];
-        samev = samev && data[i] == other.data[(7 - y) * 8 + x];
-        sameh = sameh && data[i] == other.data[y * 8 + (7 - x)];
-        samevh = samevh && data[i] == other.data[(7 - y) * 8 + (7 - x)];
-    }
-    return same || samev || sameh || samevh;
-}
-
-template <class T>
-std::ostream& operator<<(std::ostream& file, const Tile<T>& tile)
-{
-
-    file << std::hex;
-    for (unsigned int i = 0; i < 8; i++)
-    {
-        for (unsigned int j = 0; j < 8; j++)
-            file << tile.data[i * 8 + j] << " ";
-        file << std::endl;
-    }
-    file << std::dec;
-    return file;
-}
-
-bool TilesPaletteSizeComp(const GBATile& i, const GBATile& j);
+void GetPalette(const std::vector<Color>& image, unsigned int num_colors, const Color& transparent, unsigned int offset, Palette& palette);
+void QuantizeImage(const std::vector<Color>& image, unsigned int num_colors, const Color& transparent, unsigned int offset, Palette& palette,
+                   std::vector<unsigned char>& indexed);
+void DitherAndReduceImage(const Image16Bpp& image, const Color& transparent, bool dither, double dither_level, unsigned int offset, Image8Bpp& indexedImage);
 
 #endif

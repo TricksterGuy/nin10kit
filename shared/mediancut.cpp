@@ -9,6 +9,8 @@
 #include <map>
 #include <queue>
 
+#include "logger.hpp"
+
 class BoxCompare;
 
 static void CutBoxes(std::priority_queue<Box, std::vector<Box>, BoxCompare>& queue, std::list<Box>& removed, unsigned int desiredColors);
@@ -51,7 +53,7 @@ class BoxCompare
   *
   * Creates a new Box
   */
-Box::Box(const Histogram& hist) : data(hist), min(DBL_MAX, DBL_MAX, DBL_MAX), max(DBL_MIN, DBL_MIN, DBL_MIN)
+Box::Box(const Histogram& hist) : data(hist), min(255, 255, 255), max(0, 0, 0)
 {
 }
 
@@ -81,11 +83,11 @@ Box Box::Split()
     std::vector<Color> otherColors;
     std::map<Color, size_t> otherHist;
 
-    double x, y, z;
+    unsigned char x, y, z;
     ColorCompare comp(0);
-    x = max.x - min.x;
-    y = max.y - min.y;
-    z = max.z - min.z;
+    x = max.r - min.r;
+    y = max.g - min.g;
+    z = max.b - min.b;
 
     if (x > y && x > z)
         comp = ColorCompare(0);
@@ -111,12 +113,12 @@ void Box::Shrink()
     {
         Color c = *i;
 
-        min.x = std::min(c.x, min.x);
-        max.x = std::max(c.x, max.x);
-        min.y = std::min(c.y, min.y);
-        max.y = std::max(c.y, max.y);
-        min.z = std::min(c.z, min.z);
-        max.z = std::max(c.z, max.z);
+        min.r = std::min(c.r, min.r);
+        max.r = std::max(c.r, max.r);
+        min.g = std::min(c.g, min.g);
+        max.g = std::max(c.g, max.g);
+        min.b = std::min(c.b, min.b);
+        max.b = std::max(c.b, max.b);
     }
 }
 
@@ -144,7 +146,7 @@ size_t Box::Size() const
   */
 double Box::Volume() const
 {
-    return (max.x - min.x) * (max.y - min.y) * (max.z - min.z);
+    return (max.r - min.r) * (max.g - min.g) * (max.b - min.b);
 }
 
 /** @brief Error
@@ -163,9 +165,9 @@ double Box::Error() const
     {
         Color color = *i;
         size_t population = hist.find(color)->second;
-        error += (color.x - average.x) * (color.x - average.x) * population;
-        error += (color.y - average.y) * (color.y - average.y) * population;
-        error += (color.z - average.z) * (color.z - average.z) * population;
+        error += (color.r - average.r) * (color.r - average.r) * population;
+        error += (color.g - average.g) * (color.g - average.g) * population;
+        error += (color.b - average.b) * (color.b - average.b) * population;
     }
 
     return error;
@@ -186,6 +188,7 @@ bool MedianCut(const std::vector<Color>& image, unsigned int desiredColors, std:
     // If we have fewer colors than desired
     if (hist.Size() <= desiredColors)
     {
+        InfoLog("Found %zd colors which is less than the amount of colors requested %zd so not reducing number of colors further", hist.Size(), desiredColors);
         const std::vector<Color>& colors = hist.GetColors();
         for (const auto& color : colors)
             palette.push_back(color);
@@ -204,8 +207,6 @@ bool MedianCut(const std::vector<Color>& image, unsigned int desiredColors, std:
     Box box(hist);
     box.Shrink();
     queue0.push(box);
-
-
 
     CutBoxes(queue0, removed, weights[0] * desiredColors / 100);
     SwapQueues(queue0, queue1);
@@ -234,7 +235,6 @@ bool MedianCut(const std::vector<Color>& image, unsigned int desiredColors, std:
 
     return true;
 }
-
 
 void CutBoxes(std::priority_queue<Box, std::vector<Box>, BoxCompare>& queue,
               std::list<Box>& removed, unsigned int desiredColors)

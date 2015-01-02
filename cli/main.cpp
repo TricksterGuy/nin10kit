@@ -9,18 +9,18 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include <wx/app.h>
-
 #include <wx/filename.h>
+#include <Magick++.h>
 
-#include "cpercep.hpp"
 #include "cmd-line-parser-helper.hpp"
+#include "cpercep.hpp"
 #include "headerfile.hpp"
 #include "fileutils.hpp"
 #include "implementationfile.hpp"
 #include "logger.hpp"
 #include "lutgen.hpp"
-#include "reductionhelper.hpp"
 #include "scanner.hpp"
 #include "shared.hpp"
 #include "version.h"
@@ -143,6 +143,8 @@ bool Nin10KitApp::OnInit()
     logger->SetLogLevel(LogLevel::INFO);
     VerboseLog("Init");
 
+    cpercep_init();
+
     if (argc <= 1)
     {
         wxCmdLineParser parser(argc, argv);
@@ -150,6 +152,8 @@ bool Nin10KitApp::OnInit()
         parser.Usage();
         return false;
     }
+
+    Magick::InitializeMagick(static_cast<const char*>(argv[0].c_str()));
 
     if (!wxAppConsole::OnInit())
         FatalLog("A problem occurred, please report this and give any images the command line that caused this");
@@ -422,8 +426,6 @@ int Nin10KitApp::OnRun()
     VerboseLog("OnRun");
     try
     {
-        VerboseLog("Init CPERCEP");
-        cpercep_init();
 
         if (!DoExportImages()) return EXIT_FAILURE;
 

@@ -2,7 +2,6 @@
 #include <vector>
 
 #include "fileutils.hpp"
-#include "reductionhelper.hpp"
 #include "shared.hpp"
 
 void DoDSExport(const std::vector<Image32Bpp>& images32, const std::vector<Image32Bpp>& tilesets32)

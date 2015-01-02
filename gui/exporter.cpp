@@ -1,10 +1,11 @@
 #include "exporter.hpp"
 
-#include "fileutils.hpp"
-#include "shared.hpp"
-
-#include <fstream>
 #include <wx/filename.h>
+#include <fstream>
+
+#include "fileutils.hpp"
+#include "logger.hpp"
+#include "shared.hpp"
 
 ExportParams params;
 void DoGBAExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);

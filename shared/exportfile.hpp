@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "lutgen.hpp"
-#include "reductionhelper.hpp"
+#include "image.hpp"
 
 /** Base class for a file created by this program.*/
 class ExportFile

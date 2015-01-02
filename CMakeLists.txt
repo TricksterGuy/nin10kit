@@ -28,11 +28,12 @@ set(CPACK_PACKAGE_FILE_NAME "nin10kit-1.0.0")
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${ARCH})
 
 include(CPack)
+include(FindPkgConfig)
 
 option(ENABLE_DEBUG "Build debug version" OFF)
 
 IF(ENABLE_DEBUG)
-    set(CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
+    set(CMAKE_CXX_FLAGS "-g -pg -Wall -std=c++11")
 ELSE()
     set(CMAKE_CXX_FLAGS "-O3 -Wall -std=c++11")
     set(CMAKE_EXE_LINKER_FLAGS "-s")
@@ -43,21 +44,29 @@ set(SRC_SHARED
 	shared/3ds-exporter.cpp
 	shared/ds-exporter.cpp
 	shared/gba-exporter.cpp
-	shared/color.cpp
 	shared/cmd-line-parser-helper.cpp
-    shared/cpercep.cpp
-    shared/dither.cpp
+	shared/color.cpp
+	shared/cpercep.cpp
+	shared/dither.cpp
     shared/exportfile.cpp
     shared/fileutils.cpp
     shared/headerfile.cpp
-    shared/histogram.cpp
+    shared/image.cpp
+    shared/image16.cpp
+    shared/image32.cpp
+    shared/image8.cpp
     shared/implementationfile.cpp
     shared/logger.cpp
     shared/lutgen.cpp
+    shared/map.cpp
     shared/mediancut.cpp
-    shared/reductionhelper.cpp
+    shared/palette.cpp
     shared/scanner.cpp
+    shared/scene.cpp
     shared/shared.cpp
+    shared/sprite.cpp
+    shared/tile.cpp
+    shared/tileset.cpp
 )
 
 set(SRC_NIN10KIT
@@ -76,9 +85,11 @@ set(SRC_NIN10KITGUI
 find_package(wxWidgets REQUIRED core base)
 include(${wxWidgets_USE_FILE})
 find_package(ImageMagick COMPONENTS Magick++ MagickWand MagickCore REQUIRED)
+pkg_search_module(BABL REQUIRED babl)
 
 include_directories(${nin10kit_SOURCE_DIR}/shared)
 include_directories(${ImageMagick_INCLUDE_DIRS})
+include_directories("/usr/include/babl-0.1")
 link_directories(${nin10kit_SOURCE_DIR}/shared)
 
 add_definitions(-DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16)
@@ -102,6 +113,7 @@ target_link_libraries(
 	nin10kit
 	m
 	shared_files
+	${BABL_LIBRARIES}
 	${ImageMagick_LIBRARIES}
    	${wxWidgets_LIBRARIES}
 )
@@ -115,6 +127,7 @@ target_link_libraries(
 	nin10kitgui
 	m
 	shared_files
+	${BABL_LIBRARIES}
 	${ImageMagick_LIBRARIES}
     ${wxWidgets_LIBRARIES}
 )

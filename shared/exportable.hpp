@@ -1,6 +1,9 @@
 #ifndef EXPORTABLE_HPP
 #define EXPORTABLE_HPP
 
+#include <string>
+#include <iostream>
+
 /** Base class that represents an object that can be exported to a c/h file. */
 class Exportable
 {

@@ -17,16 +17,18 @@ enum class LogLevel
 class AbstractLogger
 {
     public:
-        AbstractLogger(std::ostream* target = &std::cerr) : out(target), log_level(LogLevel::INFO) {}
+        AbstractLogger(std::ostream* target = &std::cerr) : out(target), log_level(LogLevel::INFO), log_time(true) {}
         virtual ~AbstractLogger() {}
         void Log(LogLevel level, const char* format, va_list ap);
         virtual void DoLog(LogLevel level, const char* format, va_list ap) {}
         void SetLogTarget(std::ostream* stream) {out = stream;}
         void SetLogLevel(LogLevel level) {log_level = level;}
+        void SetLogTime(bool logging_time) {log_time = logging_time;}
     protected:
         std::ostream* out;
     private:
         LogLevel log_level;
+        bool log_time;
 };
 
 class Logger : public AbstractLogger
@@ -96,10 +98,11 @@ static inline void VerboseLog(const char* format, ...)
 class EventLog
 {
     public:
-        EventLog(const char* function) : func(function) {VerboseLog("start: %s", func);}
-        ~EventLog() {VerboseLog("end: %s", func);}
+        EventLog(const char* function);
+        ~EventLog();
     private:
         const char* func;
+        timeval startTime;
 };
 
 #endif

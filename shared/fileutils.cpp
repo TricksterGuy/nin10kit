@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "logger.hpp"
 #include "shared.hpp"
 
 void InitFiles(std::ofstream& file_c, std::ofstream& file_h, const std::string& name)

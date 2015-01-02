@@ -1,62 +1,69 @@
-/*
-Copyright (C) 1999-2002 Adam D. Moss (the "Author").  All Rights Reserved.
+/***********   cpercep.c *********   */
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is fur-
-nished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FIT-
-NESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CON-
-NECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-Except as contained in this notice, the name of the Author of the
-Software shall not be used in advertising or otherwise to promote the sale,
-use or other dealings in this Software without prior written authorization
-from the Author.
-*/
 
 /*
-  cpercep.c: The CPercep Functions v0.9: 2002-02-10
-  Adam D. Moss: adam@gimp.org <http://www.foxbox.org/adam/code/cpercep/>
+   Copyright (C) 1999-2002 Adam D. Moss (the "Author").  All Rights Reserved.
 
-  This code module concerns itself with conversion from a hard-coded
-  RGB colour space (sRGB by default) to CIE L*a*b* and back again with
-  (primarily) precision and (secondarily) speed, oriented largely
-  towards the purposes of quantifying the PERCEPTUAL difference between
-  two arbitrary RGB colours with a minimum of fuss.
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is fur-
+   nished to do so, subject to the following conditions:
 
-  Motivation One: The author is disheartened at the amount of graphics
-  processing software around which uses weighted or non-weighted
-  Euclidean distance between co-ordinates within a (poorly-defined) RGB
-  space as the basis of what should really be an estimate of perceptual
-  difference to the human eye.  Certainly it's fast to do it that way,
-  but please think carefully about whether your particular application
-  should be tolerating sloppy results for the sake of real-time response.
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
 
-  Motivation Two: Lack of tested, re-usable and free code available
-  for this purpose.  The difficulty in finding something similar to
-  CPercep with a free license motivated this project; I hope that this
-  code also serves to illustrate how to perform the
-  R'G'B'->XYZ->L*a*b*->XYZ->R'G'B' transformation correctly since I
-  was distressed to note how many of the equations and code snippets
-  on the net were omitting the reverse transform and/or were using
-  incorrectly-derived or just plain wrong constants.
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FIT-
+   NESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+   AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CON-
+   NECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  TODO: document functions, rename erroneously-named arguments
-*/
-#include "cpercep.hpp"
+   Except as contained in this notice, the name of the Author of the
+   Software shall not be used in advertising or otherwise to promote the sale,
+   use or other dealings in this Software without prior written authorization
+   from the Author.
+ */
 
-#include <cmath>
-#include <cstdio>
+/*
+   cpercep.c: The CPercep Functions v0.9: 2002-02-10
+   Adam D. Moss: adam@gimp.org <http://www.foxbox.org/adam/code/cpercep/>
+
+   This code module concerns itself with conversion from a hard-coded
+   RGB colour space (sRGB by default) to CIE L*a*b* and back again with
+   (primarily) precision and (secondarily) speed, oriented largely
+   towards the purposes of quantifying the PERCEPTUAL difference between
+   two arbitrary RGB colours with a minimum of fuss.
+
+   Motivation One: The author is disheartened at the amount of graphics
+   processing software around which uses weighted or non-weighted
+   Euclidean distance between co-ordinates within a (poorly-defined) RGB
+   space as the basis of what should really be an estimate of perceptual
+   difference to the human eye.  Certainly it's fast to do it that way,
+   but please think carefully about whether your particular application
+   should be tolerating sloppy results for the sake of real-time response.
+
+   Motivation Two: Lack of tested, re-usable and free code available
+   for this purpose.  The difficulty in finding something similar to
+   CPercep with a free license motivated this project; I hope that this
+   code also serves to illustrate how to perform the
+   R'G'B'->XYZ->L*a*b*->XYZ->R'G'B' transformation correctly since I
+   was distressed to note how many of the equations and code snippets
+   on the net were omitting the reverse transform and/or were using
+   incorrectly-derived or just plain wrong constants.
+
+   TODO: document functions, rename erroneously-named arguments
+ */
+
+/* #include "config.h" */
+#include <math.h>
+
+#ifndef __GLIBC__
+/* cbrt() is a GNU extension */
+#define cbrt(x)    (pow (x, 1.0 / 3.0))
+#endif
 
 
 /* defines:
@@ -67,26 +74,10 @@ from the Author.
    APPROX: speeds up the conversion from RGB to the colourspace by
    assuming that the RGB values passed in are integral and definitely
    in the range 0->255
+ */
 
-   SRGB: assumes that the RGB values being passed in (and out) are
-   destined for an sRGB-alike display device (a typical modern monitor)
-   -- if you change this then you'll probably want to change ASSUMED_GAMMA,
-   the phosphor colours and the white point definition.
-*/
-
-//#define SANITY
+/* #define SANITY */
 #define APPROX
-#define SRGB
-
-
-#ifdef SRGB
-#define ASSUMED_GAMMA (2.2F)
-#else
-/*#define ASSUMED_GAMMA (2.591F)*/
-#define ASSUMED_GAMMA (2.2F)
-#endif
-
-#define REV_GAMMA ((1.0F / ASSUMED_GAMMA))
 
 
 /* define characteristics of the source RGB space (and the space
@@ -142,37 +133,10 @@ static const double LRAMP = 7.99959199F;
 
 static double xnn, znn;
 
-static double powtable[256];
-
 
 #ifndef CLAMP
-#define CLAMP(x,l,u) ((x)<(l)?(l):((x)>(u)?(u):(x)))
+#define CLAMP(x, l, u)    ((x) < (l) ? (l) : ((x) > (u) ? (u) : (x)))
 #endif
-
-
-static void
-init_powtable(const double gamma)
-{
-    int i;
-
-#ifndef SRGB
-    /* pure gamma function */
-    for (i=0; i<256; i++)
-    {
-        powtable[i] = pow((i)/255.0F, gamma);
-    }
-#else
-    /* sRGB gamma curve */
-    for (i=0; i<11 /* 0.03928 * 255 */; i++)
-    {
-        powtable[i] = (i) / (255.0F * 12.92F);
-    }
-    for (; i<256; i++)
-    {
-        powtable[i] = pow( (((i) / 255.0F) + 0.055F) / 1.055F, 2.4F);
-    }
-#endif
-}
 
 
 typedef double CMatrix[3][3];
@@ -203,7 +167,7 @@ Minvert (CMatrix src, CMatrix dest)
     if (det <= 0.0F)
     {
 #ifdef SANITY
-        printf("\n\007 XXXX det: %f\n", det);
+        g_printerr ("\n\007 XXXX det: %f\n", det);
 #endif
         return 0;
     }
@@ -223,9 +187,12 @@ Minvert (CMatrix src, CMatrix dest)
 
 
 static void
-rgbxyzrgb_init(void)
+rgbxyzrgb_init (void)
 {
-    init_powtable (ASSUMED_GAMMA);
+    /* The gamma related code has been removed since we do our
+     * calculations in linear light. To revice that code, use version
+     * control means
+     */
 
     xnn = lxn / lyn;
     /* ynn taken as 1.0 */
@@ -233,7 +200,7 @@ rgbxyzrgb_init(void)
 
     {
         CMatrix MRC, MRCi;
-        double C1,C2,C3;
+        double  C1, C2, C3;
 
         MRC[0][0] = pxr;
         MRC[0][1] = pxg;
@@ -247,9 +214,9 @@ rgbxyzrgb_init(void)
 
         Minvert (MRC, MRCi);
 
-        C1 = MRCi[0][0]*xnn + MRCi[0][1] + MRCi[0][2]*znn;
-        C2 = MRCi[1][0]*xnn + MRCi[1][1] + MRCi[1][2]*znn;
-        C3 = MRCi[2][0]*xnn + MRCi[2][1] + MRCi[2][2]*znn;
+        C1 = MRCi[0][0] * xnn + MRCi[0][1] + MRCi[0][2] * znn;
+        C2 = MRCi[1][0] * xnn + MRCi[1][1] + MRCi[1][2] * znn;
+        C3 = MRCi[2][0] * xnn + MRCi[2][1] + MRCi[2][2] * znn;
 
         Mrgb_to_xyz[0][0] = MRC[0][0] * C1;
         Mrgb_to_xyz[0][1] = MRC[0][1] * C2;
@@ -275,9 +242,9 @@ xyz_to_rgb (double *inx_outr,
     const double y = *iny_outg;
     const double z = *inz_outb;
 
-    *inx_outr = Mxyz_to_rgb[0][0]*x + Mxyz_to_rgb[0][1]*y + Mxyz_to_rgb[0][2]*z;
-    *iny_outg = Mxyz_to_rgb[1][0]*x + Mxyz_to_rgb[1][1]*y + Mxyz_to_rgb[1][2]*z;
-    *inz_outb = Mxyz_to_rgb[2][0]*x + Mxyz_to_rgb[2][1]*y + Mxyz_to_rgb[2][2]*z;
+    *inx_outr = Mxyz_to_rgb[0][0] * x + Mxyz_to_rgb[0][1] * y + Mxyz_to_rgb[0][2] * z;
+    *iny_outg = Mxyz_to_rgb[1][0] * x + Mxyz_to_rgb[1][1] * y + Mxyz_to_rgb[1][2] * z;
+    *inz_outb = Mxyz_to_rgb[2][0] * x + Mxyz_to_rgb[2][1] * y + Mxyz_to_rgb[2][2] * z;
 }
 
 
@@ -290,28 +257,28 @@ rgb_to_xyz (double *inr_outx,
     const double g = *ing_outy;
     const double b = *inb_outz;
 
-    *inr_outx = Mrgb_to_xyz[0][0]*r + Mrgb_to_xyz[0][1]*g + Mrgb_to_xyz[0][2]*b;
-    *ing_outy = Mrgb_to_xyz[1][0]*r + Mrgb_to_xyz[1][1]*g + Mrgb_to_xyz[1][2]*b;
-    *inb_outz = Mrgb_to_xyz[2][0]*r + Mrgb_to_xyz[2][1]*g + Mrgb_to_xyz[2][2]*b;
+    *inr_outx = Mrgb_to_xyz[0][0] * r + Mrgb_to_xyz[0][1] * g + Mrgb_to_xyz[0][2] * b;
+    *ing_outy = Mrgb_to_xyz[1][0] * r + Mrgb_to_xyz[1][1] * g + Mrgb_to_xyz[1][2] * b;
+    *inb_outz = Mrgb_to_xyz[2][0] * r + Mrgb_to_xyz[2][1] * g + Mrgb_to_xyz[2][2] * b;
 }
 
 
 static inline double
-ffunc(const double t)
+ffunc (const double t)
 {
     if (t > 0.008856F)
     {
-        return (cbrt(t));
+        return (cbrt (t));
     }
     else
     {
-        return (7.787F * t + 16.0F/116.0F);
+        return (7.787F * t + 16.0F / 116.0F);
     }
 }
 
 
 static inline double
-ffunc_inv(const double t)
+ffunc_inv (const double t)
 {
     if (t > 0.206893F)
     {
@@ -319,7 +286,7 @@ ffunc_inv(const double t)
     }
     else
     {
-        return ((t - 16.0F/116.0F) / 7.787F);
+        return ((t - 16.0F / 116.0F) / 7.787F);
     }
 }
 
@@ -329,8 +296,8 @@ xyz_to_lab (double *inx,
             double *iny,
             double *inz)
 {
-    double L,a,b;
-    double ffuncY;
+    double       L, a, b;
+    double       ffuncY;
     const double X = *inx;
     const double Y = *iny;
     const double Z = *inz;
@@ -339,7 +306,7 @@ xyz_to_lab (double *inx,
     {
         if (Y > 0.008856F)
         {
-            L = (116.0F * cbrt(Y)) - 16.0F;
+            L = (116.0F * cbrt (Y)) - 16.0F;
         }
         else
         {
@@ -349,12 +316,12 @@ xyz_to_lab (double *inx,
 #ifdef SANITY
         if (L < 0.0F)
         {
-            printf(" <eek1>%f \007",(float)L);
+            g_printerr (" <eek1>%f \007", (float) L);
         }
 
         if (L > 100.0F)
         {
-            printf(" <eek2>%f \007",(float)L);
+            g_printerr (" <eek2>%f \007", (float) L);
         }
 #endif
     }
@@ -363,9 +330,9 @@ xyz_to_lab (double *inx,
         L = 0.0;
     }
 
-    ffuncY = ffunc(Y);
-    a = 500.0F * (ffunc(X/xnn) - ffuncY);
-    b = 200.0F * (ffuncY - ffunc(Z/znn));
+    ffuncY = ffunc (Y);
+    a      = 500.0F * (ffunc (X / xnn) - ffuncY);
+    b      = 200.0F * (ffuncY - ffunc (Z / znn));
 
     *inx = L;
     *iny = a;
@@ -378,8 +345,8 @@ lab_to_xyz (double *inl,
             double *ina,
             double *inb)
 {
-    double X,Y,Z;
-    double P;
+    double       X, Y, Z;
+    double       P;
     const double L = *inl;
     const double a = *ina;
     const double b = *inb;
@@ -392,31 +359,31 @@ lab_to_xyz (double *inl,
     else
     {
         Y = L / 903.3F;
-        P = 7.787F * Y + 16.0F/116.0F;
+        P = 7.787F * Y + 16.0F / 116.0F;
     }
 
     X = (P + a / 500.0F);
-    X = xnn * ffunc_inv(X);
+    X = xnn *ffunc_inv (X);
     Z = (P - b / 200.0F);
-    Z = znn * ffunc_inv(Z);
+    Z = znn *ffunc_inv (Z);
 
 #ifdef SANITY
-    if (X<-0.00000F)
+    if (X < -0.00000F)
     {
-        if (X<-0.0001F)
-            printf("{badX %f {%f,%f,%f}}",X,L,a,b);
+        if (X < -0.0001F)
+            g_printerr ("{badX %f {%f,%f,%f}}", X, L, a, b);
         X = 0.0F;
     }
-    if (Y<-0.00000F)
+    if (Y < -0.00000F)
     {
-        if (Y<-0.0001F)
-            printf("{badY %f}",Y);
+        if (Y < -0.0001F)
+            g_printerr ("{badY %f}", Y);
         Y = 0.0F;
     }
-    if (Z<-0.00000F)
+    if (Z < -0.00000F)
     {
-        if (Z<-0.1F)
-            printf("{badZ %f}",Z);
+        if (Z < -0.1F)
+            g_printerr ("{badZ %f}", Z);
         Z = 0.0F;
     }
 #endif
@@ -434,9 +401,9 @@ cpercep_init (void)
 {
     static bool initialized = false;
 
-    if (! initialized)
+    if (!initialized)
     {
-        rgbxyzrgb_init();
+        rgbxyzrgb_init ();
         initialized = true;
     }
 }
@@ -459,34 +426,8 @@ cpercep_rgb_to_space (double  inr,
             (ing) < -0.0F ||
             (inb) < -0.0F
        )
-        //abort();
+        abort ();
 #endif /* SANITY */
-        inr = powtable[(int)inr];
-    ing = powtable[(int)ing];
-    inb = powtable[(int)inb];
-#else
-#ifdef SRGB
-    /* sRGB gamma curve */
-    if (inr <= (0.03928F * 255.0F))
-        inr = inr / (255.0F * 12.92F);
-    else
-        inr = pow( (inr + (0.055F * 255.0F)) / (1.055F * 255.0F), 2.4F);
-
-    if (ing <= (0.03928F * 255.0F))
-        ing = ing / (255.0F * 12.92F);
-    else
-        ing = pow( (ing + (0.055F * 255.0F)) / (1.055F * 255.0F), 2.4F);
-
-    if (inb <= (0.03928F * 255.0F))
-        inb = inb / (255.0F * 12.92F);
-    else
-        inb = pow( (inb + (0.055F * 255.0F)) / (1.055F * 255.0F), 2.4F);
-#else
-    /* pure gamma function */
-    inr = pow((inr)/255.0F, ASSUMED_GAMMA);
-    ing = pow((ing)/255.0F, ASSUMED_GAMMA);
-    inb = pow((inb)/255.0F, ASSUMED_GAMMA);
-#endif /* SRGB */
 #endif /* APPROX */
 
 #ifdef SANITY
@@ -499,22 +440,22 @@ cpercep_rgb_to_space (double  inr,
             (inb) < 0.0F
        )
     {
-        printf("%%");
+        g_printerr ("%%");
         /* abort(); */
     }
 #endif /* SANITY */
 
-    rgb_to_xyz(&inr, &ing, &inb);
+    rgb_to_xyz (&inr, &ing, &inb);
 
 #ifdef SANITY
     if (inr < 0.0F || ing < 0.0F || inb < 0.0F)
     {
-        printf(" [BAD2 XYZ: %f,%f,%f]\007 ",
-               inr,ing,inb);
+        g_printerr (" [BAD2 XYZ: %f,%f,%f]\007 ",
+                    inr, ing, inb);
     }
 #endif /* SANITY */
 
-    xyz_to_lab(&inr, &ing, &inb);
+    xyz_to_lab (&inr, &ing, &inb);
 
     *outr = inr;
     *outg = ing;
@@ -530,43 +471,22 @@ cpercep_space_to_rgb (double  inr,
                       double *outg,
                       double *outb)
 {
-    lab_to_xyz(&inr, &ing, &inb);
+    lab_to_xyz (&inr, &ing, &inb);
 
 #ifdef SANITY
-    if (inr<-0.0F || ing<-0.0F || inb<-0.0F)
+    if (inr < -0.0F || ing < -0.0F || inb < -0.0F)
     {
-        printf(" [BAD1 XYZ: %f,%f,%f]\007 ",
-               inr,ing,inb);
+        g_printerr (" [BAD1 XYZ: %f,%f,%f]\007 ",
+                    inr, ing, inb);
     }
 #endif
 
-    xyz_to_rgb(&inr, &ing, &inb);
+    xyz_to_rgb (&inr, &ing, &inb);
 
     /* yes, essential.  :( */
-    inr = CLAMP(inr,0.0F,1.0F);
-    ing = CLAMP(ing,0.0F,1.0F);
-    inb = CLAMP(inb,0.0F,1.0F);
-
-#ifdef SRGB
-    if (inr <= 0.0030402477F)
-        inr = inr * (12.92F * 255.0F);
-    else
-        inr = pow(inr, 1.0F/2.4F) * (1.055F * 255.0F) - (0.055F * 255.0F);
-
-    if (ing <= 0.0030402477F)
-        ing = ing * (12.92F * 255.0F);
-    else
-        ing = pow(ing, 1.0F/2.4F) * (1.055F * 255.0F) - (0.055F * 255.0F);
-
-    if (inb <= 0.0030402477F)
-        inb = inb * (12.92F * 255.0F);
-    else
-        inb = pow(inb, 1.0F/2.4F) * (1.055F * 255.0F) - (0.055F * 255.0F);
-#else
-    inr = 255.0F * pow(inr, REV_GAMMA);
-    ing = 255.0F * pow(ing, REV_GAMMA);
-    inb = 255.0F * pow(inb, REV_GAMMA);
-#endif
+    inr = CLAMP (inr, 0.0F, 1.0F);
+    ing = CLAMP (ing, 0.0F, 1.0F);
+    inb = CLAMP (inb, 0.0F, 1.0F);
 
     *outr = inr;
     *outg = ing;
@@ -578,10 +498,10 @@ cpercep_space_to_rgb (double  inr,
 /* EXPERIMENTAL SECTION */
 
 const double
-xscaler(const double start, const double end,
-        const double me, const double him)
+xscaler (const double start, const double end,
+         const double me, const double him)
 {
-    return start + ((end-start) * him) / (me + him);
+    return start + ((end - start) * him) / (me + him);
 }
 
 
@@ -598,13 +518,12 @@ mix_colours (const double L1, const double a1, const double b1,
     *rtna = xscaler (a1, a2, mass1, mass2);
     *rtnb = xscaler (b1, b2, mass1, mass2);
 #else
-
 #if 1
     w1 = mass1 * L1;
     w2 = mass2 * L2;
 #else
-    w1 = mass1 * (L1*L1*L1);
-    w2 = mass2 * (L2*L2*L2);
+    w1 = mass1 * (L1 * L1 * L1);
+    w2 = mass2 * (L2 * L2 * L2);
 #endif
 
     *rtnL = xscaler (L1, L2, mass1, mass2);
@@ -612,17 +531,19 @@ mix_colours (const double L1, const double a1, const double b1,
     if (w1 <= 0.0 &&
             w2 <= 0.0)
     {
-        *rtna =
+        *rtna   =
             *rtnb = 0.0;
 #ifdef SANITY
-        /* printf("\007OUCH. "); */
+        /* g_printerr ("\007OUCH. "); */
 #endif
     }
     else
     {
-        *rtna = xscaler(a1, a2, w1, w2);
-        *rtnb = xscaler(b1, b2, w1, w2);
+        *rtna = xscaler (a1, a2, w1, w2);
+        *rtnb = xscaler (b1, b2, w1, w2);
     }
 #endif
 }
 #endif /* EXPERIMENTAL SECTION */
+
+/***********  /cpercep.c *********   */

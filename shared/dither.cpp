@@ -6,7 +6,7 @@
 #include "logger.hpp"
 
 #ifndef CLAMP
-#define CLAMP(x) (((x) < 0.0) ? 0.0 : (((x) > 255) ? 255 : (x)))
+#define CLAMP(x) (((x) < 0.0) ? 0.0 : (((x) > 31) ? 31 : (x)))
 #endif
 
 struct DitherImage
@@ -30,26 +30,24 @@ enum
     RIGHT,
 };
 
-int Dither(const Color& color, std::shared_ptr<Palette>& palette, const Color& transparent, int dither, float ditherlevel)
+int Dither(const Color16& color, std::shared_ptr<Palette>& palette, const Color& transparent, int dither, float ditherlevel)
 {
     static int ex = 0, ey = 0, ez = 0;
-    if (color == transparent) return 0;
+    //if (color == transparent) return 0;
 
-    Color newColor(CLAMP(color.r + ex), CLAMP(color.g + ey), CLAMP(color.b + ez));
+    Color16 newColor(CLAMP(color.r + ex), CLAMP(color.g + ey), CLAMP(color.b + ez));
     int index = palette->Search(newColor);
     newColor = palette->At(index);
 
     if (dither)
     {
-        ex += color.r - newColor.r;
-        ey += color.g - newColor.g;
-        ez += color.b - newColor.b;
-        ex *= ditherlevel;
-        ey *= ditherlevel;
-        ez *= ditherlevel;
+        ex += (color.r - newColor.r);
+        ey += (color.g - newColor.g);
+        ez += (color.b - newColor.b);
+        ex = std::max(std::min(31, ex), -31) * ditherlevel;
+        ey = std::max(std::min(31, ey), -31) * ditherlevel;
+        ez = std::max(std::min(31, ez), -31) * ditherlevel;
     }
-
-    VerboseLog("Color 0x%08x -> 0x%08x %d %d %d %f", color.GetARGB(), newColor.GetARGB(), ex, ey, ez, ditherlevel);
 
     return index;
 }

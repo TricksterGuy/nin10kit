@@ -8,9 +8,9 @@
 
 #include "color.hpp"
 #include "headerfile.hpp"
+#include "image32.hpp"
 #include "implementationfile.hpp"
 #include "lutgen.hpp"
-#include "reductionhelper.hpp"
 
 struct resize
 {

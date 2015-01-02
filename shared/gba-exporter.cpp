@@ -1,8 +1,9 @@
 #include <memory>
 #include <vector>
 
+#include "alltypes.hpp"
 #include "fileutils.hpp"
-#include "reductionhelper.hpp"
+#include "logger.hpp"
 #include "shared.hpp"
 
 void DoMode0Export(const std::vector<Image16Bpp>& images);

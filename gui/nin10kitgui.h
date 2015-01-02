@@ -1,12 +1,12 @@
+#ifndef __NIN10KITGUI_H__
+#define __NIN10KITGUI_H__
+
 ///////////////////////////////////////////////////////////////////////////
 // C++ code generated with wxFormBuilder (version Jun  6 2014)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
-
-#ifndef __NIN10KITGUI_H__
-#define __NIN10KITGUI_H__
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
@@ -35,10 +35,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class Nin10KitGUI
 ///////////////////////////////////////////////////////////////////////////////
-class Nin10KitGUI : public wxFrame 
+class Nin10KitGUI : public wxFrame
 {
 	private:
-	
+
 	protected:
 		wxSplitterWindow* m_splitter1;
 		wxPanel* m_panel1;
@@ -62,7 +62,7 @@ class Nin10KitGUI : public wxFrame
 		wxButton* m_button1;
 		wxButton* m_button4;
 		wxButton* m_button5;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnImageSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnLoadImages( wxCommandEvent& event ) { event.Skip(); }
@@ -71,20 +71,20 @@ class Nin10KitGUI : public wxFrame
 		virtual void OnDeleteCurrentImage( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditor( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		Nin10KitGUI( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Nin10Kit"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 640,480 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		
+
 		~Nin10KitGUI();
-		
+
 		void m_splitter1OnIdle( wxIdleEvent& )
 		{
 			m_splitter1->SetSashPosition( 320 );
 			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( Nin10KitGUI::m_splitter1OnIdle ), NULL, this );
 		}
-	
+
 };
 
-#endif //__NIN10KITGUI_H__
+#endif

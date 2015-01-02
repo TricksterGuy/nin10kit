@@ -1,5 +1,7 @@
 #include "imageutil.hpp"
 
+#include "image16.hpp"
+
 ImageInfo::ImageInfo(const std::string& _filename) : filename(_filename)
 {
     name = Format(filename);

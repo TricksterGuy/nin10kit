@@ -46,7 +46,7 @@ void ExportFile::Write(std::ostream& file)
     if (params.transparent_given)
     {
         Color& trans = params.transparent_color;
-        file << " * Transparent color: (" << trans.r << ", " << trans.g << ", " << trans.b << ")\n";
+        file << " * Transparent color: (" << (int)trans.r << ", " << (int)trans.g << ", " << (int)trans.b << ")\n";
     }
     if (!luts.empty())
     {

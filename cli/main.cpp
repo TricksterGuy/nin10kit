@@ -203,8 +203,8 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     params.output_dir = parse.GetString("output_dir");
     params.names = parse.GetListString("names");
     std::vector<std::string> resizes = parse.GetListString("resize");
-    int transparent = parse.GetHexInt("transparent", -1, 0, 0xFFFFFF);
-    params.transparent_given = transparent != -1;
+    unsigned int transparent = parse.GetHexInt("transparent", 0xFF000000, 0, 0xFFFFFF);
+    params.transparent_given = transparent != 0xFF000000;
     params.transparent_color = Color(transparent);
     params.dither = parse.GetBoolean("dither", true);
     params.dither_level = parse.GetInt("dither_level", 80, 0, 100) / 100.0f;

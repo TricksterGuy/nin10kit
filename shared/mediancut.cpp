@@ -371,25 +371,30 @@ bool MedianCut(Histogram& hist, unsigned int desired_colors, std::vector<Color16
     // Could be the case we get n + 1 colors due to two new colors being added.
     palette.resize(desired_colors);
 
-    std::sort(palette.begin(), palette.end(), PaletteSort());
-
     return true;
 }
 
 void GetPalette(const std::vector<Color16>& pixels, unsigned int num_colors, const Color16& transparent, unsigned int offset, Palette& palette)
 {
     EventLog l(__func__);
+
+    Histogram hist(pixels);
+
     std::vector<Color16> paletteArray;
     paletteArray.reserve(num_colors);
 
     if (!offset)
     {
-        paletteArray.push_back(transparent);
         num_colors = std::max(1U, num_colors - 1);
+        hist.Remove(ColorLAB(transparent));
     }
 
-    Histogram hist(pixels);
     MedianCut(hist, num_colors, paletteArray);
+
+    std::sort(paletteArray.begin(), paletteArray.end(), PaletteSort());
+    if (!offset)
+        paletteArray.insert(paletteArray.begin(), transparent);
+
     palette.Set(paletteArray);
 }
 
@@ -401,25 +406,32 @@ void GetPalette(const Image16Bpp& image, unsigned int num_colors, const Color16&
 void GetPalette(const std::vector<Image16Bpp>& images, unsigned int num_colors, const Color16& transparent, unsigned int offset, Palette& palette)
 {
     EventLog l(__func__);
-    std::vector<Color16> paletteArray;
-    paletteArray.reserve(num_colors);
-
-    if (!offset)
-    {
-        paletteArray.push_back(transparent);
-        num_colors = std::max(1U, num_colors - 1);
-    }
 
     Histogram hist;
     for (const auto& image : images)
         hist.Add(image.pixels);
 
+    std::vector<Color16> paletteArray;
+    paletteArray.reserve(num_colors);
+
+    if (!offset)
+    {
+        num_colors = std::max(1U, num_colors - 1);
+        hist.Remove(ColorLAB(transparent));
+    }
+
     MedianCut(hist, num_colors, paletteArray);
+
+    std::sort(paletteArray.begin(), paletteArray.end(), PaletteSort());
+    if (!offset)
+        paletteArray.insert(paletteArray.begin(), transparent);
+
     palette.Set(paletteArray);
 }
 
 void DitherAndReduceImage(const Image16Bpp& image, const Color16& transparent, bool dither, double dither_level, unsigned int offset, Image8Bpp& indexedImage)
 {
+    EventLog l(__func__);
     RiemersmaDither(image, indexedImage, transparent, dither, dither_level);
     if (offset > 0)
     {
@@ -431,6 +443,7 @@ void DitherAndReduceImage(const Image16Bpp& image, const Color16& transparent, b
 
 void ReduceImage(const std::vector<Color16>& pixels, const Palette& palette, const Color16& transparent, unsigned int offset, std::vector<unsigned char>& indexedPixels)
 {
+    EventLog l(__func__);
     indexedPixels.reserve(pixels.size());
     for (const auto& color : pixels)
         indexedPixels.push_back((color == transparent) ? 0 : palette.Search(color) + offset);

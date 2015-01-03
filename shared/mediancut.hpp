@@ -10,12 +10,12 @@
 #include "image8.hpp"
 #include "palette.hpp"
 
-void GetPalette(const std::vector<Color16>& pixels, unsigned int num_colors, const Color& transparent, unsigned int offset, Palette& palette);
-void QuantizeImage(const std::vector<Image16Bpp>& images, unsigned int num_colors, const Color& transparent, unsigned int offset, Palette& palette,
-                   std::vector<unsigned char>& indexed);
-void DitherAndReduceImage(const Image16Bpp& image, const Color& transparent, bool dither, double dither_level, unsigned int offset, Image8Bpp& indexedImage);
+void GetPalette(const std::vector<Color16>& pixels, unsigned int num_colors, const Color16& transparent, unsigned int offset, Palette& palette);
+void GetPalette(const Image16Bpp& image, unsigned int num_colors, const Color16& transparent, unsigned int offset, Palette& palette);
+void GetPalette(const std::vector<Image16Bpp>& images, unsigned int num_colors, const Color16& transparent, unsigned int offset, Palette& palette);
 
-bool MedianCut(const std::vector<Color16>& image, unsigned int desiredColors, std::vector<Color16>& palette);
+void DitherAndReduceImage(const Image16Bpp& image, const Color16& transparent, bool dither, double dither_level, unsigned int offset, Image8Bpp& indexedImage);
+void ReduceImage(const std::vector<Color16>& pixels, const Palette& palette, const Color16& transparent, unsigned int offset, std::vector<unsigned char>& indexedPixels);
 
 #endif
 

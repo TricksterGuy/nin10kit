@@ -17,12 +17,12 @@ void HeaderFile::Write(std::ostream& file)
 
     std::map<std::string, std::vector<Image*>> name_frames = GetAnimatedImages();
 
-    /// TODO This needs to change new devices different datatypes.
     bool ok_newline = false;
-    if (transparent_color != -1)
+    if (params.transparent_given)
     {
+        /// TODO This needs to change new devices different datatypes.
         char buffer[7];
-        sprintf(buffer, "0x%04x", transparent_color);
+        sprintf(buffer, "0x%04x", Color16(params.transparent_color).ToGBAShort());
         WriteDefine(file, params.symbol_base_name, "_TRANSPARENT", (mode == "3") ? buffer : "0x00");
         ok_newline = true;
     }

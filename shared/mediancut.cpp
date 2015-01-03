@@ -59,6 +59,7 @@ class Histogram
         bool Empty() const {return frequencies.empty();}
         unsigned long& operator[](const ColorLAB& color) {return frequencies[color];}
         unsigned long& operator[](const Color16& color) {return frequencies[ColorLAB(color)];}
+        void Add(const std::vector<Color16>& pixels);
         void Remove(const ColorLAB& color) {frequencies.erase(color);}
         bool Contains(const ColorLAB& color) const {return frequencies.find(color) != frequencies.end();}
         void GetTotals(unsigned long& total, unsigned long& ltotal, unsigned long& atotal, unsigned long& btotal) const;
@@ -98,6 +99,12 @@ class Box
 Histogram::Histogram(const std::vector<Color16>& imgdata)
 {
     for (const auto& color : imgdata)
+        frequencies[ColorLAB(color)]++;
+}
+
+void Histogram::Add(const std::vector<Color16>& pixels)
+{
+    for (const auto& color : pixels)
         frequencies[ColorLAB(color)]++;
 }
 
@@ -317,11 +324,10 @@ class PaletteSort
         }
 };
 
-bool MedianCut(const std::vector<Color16>& image, unsigned int desired_colors, std::vector<Color16>& palette)
+bool MedianCut(Histogram& hist, unsigned int desired_colors, std::vector<Color16>& palette)
 {
     EventLog l(__func__);
 
-    Histogram hist(image);
     if (hist.Size() <= desired_colors)
     {
         palette.reserve(hist.Size());
@@ -370,26 +376,49 @@ bool MedianCut(const std::vector<Color16>& image, unsigned int desired_colors, s
     return true;
 }
 
-void GetPalette(const std::vector<Color16>& pixels, unsigned int num_colors, const Color& transparent, unsigned int offset, Palette& palette)
+void GetPalette(const std::vector<Color16>& pixels, unsigned int num_colors, const Color16& transparent, unsigned int offset, Palette& palette)
 {
     EventLog l(__func__);
     std::vector<Color16> paletteArray;
-    ///TODO finalize
-    //if (!offset)
-    //    paletteArray.push_back(transparent);
+    paletteArray.reserve(num_colors);
 
-    MedianCut(pixels, num_colors, paletteArray);
+    if (!offset)
+    {
+        paletteArray.push_back(transparent);
+        num_colors = std::max(1U, num_colors - 1);
+    }
+
+    Histogram hist(pixels);
+    MedianCut(hist, num_colors, paletteArray);
     palette.Set(paletteArray);
 }
 
-void QuantizeImage(const std::vector<Color16>& image, unsigned int num_colors, const Color& transparent, unsigned int offset, Palette& palette, std::vector<unsigned char>& indexed)
+void GetPalette(const Image16Bpp& image, unsigned int num_colors, const Color16& transparent, unsigned int offset, Palette& palette)
 {
-    GetPalette(image, num_colors, transparent, offset, palette);
-    for (const auto& color : image)
-        indexed.push_back((color == transparent) ? 0 : palette.Search(color) + offset);
+    GetPalette(image.pixels, num_colors, transparent, offset, palette);
 }
 
-void DitherAndReduceImage(const Image16Bpp& image, const Color& transparent, bool dither, double dither_level, unsigned int offset, Image8Bpp& indexedImage)
+void GetPalette(const std::vector<Image16Bpp>& images, unsigned int num_colors, const Color16& transparent, unsigned int offset, Palette& palette)
+{
+    EventLog l(__func__);
+    std::vector<Color16> paletteArray;
+    paletteArray.reserve(num_colors);
+
+    if (!offset)
+    {
+        paletteArray.push_back(transparent);
+        num_colors = std::max(1U, num_colors - 1);
+    }
+
+    Histogram hist;
+    for (const auto& image : images)
+        hist.Add(image.pixels);
+
+    MedianCut(hist, num_colors, paletteArray);
+    palette.Set(paletteArray);
+}
+
+void DitherAndReduceImage(const Image16Bpp& image, const Color16& transparent, bool dither, double dither_level, unsigned int offset, Image8Bpp& indexedImage)
 {
     RiemersmaDither(image, indexedImage, transparent, dither, dither_level);
     if (offset > 0)
@@ -398,4 +427,11 @@ void DitherAndReduceImage(const Image16Bpp& image, const Color& transparent, boo
             if (pix)
                 pix += offset;
     }
+}
+
+void ReduceImage(const std::vector<Color16>& pixels, const Palette& palette, const Color16& transparent, unsigned int offset, std::vector<unsigned char>& indexedPixels)
+{
+    indexedPixels.reserve(pixels.size());
+    for (const auto& color : pixels)
+        indexedPixels.push_back((color == transparent) ? 0 : palette.Search(color) + offset);
 }

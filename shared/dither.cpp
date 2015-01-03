@@ -11,7 +11,7 @@
 
 struct DitherImage
 {
-    DitherImage(const Image16Bpp& _inImage, Image8Bpp& _outImage, const Color& _transparent, int _dither, float _ditherlevel) :
+    DitherImage(const Image16Bpp& _inImage, Image8Bpp& _outImage, const Color16& _transparent, int _dither, float _ditherlevel) :
         inImage(_inImage), outImage(_outImage), transparent(_transparent), x(0), y(0), dither(_dither), ditherlevel(_ditherlevel) {};
     const Image16Bpp& inImage;
     Image8Bpp& outImage;
@@ -30,7 +30,7 @@ enum
     RIGHT,
 };
 
-int Dither(const Color16& color, std::shared_ptr<Palette>& palette, const Color& transparent, int dither, float ditherlevel)
+int Dither(const Color16& color, std::shared_ptr<Palette>& palette, const Color16& transparent, int dither, float ditherlevel)
 {
     static int ex = 0, ey = 0, ez = 0;
     //if (color == transparent) return 0;
@@ -157,7 +157,7 @@ void Hilbert(DitherImage& dither, int level, int direction)
     }
 }
 
-void RiemersmaDither(const Image16Bpp& inImage, Image8Bpp& outImage, const Color& transparent, int dither, float ditherlevel)
+void RiemersmaDither(const Image16Bpp& inImage, Image8Bpp& outImage, const Color16& transparent, int dither, float ditherlevel)
 {
     DitherImage dimage(inImage, outImage, transparent, dither, ditherlevel);
     int size = ceil(log2(std::max(inImage.width, inImage.height)));

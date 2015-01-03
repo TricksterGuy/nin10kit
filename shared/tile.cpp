@@ -4,6 +4,7 @@
 #include "fileutils.hpp"
 #include "image16.hpp"
 #include "image8.hpp"
+#include "mediancut.hpp"
 #include "shared.hpp"
 
 ImageTile::ImageTile(const Image16Bpp& image, int tilex, int tiley, int border) : id(0), pixels(TILE_SIZE)
@@ -46,15 +47,14 @@ bool ImageTile::IsSameAs(const ImageTile& other) const
     return same || samev || sameh || samevh;
 }
 
-
 Tile::Tile(const Image16Bpp& image, int tilex, int tiley, int border, int _bpp) : id(0), pixels(TILE_SIZE), bpp(_bpp), palette_bank(-1),
     sourceTile(new ImageTile(image, tilex, tiley, border))
 {
     const std::vector<Color16>& imgdata = sourceTile->pixels;
     unsigned int num_colors = 1 << bpp;
 
-    /// TODO finalize
-    //QuantizeImage(imgdata, num_colors, params.transparent_color, 0, palette, pixels);
+    GetPalette(imgdata, num_colors, params.transparent_color, 0, palette);
+    ReduceImage(imgdata, palette, params.transparent_color, 0, pixels);
 }
 
 Tile::Tile(const Image8Bpp& image, int tilex, int tiley, int border, int _bpp) : id(0), pixels(TILE_SIZE), bpp(_bpp), palette_bank(-1), palette(*image.palette)
@@ -72,8 +72,8 @@ Tile::Tile(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette, in
     const std::vector<Color16>& imgdata = sourceTile->pixels;
     unsigned int num_colors = 1 << bpp;
 
-    /// TODO finalize
-    //QuantizeImage(imgdata, num_colors, params.transparent_color, 0, palette, pixels);
+    GetPalette(imgdata, num_colors, params.transparent_color, 0, palette);
+    ReduceImage(imgdata, palette, params.transparent_color, 0, pixels);
 }
 
 Tile::Tile(std::shared_ptr<ImageTile>& imageTile, int _bpp) : id(0), pixels(TILE_SIZE), bpp(_bpp), palette_bank(-1), sourceTile(imageTile)
@@ -81,8 +81,8 @@ Tile::Tile(std::shared_ptr<ImageTile>& imageTile, int _bpp) : id(0), pixels(TILE
     const std::vector<Color16>& imgdata = sourceTile->pixels;
     unsigned int num_colors = 1 << bpp;
 
-    /// TODO finalize
-    //QuantizeImage(imgdata, num_colors, params.transparent_color, 0, palette, pixels);
+    GetPalette(imgdata, num_colors, params.transparent_color, 0, palette);
+    ReduceImage(imgdata, palette, params.transparent_color, 0, pixels);
 }
 
 bool Tile::operator<(const Tile& other) const

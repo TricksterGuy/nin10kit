@@ -13,7 +13,7 @@ Image8Bpp::Image8Bpp(const Image16Bpp& image) : Image(image), pixels(width * hei
     if (width & 1)
         FatalLog("Image: %s width is not a multiple of 2. Please fix", name.c_str());
 
-    GetPalette(image.pixels, params.palette, params.transparent_color, params.offset, *palette);
+    GetPalette(image, params.palette, params.transparent_color, params.offset, *palette);
     DitherAndReduceImage(image, params.transparent_color, params.dither, params.dither_level, params.offset, *this);
 }
 
@@ -69,39 +69,16 @@ Magick::Image Image8Bpp::ToMagick() const
         }
     }
     ret.syncPixels();
-    ret.write("image8.png");
     return ret;
 }
 
 Image8BppScene::Image8BppScene(const std::vector<Image16Bpp>& images16, const std::string& name) : Scene(name), palette(new Palette(name))
 {
-    ///TODO finalize
-    GetPalette(images16[0].pixels, 256, params.transparent_color, params.offset, *palette);
+    GetPalette(images16, params.palette, params.transparent_color, params.offset, *palette);
 
     images.reserve(images16.size());
     for (unsigned int i = 0; i < images16.size(); i++)
         images.emplace_back(new Image8Bpp(images16[i], palette));
-
-    palette->ToMagick();
-    images16[0].ToMagick();
-    GetImage(0).ToMagick();
-
-    unsigned long error_total = 0;
-    for (const auto& color_ces : palette->colorEntryStats)
-    {
-        const auto& color = color_ces.first;
-        const auto& ces = color_ces.second;
-        VerboseLog("Color %d,%d,%d count %d index %d error %d importance %d", color.r, color.g, color.b, ces.count, ces.index, ces.error, ces.count * ces.error);
-        error_total += ces.count * ces.error;
-    }
-    for (int index = 0; index < 256; index++)
-    {
-        const auto& pes = palette->paletteEntryStats[index];
-        VerboseLog("Palette %d used %d perfect matched %d error_total %ld error/color %f", index, pes.used_count, pes.perfect_count, pes.error, pes.error / ((double)pes.used_count));
-    }
-
-    VerboseLog("Error total %ld Error per color %f Error per pixel %f", error_total, error_total * 1.0f / palette->colorEntryStats.size(),
-               error_total * 1.0f / (images[0]->width * images[0]->height));
 }
 
 const Image8Bpp& Image8BppScene::GetImage(int index) const

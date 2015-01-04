@@ -57,6 +57,7 @@ set(SRC_SHARED
     shared/image8.cpp
     shared/implementationfile.cpp
     shared/logger.cpp
+	shared/lut-exporter.cpp
     shared/lutgen.cpp
     shared/map.cpp
     shared/mediancut.cpp
@@ -71,7 +72,6 @@ set(SRC_SHARED
 
 set(SRC_NIN10KIT
 	cli/main.cpp
-	cli/lut-exporter.cpp
 )
 
 set(SRC_NIN10KITGUI

@@ -211,7 +211,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     params.force = parse.GetBoolean("force", false);
 
     params.export_2d = parse.GetBoolean("export_2d", false);
-    params.for_bitmap = parse.GetBoolean("for_bitmap", false);s
+    params.for_bitmap = parse.GetBoolean("for_bitmap", false);
 
     std::string export_file = parser.GetParam(0).ToStdString();
     params.export_file = Chop(export_file);

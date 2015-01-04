@@ -34,9 +34,12 @@ Sprite::Sprite(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette
     if (size == -1 || image.width & 7 || image.height & 7)
         FatalLog("Invalid sprite size, (%d %d) Please fix", image.width, image.height);
 
+    // Is actually an 8 or 4bpp image
+    Image8Bpp image8(image, palette);
+
     data.reserve(width * height);
     for (unsigned int i = 0; i < width * height; i++)
-        data.emplace_back(image, global_palette, i % width, i / width);
+        data.emplace_back(image8, i % width, i / width, 0, 8);
 }
 
 Sprite::Sprite(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
@@ -48,7 +51,7 @@ Sprite::Sprite(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.
     if (size == -1 || image.width & 7 || image.height & 7)
         FatalLog("Invalid sprite size, (%d %d) Please fix", image.width, image.height);
 
-    GetPalette(image.pixels, 0, params.transparent_color, 0, *palette);
+    GetPalette(image.pixels, 1 << bpp, params.transparent_color, 0, *palette);
     // Is actually an 8 or 4bpp image
     Image8Bpp image8(image, palette);
 
@@ -76,8 +79,8 @@ void Sprite::WriteTile(unsigned char* arr, int x, int y) const
 
 void Sprite::WriteCommonExport(std::ostream& file) const
 {
-    WriteDefine(file, name, "_SHAPE", shape, 14);
-    WriteDefine(file, name, "_SIZE", size, 14);
+    WriteDefine(file, name, "_SPRITE_SHAPE", shape, 14);
+    WriteDefine(file, name, "_SPRITE_SIZE", size, 14);
 }
 
 void Sprite::WriteExport(std::ostream& file) const
@@ -188,8 +191,8 @@ bool SpriteCompare(const Image* l, const Image* r)
         return lhs->width + lhs->height > rhs->width + rhs->height;
 }
 
-SpriteSheet::SpriteSheet(const std::vector<Sprite*>& _sprites, const std::string& _name, int _bpp, bool _spriteSheetGiven) :
-    name(_name), bpp(_bpp), spriteSheetGiven(_spriteSheetGiven), sprites(_sprites)
+SpriteSheet::SpriteSheet(const std::vector<Sprite*>& _sprites, const std::string& _name, int _bpp) :
+    name(_name), bpp(_bpp), sprites(_sprites)
 {
     width = bpp == 4 ? 32 : 16;
     height = !params.for_bitmap ? 32 : 16;
@@ -231,28 +234,12 @@ void SpriteSheet::WriteExport(std::ostream& file) const
     WriteDefine(file, name, "_SIZE", size);
     WriteNewLine(file);
 
-    if (!spriteSheetGiven)
-    {
-        for (const auto& sprite : sprites)
-            sprite->WriteExport(file);
-    }
+    for (const auto& sprite : sprites)
+        sprite->WriteExport(file);
 }
 
 void SpriteSheet::PlaceSprites()
 {
-    if (spriteSheetGiven)
-    {
-        for (unsigned int i = 0; i < sprites.size(); i++)
-        {
-            Sprite& sprite = *sprites[i];
-            Block allocd(i % width, i / width, BlockSize(1, 1));
-            allocd.sprite_id = i;
-            sprite.offset = (allocd.y * width + allocd.x) * (params.bpp == 4 ? 1 : 2);
-            placedBlocks.push_back(allocd);
-        }
-        return;
-    }
-
     // Gimme some blocks.
     BlockSize size(8, 8);
     for (unsigned int y = 0; y < height; y += 8)
@@ -350,7 +337,7 @@ void SpriteSheet::SliceBlock(const BlockSize& size, const std::list<BlockSize>& 
 }
 
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, int _bpp) : Scene(_name), bpp(_bpp), paletteBanks(name),
-    is2d(_is2d), spriteSheetGiven(false)
+    is2d(_is2d)
 {
     switch(bpp)
     {
@@ -364,13 +351,13 @@ SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::strin
 }
 
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, std::shared_ptr<Palette>& _palette) :
-    Scene(_name), bpp(8), palette(_palette), paletteBanks(name), is2d(_is2d), spriteSheetGiven(false)
+    Scene(_name), bpp(8), palette(_palette), paletteBanks(name), is2d(_is2d)
 {
     Init8bpp(images);
 }
 
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, const std::vector<PaletteBank>& _paletteBanks) :
-    Scene(_name), bpp(4), paletteBanks(name, _paletteBanks), is2d(_is2d), spriteSheetGiven(false)
+    Scene(_name), bpp(4), paletteBanks(name, _paletteBanks), is2d(_is2d)
 {
     Init4bpp(images);
 }
@@ -386,7 +373,7 @@ void SpriteScene::Build()
             if (!sprite) FatalLog("Could not cast Image to Sprite. This shouldn't happen");
             sprites.push_back(sprite);
         }
-        spriteSheet.reset(new SpriteSheet(sprites, name, bpp, spriteSheetGiven));
+        spriteSheet.reset(new SpriteSheet(sprites, name, bpp));
         spriteSheet->Compile();
     }
     else
@@ -465,11 +452,8 @@ void SpriteScene::WriteExport(std::ostream& file) const
         WriteDefine(file, name, "_SIZE", Size());
         WriteNewLine(file);
 
-        if (!spriteSheetGiven)
-        {
-            for (const auto& sprite : images)
-                sprite->WriteExport(file);
-        }
+        for (const auto& sprite : images)
+            sprite->WriteExport(file);
     }
 }
 
@@ -549,8 +533,8 @@ void SpriteScene::Init8bpp(const std::vector<Image16Bpp>& images16)
 {
     if (!palette)
     {
-        Image8BppScene scene(images16, name);
-        palette = scene.palette;
+        palette.reset(new Palette(name));
+        GetPalette(images16, params.palette, params.transparent_color, params.offset, *palette);
     }
 
     for (const auto& image : images16)

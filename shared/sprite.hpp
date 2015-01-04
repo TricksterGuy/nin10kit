@@ -75,7 +75,7 @@ class Block
 class SpriteSheet
 {
     public:
-        SpriteSheet(const std::vector<Sprite*>& sprites, const std::string& name, int bpp, bool spriteSheetGiven);
+        SpriteSheet(const std::vector<Sprite*>& sprites, const std::string& name, int bpp);
         void Compile();
         void WriteData(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
@@ -83,7 +83,6 @@ class SpriteSheet
         unsigned int width, height;
         std::string name;
         int bpp;
-        bool spriteSheetGiven;
     private:
         void PlaceSprites();
         bool AssignBlockIfAvailable(BlockSize& size, Sprite& sprite, unsigned int i);
@@ -114,8 +113,6 @@ class SpriteScene : public Scene
         // Used if is2d is true
         std::unique_ptr<SpriteSheet> spriteSheet;
         bool is2d;
-        // Special for use spritesheet mode
-        bool spriteSheetGiven;
     private:
         void Init4bpp(const std::vector<Image16Bpp>& images);
         void Init8bpp(const std::vector<Image16Bpp>& images);

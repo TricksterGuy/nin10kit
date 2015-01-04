@@ -1,5 +1,6 @@
 #include "tileset.hpp"
 
+#include <sstream>
 #include "logger.hpp"
 #include "fileutils.hpp"
 #include "image16.hpp"
@@ -122,12 +123,8 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
 
     // Reduce each tile to 4bpp
     std::vector<Tile> gbaTiles;
-    for (std::set<ImageTile>::const_iterator i = imageTiles.begin(); i != imageTiles.end(); ++i)
-    {
-        std::shared_ptr<ImageTile> src(new ImageTile(*i));
-        Tile tile(src, 4);
-        gbaTiles.push_back(tile);
-    }
+    for (const auto& imageTile : imageTiles)
+        gbaTiles.emplace_back(imageTile, 4);
 
     // Ensure image contains < 256 colors
     std::set<Color16> bigPalette;
@@ -185,7 +182,7 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
         tile.UsePalette(paletteBanks[pbank]);
 
         // Assign tile id
-        std::set<Tile>::const_iterator it = tiles.find(tile);
+        const auto& it = tiles.find(tile);
         if (it == tiles.end())
         {
             tile.id = tiles.size();

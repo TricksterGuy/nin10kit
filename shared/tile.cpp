@@ -47,12 +47,23 @@ bool ImageTile::IsSameAs(const ImageTile& other) const
     return same || samev || sameh || samevh;
 }
 
-Tile::Tile(const Image16Bpp& image, int tilex, int tiley, int border, int _bpp) : id(0), pixels(TILE_SIZE), bpp(_bpp), palette_bank(-1),
+Tile::Tile(const Image16Bpp& image, int tilex, int tiley, int border, int _bpp) : id(0), bpp(_bpp), palette_bank(-1),
     sourceTile(new ImageTile(image, tilex, tiley, border))
 {
     const std::vector<Color16>& imgdata = sourceTile->pixels;
     unsigned int num_colors = 1 << bpp;
 
+    pixels.reserve(TILE_SIZE);
+    GetPalette(imgdata, num_colors, params.transparent_color, 0, palette);
+    ReduceImage(imgdata, palette, params.transparent_color, 0, pixels);
+}
+
+Tile::Tile(const ImageTile& imageTile, int _bpp) : id(0), bpp(_bpp), palette_bank(-1), sourceTile(new ImageTile(imageTile))
+{
+    const std::vector<Color16>& imgdata = sourceTile->pixels;
+    unsigned int num_colors = 1 << bpp;
+
+    pixels.reserve(TILE_SIZE);
     GetPalette(imgdata, num_colors, params.transparent_color, 0, palette);
     ReduceImage(imgdata, palette, params.transparent_color, 0, pixels);
 }
@@ -64,25 +75,6 @@ Tile::Tile(const Image8Bpp& image, int tilex, int tiley, int border, int _bpp) :
         for (int j = 0; j < 8; j++)
             pixels[i * 8 + j] = image.pixels[(tiley * (8+border) + i) * image.width + tilex * (8+border) + j];
     }
-}
-
-Tile::Tile(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette, int tilex, int tiley, int border) : id(0), pixels(TILE_SIZE), bpp(8), palette_bank(-1),
-    palette(*global_palette), sourceTile(new ImageTile(image, tilex, tiley, border))
-{
-    const std::vector<Color16>& imgdata = sourceTile->pixels;
-    unsigned int num_colors = 1 << bpp;
-
-    GetPalette(imgdata, num_colors, params.transparent_color, 0, palette);
-    ReduceImage(imgdata, palette, params.transparent_color, 0, pixels);
-}
-
-Tile::Tile(std::shared_ptr<ImageTile>& imageTile, int _bpp) : id(0), pixels(TILE_SIZE), bpp(_bpp), palette_bank(-1), sourceTile(imageTile)
-{
-    const std::vector<Color16>& imgdata = sourceTile->pixels;
-    unsigned int num_colors = 1 << bpp;
-
-    GetPalette(imgdata, num_colors, params.transparent_color, 0, palette);
-    ReduceImage(imgdata, palette, params.transparent_color, 0, pixels);
 }
 
 bool Tile::operator<(const Tile& other) const

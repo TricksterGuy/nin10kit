@@ -43,6 +43,9 @@ void HeaderFile::Write(std::ostream& file)
         if (frames <= 1) continue;
         const std::string& img_type = name_frames[name][0]->GetImageType();
         WriteExtern(file, img_type, name, "_frames", frames);
+        // If image has a palette and splitting
+        if (name_frames[name][0]->HasPalette() && params.split)
+            WriteExtern(file, "const unsigned short*", name, "_palette_frames", frames);
         WriteDefine(file, name, "_FRAMES", frames);
         // Write the common #defines here.
         name_frames[name][0]->WriteCommonExport(file);

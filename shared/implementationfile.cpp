@@ -27,6 +27,14 @@ void ImplementationFile::Write(std::ostream& file)
             names.push_back(image->GetExportName());
         WriteAnimationArray(file, img_type, name, "_frames", names, 1);
         WriteNewLine(file);
+        // If image has a palette and splitting
+        if (name_frames[name][0]->HasPalette() && params.split)
+        {
+            for (auto& name : names)
+                name += "_palette";
+            WriteAnimationArray(file, "const unsigned short*", name, "_palette_frames", names, 1);
+            WriteNewLine(file);
+        }
     }
 
     for (const auto& exportable : exportables)

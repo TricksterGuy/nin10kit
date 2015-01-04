@@ -48,9 +48,8 @@ class Tile
 {
     public:
         Tile(const Image16Bpp& image, int tilex, int tiley, int border = 0, int bpp = 8);
+        Tile(const ImageTile& imageTile, int bpp);
         Tile(const Image8Bpp& image, int tilex, int tiley, int border = 0, int bpp = 8);
-        Tile(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette, int tilex, int tiley, int border = 0);
-        Tile(std::shared_ptr<ImageTile>& imageTile, int bpp);
         bool IsEqual(const Tile& other) const;
         bool IsSameAs(const Tile& other) const;
         bool operator<(const Tile& other) const;
@@ -72,6 +71,7 @@ class Tile
         int bpp;
         int palette_bank;
         Palette palette;
+        /* Shared because copies of tiles exist */
         std::shared_ptr<ImageTile> sourceTile;
 
     friend std::ostream& operator<<(std::ostream& file, const Tile& tile);

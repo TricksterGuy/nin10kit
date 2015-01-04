@@ -83,7 +83,7 @@ void Map::WriteData(std::ostream& file) const
     int type = (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1;
     int num_blocks = (type == 0 ? 1 : (type < 3 ? 2 : 4));
 
-    WriteBeginArray(file, "const unsigned short", export_name, "_map", num_blocks * 32 * 32);
+    WriteBeginArray(file, "const unsigned short", export_name, "", num_blocks * 32 * 32);
     for (int i = 0; i < num_blocks; i++)
     {
         // Case for each possible value of num_blocks
@@ -130,8 +130,8 @@ void Map::WriteExport(std::ostream& file) const
     if (export_shared_info)
         tileset->WriteExport(file);
 
-    WriteExtern(file, "const unsigned short", export_name, "_map", data.size());
-    if (animated)
+    WriteExtern(file, "const unsigned short", export_name, "", data.size());
+    if (!animated)
     {
         WriteDefine(file, export_name, "_WIDTH", width);
         WriteDefine(file, export_name, "_HEIGHT", height);

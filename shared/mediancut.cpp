@@ -393,7 +393,13 @@ void GetPalette(const std::vector<Color16>& pixels, unsigned int num_colors, con
 
     std::sort(paletteArray.begin(), paletteArray.end(), PaletteSort());
     if (!offset)
-        paletteArray.insert(paletteArray.begin(), transparent);
+    {
+        const auto& it = std::find(paletteArray.begin(), paletteArray.end(), transparent);
+        if (it == paletteArray.end())
+            paletteArray.insert(paletteArray.begin(), transparent);
+        else
+            std::swap(*paletteArray.begin(), *it);
+    }
 
     palette.Set(paletteArray);
 }
@@ -424,7 +430,13 @@ void GetPalette(const std::vector<Image16Bpp>& images, unsigned int num_colors, 
 
     std::sort(paletteArray.begin(), paletteArray.end(), PaletteSort());
     if (!offset)
-        paletteArray.insert(paletteArray.begin(), transparent);
+    {
+        const auto& it = std::find(paletteArray.begin(), paletteArray.end(), transparent);
+        if (it == paletteArray.end())
+            paletteArray.insert(paletteArray.begin(), transparent);
+        else
+            std::swap(*paletteArray.begin(), *it);
+    }
 
     palette.Set(paletteArray);
 }

@@ -10,10 +10,12 @@ class Image : public Exportable
         Image(unsigned int _width, unsigned int _height, const std::string& _name = "", const std::string& _filename = "", unsigned int _frame = 0, bool _animated = false);
         /** If Image is actually part of an animated Image export information common to all of these images */
         virtual void WriteCommonExport(std::ostream& file) const = 0;
-        /** Gets type of image array for generating an array of images for animation.  */
+        /** Gets type of image array for generating an array of images for animation. */
         virtual std::string GetImageType() const {return "const unsigned short*";}
         /** Gets the symbol base name for this image */
         virtual std::string GetExportName() const {return export_name;}
+        /** Does this image have a palette attached to it */
+        virtual bool HasPalette() const {return false;}
         /** Width of image in either pixels or tiles */
         unsigned int width;
         /** Height of image in either pixels or tiles */

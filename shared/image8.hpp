@@ -23,6 +23,7 @@ class Image8Bpp : public Image
         void WriteData(std::ostream& file) const;
         void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
+        virtual bool HasPalette() const {return true;}
         Magick::Image ToMagick() const;
         std::vector<unsigned char> pixels;
         /** Palette this image uses */

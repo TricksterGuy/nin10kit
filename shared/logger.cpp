@@ -1,6 +1,8 @@
 #include "logger.hpp"
 #include <ctime>
+#ifndef _WIN32
 #include <sys/time.h>
+#endif
 
 std::unique_ptr<AbstractLogger> logger(new Logger());
 

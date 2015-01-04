@@ -1,7 +1,7 @@
 # File intended only to be ran with GNU make. Use any other make program at your own risk!
 PREFIX := /usr/local
 export PREFIX
-MASTER_CPP_FLAGS := #-O3 -s
+MASTER_CPP_FLAGS := -std=c++11 -O3 -Wall
 export MASTER_CPP_FLAGS
 INSTALL := install
 

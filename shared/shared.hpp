@@ -44,7 +44,6 @@ struct ExportParams
 
     // Palette options
     unsigned int offset;
-    std::vector<int> weights;
     bool dither;
     float dither_level;
     unsigned int palette;

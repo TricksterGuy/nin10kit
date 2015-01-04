@@ -41,7 +41,7 @@ FILES := 3ds-exporter.o \
 all : $(OUTPUT)
 
 $(OUTPUT) : $(FILES)
-	$(AR) -rcs $^ -o $(OUTPUT)
+	$(AR) rcs $(OUTPUT) $^ 
 
 clean :
 	$(RM) -rf *.o $(OUTPUT)

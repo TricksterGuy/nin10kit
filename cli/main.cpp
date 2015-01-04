@@ -117,14 +117,6 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
         "For sprites export only.  Exports sprites for use in modes 3 and 4 (Default false).",
         wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
-    // Advanced Mode 4 options Use at your own risk.
-    {wxCMD_LINE_OPTION, "weights", "weights",
-        "Only for mode0/4 exports.  ADVANCED option use at your own risk. (Usage -weights=w1,w2,w3,w4) "
-        "Fine tune? median cut algorithm.  w1 = volume, w2 = population, w3 = volume*population, w4 = error "
-        "Affects image output quality for mode4, Range of w1-w4 is [0,100] but must sum up to 100 "
-        "These values affects which colors are chosen by the median cut algorithm used to reduce the number "
-        "of colors in the image.", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
-
     {wxCMD_LINE_PARAM,  NULL, NULL, "output filename / input file(s)", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE},
     {wxCMD_LINE_NONE}
 };
@@ -219,9 +211,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     params.force = parse.GetBoolean("force", false);
 
     params.export_2d = parse.GetBoolean("export_2d", false);
-    params.for_bitmap = parse.GetBoolean("for_bitmap", false);
-
-    params.weights = parse.GetListInt("weights", {25, 25, 25, 25});
+    params.for_bitmap = parse.GetBoolean("for_bitmap", false);s
 
     std::string export_file = parser.GetParam(0).ToStdString();
     params.export_file = Chop(export_file);
@@ -296,15 +286,6 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
         }
         params.resizes.push_back(resize(w, h));
     }
-
-    if (params.weights.size() != 4)
-        FatalLog("Error parsing -weights expected 4 elements %d given", params.weights.size());
-    int p = params.weights[0];
-    int v = params.weights[1];
-    int pv = params.weights[2];
-    int error = params.weights[3];
-    if (p < 0 || v < 0 || pv < 0 || error < 0 || (p+v+pv+error != 100))
-        WarnLog("-weights total does not sum up to 100 or invalid value given.");
 
     if (!params.tilesets.empty())
     {

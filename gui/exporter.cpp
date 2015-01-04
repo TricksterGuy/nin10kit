@@ -59,7 +59,6 @@ void DoExport(int mode, const std::string& filename, std::vector<std::string>& f
     params.offset = 0;
     params.palette = 256;
     params.border = 0;
-    params.weights = {25, 25, 25, 25};
 
     header.SetMode(params.mode);
     implementation.SetMode(params.mode);

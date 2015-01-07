@@ -32,15 +32,11 @@ class ImageTile
         bool IsSameAs(const ImageTile& other) const;
         bool operator<(const ImageTile& other) const;
         bool operator==(const ImageTile& other) const;
-        static const ImageTile& GetNullTile()
-        {
-            static ImageTile nullTile;
-            return nullTile;
-        }
+        static const ImageTile& GetNullTile();
         int id;
         std::vector<Color16> pixels;
     private:
-        ImageTile() : id(0), pixels(TILE_SIZE) {}
+        ImageTile(const Color16& color = Color16()) : id(0), pixels(TILE_SIZE, color) {}
 };
 
 /* */
@@ -56,16 +52,8 @@ class Tile
         bool operator==(const Tile& other) const;
         /* Set to use palette bank only for 4bpp tiles */
         void UsePalette(const PaletteBank& bank);
-        static const Tile& GetNullTile8()
-        {
-            static Tile nullTile(8);
-            return nullTile;
-        }
-        static const Tile& GetNullTile4()
-        {
-            static Tile nullTile(4);
-            return nullTile;
-        }
+        static const Tile& GetNullTile8();
+        static const Tile& GetNullTile4();
         int id;
         std::vector<unsigned char> pixels;
         int bpp;

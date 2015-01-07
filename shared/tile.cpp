@@ -7,6 +7,12 @@
 #include "mediancut.hpp"
 #include "shared.hpp"
 
+const ImageTile& ImageTile::GetNullTile()
+{
+    static ImageTile nullTile(params.transparent_color);
+    return nullTile;
+}
+
 ImageTile::ImageTile(const Image16Bpp& image, int tilex, int tiley, int border) : id(0), pixels(TILE_SIZE)
 {
     for (int i = 0; i < 8; i++)
@@ -45,6 +51,18 @@ bool ImageTile::IsSameAs(const ImageTile& other) const
         samevh = samevh && pixels[i] == other.pixels[(7 - y) * 8 + (7 - x)];
     }
     return same || samev || sameh || samevh;
+}
+
+const Tile& Tile::GetNullTile8()
+{
+    static Tile nullTile(8);
+    return nullTile;
+}
+
+const Tile& Tile::GetNullTile4()
+{
+    static Tile nullTile(4);
+    return nullTile;
 }
 
 Tile::Tile(const Image16Bpp& image, int tilex, int tiley, int border, int _bpp) : id(0), bpp(_bpp), palette_bank(-1),

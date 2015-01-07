@@ -131,13 +131,16 @@ Magick::Image Palette::ToMagick() const
     return ret;
 }
 
-int PaletteBank::CanMerge(const ColorArray& palette) const
+void PaletteBank::CanMerge(const ColorArray& palette, int& colors_left, int& delta) const
 {
-    std::set<Color16> tmpset(colorSet);
-    for (const auto& color : palette.GetColors())
-        tmpset.insert(color);
+    int size = colorSet.size();
 
-    return 16 - tmpset.size();
+    for (const auto& color : palette.GetColors())
+        if (colorSet.find(color) == colorSet.end())
+            size++;
+
+    colors_left = 16 - size;
+    delta = size - colorSet.size();
 }
 
 void PaletteBank::Merge(const ColorArray& palette)

@@ -503,18 +503,21 @@ void SpriteScene::Init4bpp(const std::vector<Image16Bpp>& images16)
         // Ok then find least affected bank
         if (pbank == -1)
         {
-            int max_colors_left = -1;
+            int min_delta = 0x7FFFFFFF;
             for (unsigned int i = 0; i < paletteBanks.Size(); i++)
             {
                 PaletteBank& bank = paletteBanks[i];
-                int colors_left = bank.CanMerge(*sprite->palette);
-                if (colors_left != 0 && max_colors_left < colors_left)
+                int colors_left;
+                int delta;
+                bank.CanMerge(*sprite->palette, colors_left, delta);
+                if (colors_left >= 0 && delta < min_delta)
                 {
-                    max_colors_left = colors_left;
+                    min_delta = delta;
                     pbank = i;
                 }
             }
         }
+
         // Cry and die for now. Unless you tell me to keep going.
         if (pbank == -1 && !params.force)
             FatalLog("More than 16 distinct palettes found, please use 8bpp mode.");

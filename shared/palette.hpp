@@ -71,7 +71,7 @@ class PaletteBank : public ColorArray
     public:
         PaletteBank(int _id = -1) : id(_id) {};
         PaletteBank(const std::vector<Color16>& _colors, int id);
-        int CanMerge(const ColorArray& palette) const;
+        void CanMerge(const ColorArray& palette, int& colors_left, int& delta) const;
         void Merge(const ColorArray& palette);
         int id;
 };

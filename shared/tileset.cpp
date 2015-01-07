@@ -140,9 +140,9 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
     // Greedy approach deal with tiles with largest palettes first.
     std::sort(gbaTiles.begin(), gbaTiles.end(), TilesPaletteSizeComp);
 
-    // But deal with nulltile
+    // But deal with transparent color
     for (unsigned int i = 0; i < paletteBanks.Size(); i++)
-        paletteBanks[i].Add(Color16());
+        paletteBanks[i].Add(Color16(params.transparent_color));
 
     // Construct palette banks, assign bank id to tile, remap tile to palette bank given, assign tile ids
     for (auto& tile : gbaTiles)
@@ -159,14 +159,16 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
         // Ok then find least affected bank
         if (pbank == -1)
         {
-            int max_colors_left = -1;
+            int min_delta = 0x7FFFFFFF;
             for (unsigned int i = 0; i < paletteBanks.Size(); i++)
             {
                 PaletteBank& bank = paletteBanks[i];
-                int colors_left = bank.CanMerge(tile.palette);
-                if (colors_left != 0 && max_colors_left < colors_left)
+                int colors_left;
+                int delta;
+                bank.CanMerge(tile.palette, colors_left, delta);
+                if (colors_left >= 0 && delta < min_delta)
                 {
-                    max_colors_left = colors_left;
+                    min_delta = delta;
                     pbank = i;
                 }
             }

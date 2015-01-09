@@ -98,8 +98,6 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
     {wxCMD_LINE_NONE}
 };
 
-IMPLEMENT_APP(Nin10KitApp);
-
 // All of the read in command line flags will be in this structure.
 ExportParams params;
 
@@ -196,6 +194,25 @@ const std::map<std::string, HelpDesc> help_text = {
 {"split_sbb", HelpDesc("number [0-3]", "NOT IMPLEMENTED")},
 };
 
+IMPLEMENT_APP_NO_MAIN(Nin10KitApp);
+
+int main(int argc, char** argv)
+{
+    /*if (MagickCore::ExpandFilenames(&argc, &argv) == MagickCore::MagickFalse)
+        FatalLog("Unable to expand filenames");
+
+    for (int i = 0; i < argc+1; i++)
+        InfoLog(argv[i]);*/
+
+    Magick::InitializeMagick(*argv);
+
+    wxEntryStart(argc, argv);
+    wxTheApp->CallOnInit();
+    wxTheApp->OnRun();
+
+    return 0;
+}
+
 /** OnInit
   *
   * Initializes the program
@@ -212,8 +229,6 @@ bool Nin10KitApp::OnInit()
         ShowBasicHelp();
         return false;
     }
-
-    Magick::InitializeMagick(static_cast<const char*>(argv[0].c_str()));
 
     wxCmdLineParser help_parser(argc, argv);
     help_parser.SetDesc(help_description);
@@ -458,6 +473,7 @@ bool Nin10KitApp::DoExportImages()
     std::map<std::string, std::vector<Magick::Image>> file_tilesets;
     for (const auto& filename : params.files)
     {
+        InfoLog("Reading image %s", filename.c_str());
         file_images[filename] = std::vector<Magick::Image>();
         readImages(&file_images[filename], filename);
     }

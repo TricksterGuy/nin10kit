@@ -104,7 +104,7 @@ void Palette::WriteData(std::ostream& file) const
     for (unsigned int i = 0; i < colors.size(); i++)
     {
         snprintf(buffer, 7, "0x%04x", colors[i].ToGBAShort());
-        WriteElement(file, buffer, colors.size(), i, 16);
+        WriteElement(file, buffer, colors.size(), i, 8);
     }
     WriteEndArray(file);
     WriteNewLine(file);

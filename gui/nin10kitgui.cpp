@@ -93,9 +93,7 @@ Nin10KitGUI::Nin10KitGUI( wxWindow* parent, wxWindowID id, const wxString& title
 	m_staticText1->Wrap( -1 );
 	fgSizer2->Add( m_staticText1, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL, 8 );
 	
-	imageFilename = new wxTextCtrl( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	imageFilename->Enable( false );
-	
+	imageFilename = new wxTextCtrl( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
 	fgSizer2->Add( imageFilename, 0, wxALL|wxEXPAND, 8 );
 	
 	m_staticText3 = new wxStaticText( m_panel2, wxID_ANY, _("Name:"), wxDefaultPosition, wxDefaultSize, 0 );

@@ -1,8 +1,21 @@
 #include "logger.hpp"
+#include <cstdio>
+#include <cstdlib>
 #include <ctime>
-#ifndef _WIN32
-#include <sys/time.h>
-#endif
+
+std::string time_to_string(std::chrono::system_clock::time_point& time_point)
+{
+    std::time_t time_secs = std::chrono::system_clock::to_time_t(time_point);
+    std::chrono::system_clock::time_point time_point_sec = std::chrono::system_clock::from_time_t(time_secs);
+    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_point - time_point_sec);
+
+    char buffer[128];
+    strftime(buffer, 128, "%H:%M:%S", localtime(&time_secs));
+    char currentTime[128] = "";
+    snprintf(currentTime, 128, "%s.%03d", buffer, (int)ms.count());
+
+    return currentTime;
+}
 
 std::unique_ptr<AbstractLogger> logger(new Logger());
 
@@ -32,6 +45,7 @@ inline const char* GetLogAbbrev(LogLevel level)
 
 inline const char* GetLogColor(LogLevel level)
 {
+#ifndef _WIN32
     switch(level)
     {
         case LogLevel::FATAL:
@@ -47,6 +61,18 @@ inline const char* GetLogColor(LogLevel level)
         default:
             return "";
     }
+#else
+    return "";
+#endif
+}
+
+inline const char* EndLogColor()
+{
+#ifndef _WIN32
+    return "\033[0m";
+#else
+    return "";
+#endif
 }
 
 void AbstractLogger::Log(LogLevel level, const char* format, va_list ap)
@@ -56,13 +82,8 @@ void AbstractLogger::Log(LogLevel level, const char* format, va_list ap)
 
     if (log_time)
     {
-        timeval curTime;
-        gettimeofday(&curTime, NULL);
-        char buffer[128];
-        strftime(buffer, 128, "%H:%M:%S", localtime(&curTime.tv_sec));
-        char currentTime[128] = "";
-        snprintf(currentTime, 128, "%s:%ld", buffer, (long)curTime.tv_usec);
-        (*out) << GetLogColor(level) << GetLogAbbrev(level) << "[" << currentTime << "]\033[0m";
+        std::chrono::time_point<std::chrono::system_clock> time_now(std::chrono::system_clock::now());
+        (*out) << GetLogColor(level) << GetLogAbbrev(level) << "[" << time_to_string(time_now) << "]" << EndLogColor();
     }
 
     DoLog(level, format, ap);
@@ -76,21 +97,14 @@ void Logger::DoLog(LogLevel level, const char* format, va_list ap)
     if (level == LogLevel::FATAL) exit(EXIT_FAILURE);
 }
 
-inline int diff_ms(timeval& t1, timeval& t2)
+EventLog::EventLog(const char* function) : func(function), startTime(std::chrono::system_clock::now())
 {
-    return (((t1.tv_sec - t2.tv_sec) * 1000000) +
-            (t1.tv_usec - t2.tv_usec))/1000;
-}
-
-EventLog::EventLog(const char* function) : func(function)
-{
-    gettimeofday(&startTime, NULL);
     VerboseLog("start: %s", func);
 }
 
 EventLog::~EventLog()
 {
-    timeval endTime;
-    gettimeofday(&endTime, NULL);
-    VerboseLog("end: %s time: %dms", func, diff_ms(endTime, startTime));
+    std::chrono::time_point<std::chrono::system_clock> endTime(std::chrono::system_clock::now());
+    std::chrono::duration<double> elapsed_seconds = endTime-startTime;
+    VerboseLog("end: %s time: %fs", func, elapsed_seconds.count());
 }

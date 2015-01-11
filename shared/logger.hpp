@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstdarg>
 #include <memory>
+#include <chrono>
 
 enum class LogLevel
 {
@@ -102,7 +103,7 @@ class EventLog
         ~EventLog();
     private:
         const char* func;
-        timeval startTime;
+        std::chrono::time_point<std::chrono::system_clock> startTime;
 };
 
 #endif

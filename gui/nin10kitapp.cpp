@@ -26,7 +26,9 @@ bool Nin10KitApp::OnInit()
 
     wxInitAllImageHandlers();
     wxDialog::EnableLayoutAdaptation(true);
+#ifndef _WIN32
     wxHandleFatalExceptions();
+#endif
 
     frame = new Nin10KitFrame();
     SetTopWindow(frame);

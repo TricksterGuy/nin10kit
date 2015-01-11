@@ -25,6 +25,19 @@
 #include "shared.hpp"
 #include "version.h"
 
+
+#ifndef _WIN32
+#define RED "\033[1;31m"
+#define EMPH "\033[1;33m"
+#define END "\033[0m"
+#define ENDEMPH END
+#else
+#define RED "<"
+#define END ">"
+#define EMPH
+#define ENDEMPH
+#endif
+
 void PrintMagickFormats(void)
 {
     MagickCore::ExceptionInfo* exception = MagickCore::AcquireExceptionInfo();
@@ -207,10 +220,13 @@ int main(int argc, char** argv)
     Magick::InitializeMagick(*argv);
 
     wxEntryStart(argc, argv);
-    wxTheApp->CallOnInit();
+
+    if (!wxTheApp->CallOnInit())
+        return EXIT_FAILURE;
+
     wxTheApp->OnRun();
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 /** OnInit
@@ -271,14 +287,14 @@ void Nin10KitApp::ShowBasicHelp()
     printf("nin10kit version %s\n", AutoVersion::FULLVERSION_STRING);
     printf("Basic usage\n");
     printf("-----------\n");
-    printf("nin10kit -\033[1;33mmode\033[0m=\033[1;31mmode\033[0m \033[1;33mexport_file_to\033[0m \033[1;33mlist_of_image_files_or_urls\033[0m\n");
-    printf("\033[1;33mmode\033[0m is one of 0, 3, 4, palette, tiles, map, sprites, or lut\n");
-    printf("\033[1;33mexport_file_to\033[0m is the filename to export to (can include directories)\n"
+    printf("nin10kit -mode=" RED "mode" END " " RED "export_file_to" END " " RED "list_of_image_files_or_urls" END "\n");
+    printf(RED "mode" END " is one of 0, 3, 4, palette, tiles, map, sprites, or lut\n");
+    printf(RED "export_file_to" END " is the filename to export to (can include directories)\n"
            "\tex: my_images will create my_images.c and my_images.h in the current directory.\n");
-    printf("\033[1;33mlist_of_image_files_or_urls\033[0m is a list of image files or URLs of images.\n"
+    printf(RED "list_of_image_files_or_urls" END " is a list of image files or URLs of images.\n"
            "\tTo see what image formats are supported use command nin10kit -h=formats\n\n");
     printf("For more detailed help use command nin10kit -h\n"
-           "nin10kit -h=\033[1;31mcommand_line_flag\033[0m for a more detailed description of what command_line_flag does.\n");
+           "nin10kit -h=" RED "command_line_flag" END " for a more detailed description of what command_line_flag does.\n");
 }
 
 void Nin10KitApp::OnHelp(const std::string& topic)
@@ -287,7 +303,7 @@ void Nin10KitApp::OnHelp(const std::string& topic)
     {
         printf("Available command line flags are as follows\n");
         for (const auto& flag_desc : help_text)
-            printf("\033[1;33m%s\033[0m=%s\n", flag_desc.first.c_str(), flag_desc.second.usage.c_str());
+            printf(EMPH "%s" ENDEMPH "=%s\n", flag_desc.first.c_str(), flag_desc.second.usage.c_str());
     }
     else if (topic == "formats")
     {
@@ -304,7 +320,7 @@ void Nin10KitApp::OnHelp(const std::string& topic)
         const auto& desc = help_text.at(topic);
         printf("Help on %s\n"
                "-----------------\n", topic.c_str());
-        printf("Usage: \033[1;33m%s\033[0m=%s\n", topic.c_str(), desc.usage.c_str());
+        printf("Usage: " EMPH "%s" ENDEMPH "=%s\n", topic.c_str(), desc.usage.c_str());
         printf("%s\n", desc.text.c_str());
     }
     else

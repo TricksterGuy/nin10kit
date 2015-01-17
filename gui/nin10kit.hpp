@@ -9,6 +9,8 @@
 #include "nin10kitgui.h"
 #include "imageutil.hpp"
 
+class Nin10KitViewerFrame;
+
 class Nin10KitFrame : public Nin10KitGUI
 {
     public:
@@ -20,11 +22,13 @@ class Nin10KitFrame : public Nin10KitGUI
 		void OnUpdateCurrentImage(wxCommandEvent& event);
 		void OnDeleteCurrentImage(wxCommandEvent& event);
 		void OnExport(wxCommandEvent& event);
+		void OnView(wxCommandEvent& event);
 		void OnEditor(wxCommandEvent& event);
     private:
         std::unique_ptr<wxImageList> imageList;
         std::vector<std::string> filenames;
         std::map<std::string, ImageInfo> images;
+        Nin10KitViewerFrame* viewer;
 };
 
 #endif

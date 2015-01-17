@@ -11,6 +11,7 @@ class Scene : public Exportable
     public:
         Scene(const std::string& _name) : Exportable(_name) {}
         virtual ~Scene() {}
+        unsigned int NumImages() const {return images.size();}
         std::vector<std::unique_ptr<Image>>& GetImages() {return images;}
         virtual void WriteData(std::ostream& file) const;
         virtual void WriteExport(std::ostream& file) const;

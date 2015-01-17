@@ -1,11 +1,28 @@
 #include "nin10kitapp.hpp"
 #include <wx/config.h>
 #include <wx/dialog.h>
+#include <Magick++.h>
 
 #include "cmd-line-parser-helper.hpp"
+#include "cpercep.hpp"
 #include "logger.hpp"
 
-IMPLEMENT_APP(Nin10KitApp);
+IMPLEMENT_APP_NO_MAIN(Nin10KitApp);
+
+int main(int argc, char** argv)
+{
+    Magick::InitializeMagick(*argv);
+    cpercep_init();
+
+    wxEntryStart(argc, argv);
+
+    if (!wxTheApp->CallOnInit())
+        return EXIT_FAILURE;
+
+    wxTheApp->OnRun();
+
+    return EXIT_SUCCESS;
+}
 
 static const wxCmdLineEntryDesc cmd_descriptions[] =
 {

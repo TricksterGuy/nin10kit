@@ -3,6 +3,8 @@
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 
+#include "nin10kitviewer.hpp"
+
 #include "exporter.hpp"
 #include "imageutil.hpp"
 #include "logger.hpp"
@@ -149,6 +151,16 @@ void Nin10KitFrame::OnExport(wxCommandEvent& event)
 
     InfoLog("Saving exported file to %s", filename.c_str());
     DoExport(mode->GetSelection(), filename, filenames, images);
+}
+
+void Nin10KitFrame::OnView(wxCommandEvent& event)
+{
+    EventLog l(__func__);
+    if (!viewer)
+        viewer = new Nin10KitViewerFrame();
+
+    viewer->Set(mode->GetSelection(), images);
+    viewer->Show(true);
 }
 
 void Nin10KitFrame::OnEditor(wxCommandEvent& event)

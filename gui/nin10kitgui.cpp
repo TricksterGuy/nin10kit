@@ -169,6 +169,9 @@ Nin10KitGUI::Nin10KitGUI( wxWindow* parent, wxWindowID id, const wxString& title
 	m_button4 = new wxButton( m_panel2, wxID_ANY, _("Export"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer9->Add( m_button4, 0, wxALL, 5 );
 	
+	m_button7 = new wxButton( m_panel2, wxID_ANY, _("View"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer9->Add( m_button7, 0, wxALL, 5 );
+	
 	m_button5 = new wxButton( m_panel2, wxID_ANY, _("Edit"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer9->Add( m_button5, 0, wxALL, 5 );
 	
@@ -195,6 +198,7 @@ Nin10KitGUI::Nin10KitGUI( wxWindow* parent, wxWindowID id, const wxString& title
 	m_button6->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitGUI::OnUpdateCurrentImage ), NULL, this );
 	m_button1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitGUI::OnDeleteCurrentImage ), NULL, this );
 	m_button4->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitGUI::OnExport ), NULL, this );
+	m_button7->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitGUI::OnView ), NULL, this );
 	m_button5->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitGUI::OnEditor ), NULL, this );
 }
 
@@ -207,6 +211,7 @@ Nin10KitGUI::~Nin10KitGUI()
 	m_button6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitGUI::OnUpdateCurrentImage ), NULL, this );
 	m_button1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitGUI::OnDeleteCurrentImage ), NULL, this );
 	m_button4->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitGUI::OnExport ), NULL, this );
+	m_button7->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitGUI::OnView ), NULL, this );
 	m_button5->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( Nin10KitGUI::OnEditor ), NULL, this );
 	
 }

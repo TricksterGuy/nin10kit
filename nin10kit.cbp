@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="nin10kit" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="nin10kit">
+				<Option output="bin/nin10kit" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+			</Target>
+			<Target title="nin10kitgui">
+				<Option output="bin/nin10kitgui" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c++11" />
+			<Add option="-Wall" />
+			<Add option="-DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16" />
+			<Add directory="D:/projects/nin10kit/shared" />
+			<Add directory="D:/src/ImageMagick-6.8.5/include" />
+			<Add directory="D:/src/wxWidgets-3.0.2-MSW/include" />
+			<Add directory="D:/src/wxWidgets-3.0.2-MSW/lib/mswu" />
+		</Compiler>
+		<Linker>
+			<Add library="D:\src\ImageMagick-6.8.5\lib\libMagick++-6.Q16.dll.a" />
+			<Add library="D:\src\ImageMagick-6.8.5\lib\libMagickCore-6.Q16.dll.a" />
+			<Add library="D:\src\ImageMagick-6.8.5\lib\libMagickWand-6.Q16.dll.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30u.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30u_net.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30u_xml.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30ud.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30ud_net.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30ud_xml.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxexpat.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxexpatd.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxjpeg.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxjpegd.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_adv.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_aui.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_core.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_gl.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_html.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_media.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_propgrid.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_ribbon.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_richtext.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_stc.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_webview.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_xrc.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_adv.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_aui.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_core.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_gl.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_html.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_media.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_propgrid.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_ribbon.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_richtext.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_stc.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_webview.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_xrc.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxpng.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxpngd.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxregexu.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxregexud.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxscintilla.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxscintillad.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxtiff.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxtiffd.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxzlib.a" />
+			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxzlibd.a" />
+			<Add directory="D:/src/ImageMagick-6.8.5/lib" />
+			<Add directory="D:/src/wxWidgets-3.0.2-MSW/lib" />
+		</Linker>
+		<Unit filename="CMakeLists.txt">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="cli/main.cpp">
+			<Option target="nin10kit" />
+		</Unit>
+		<Unit filename="gui/exporter.cpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/exporter.hpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/imageutil.cpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/imageutil.hpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/nin10kit.cpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/nin10kit.hpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/nin10kitapp.cpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/nin10kitapp.hpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/nin10kitgui.cpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/nin10kitgui.h">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="shared/3ds-exporter.cpp" />
+		<Unit filename="shared/alltypes.hpp" />
+		<Unit filename="shared/cmd-line-parser-helper.cpp" />
+		<Unit filename="shared/cmd-line-parser-helper.hpp" />
+		<Unit filename="shared/color.cpp" />
+		<Unit filename="shared/color.hpp" />
+		<Unit filename="shared/cpercep.cpp" />
+		<Unit filename="shared/cpercep.hpp" />
+		<Unit filename="shared/dither.cpp" />
+		<Unit filename="shared/dither.hpp" />
+		<Unit filename="shared/ds-exporter.cpp" />
+		<Unit filename="shared/exportable.hpp" />
+		<Unit filename="shared/exportfile.cpp" />
+		<Unit filename="shared/exportfile.hpp" />
+		<Unit filename="shared/fileutils.cpp" />
+		<Unit filename="shared/fileutils.hpp" />
+		<Unit filename="shared/gba-exporter.cpp" />
+		<Unit filename="shared/headerfile.cpp" />
+		<Unit filename="shared/headerfile.hpp" />
+		<Unit filename="shared/image.cpp" />
+		<Unit filename="shared/image.hpp" />
+		<Unit filename="shared/image16.cpp" />
+		<Unit filename="shared/image16.hpp" />
+		<Unit filename="shared/image32.cpp" />
+		<Unit filename="shared/image32.hpp" />
+		<Unit filename="shared/image8.cpp" />
+		<Unit filename="shared/image8.hpp" />
+		<Unit filename="shared/implementationfile.cpp" />
+		<Unit filename="shared/implementationfile.hpp" />
+		<Unit filename="shared/logger.cpp" />
+		<Unit filename="shared/logger.hpp" />
+		<Unit filename="shared/lut-exporter.cpp" />
+		<Unit filename="shared/lutgen.cpp" />
+		<Unit filename="shared/lutgen.hpp" />
+		<Unit filename="shared/map.cpp" />
+		<Unit filename="shared/map.hpp" />
+		<Unit filename="shared/mediancut.cpp" />
+		<Unit filename="shared/mediancut.hpp" />
+		<Unit filename="shared/palette.cpp" />
+		<Unit filename="shared/palette.hpp" />
+		<Unit filename="shared/scanner.cpp" />
+		<Unit filename="shared/scanner.hpp" />
+		<Unit filename="shared/scene.cpp" />
+		<Unit filename="shared/scene.hpp" />
+		<Unit filename="shared/shared.cpp" />
+		<Unit filename="shared/shared.hpp" />
+		<Unit filename="shared/sprite.cpp" />
+		<Unit filename="shared/sprite.hpp" />
+		<Unit filename="shared/tile.cpp" />
+		<Unit filename="shared/tile.hpp" />
+		<Unit filename="shared/tileset.cpp" />
+		<Unit filename="shared/tileset.hpp" />
+		<Unit filename="shared/version.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

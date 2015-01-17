@@ -61,6 +61,7 @@ class Nin10KitGUI : public wxFrame
 		wxButton* m_button6;
 		wxButton* m_button1;
 		wxButton* m_button4;
+		wxButton* m_button7;
 		wxButton* m_button5;
 		
 		// Virtual event handlers, overide them in your derived class
@@ -70,6 +71,7 @@ class Nin10KitGUI : public wxFrame
 		virtual void OnUpdateCurrentImage( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteCurrentImage( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnView( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditor( wxCommandEvent& event ) { event.Skip(); }
 		
 	

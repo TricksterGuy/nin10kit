@@ -55,7 +55,7 @@ void DoExport(int mode, const std::string& filename, std::vector<std::string>& f
     InfoLog("Using %s exporter mode %s", params.device.c_str(), params.mode.c_str());
 
     params.transparent_color = -1;
-    params.dither_level = 80 / 100.0f;
+    params.dither_level = 10 / 100.0f;
     params.offset = 0;
     params.palette = 256;
     params.border = 0;

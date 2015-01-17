@@ -378,6 +378,7 @@ void GetPalette(const std::vector<Color16>& pixels, unsigned int num_colors, con
 {
     EventLog l(__func__);
 
+    //BUG HERE
     Histogram hist(pixels);
 
     std::vector<Color16> paletteArray;
@@ -439,6 +440,7 @@ void GetPalette(const std::vector<Image16Bpp>& images, unsigned int num_colors, 
     }
 
     palette.Set(paletteArray);
+    VerboseLog("palette array size %d num_colors %d", paletteArray.size(), num_colors);
 }
 
 void DitherAndReduceImage(const Image16Bpp& image, const Color16& transparent, bool dither, double dither_level, unsigned int offset, Image8Bpp& indexedImage)

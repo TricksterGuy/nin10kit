@@ -218,6 +218,7 @@ int main(int argc, char** argv)
         InfoLog(argv[i]);*/
 
     Magick::InitializeMagick(*argv);
+    cpercep_init();
 
     wxEntryStart(argc, argv);
 
@@ -237,8 +238,6 @@ bool Nin10KitApp::OnInit()
 {
     logger->SetLogLevel(LogLevel::INFO);
     VerboseLog("Init");
-
-    cpercep_init();
 
     if (argc <= 1)
     {

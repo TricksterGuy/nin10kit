@@ -78,6 +78,8 @@ set(SRC_NIN10KITGUI
     gui/nin10kit.cpp
     gui/nin10kitapp.cpp
     gui/nin10kitgui.cpp
+    gui/nin10kitviewergui.cpp
+    gui/nin10kitviewer.cpp
     gui/imageutil.cpp
     gui/exporter.cpp
 )

@@ -73,6 +73,9 @@ class PaletteBank : public ColorArray
         PaletteBank(const std::vector<Color16>& _colors, int id);
         void CanMerge(const ColorArray& palette, int& colors_left, int& delta) const;
         void Merge(const ColorArray& palette);
+        void BestMerge(const ColorArray& palette);
+        unsigned long CalculateError(const ColorArray& palette) const;
+        unsigned long CalculateError(const Color16& color) const;
         int id;
 };
 
@@ -85,6 +88,7 @@ class PaletteBankManager : public Exportable
         PaletteBank& operator[](int i) {return banks[i];}
         const PaletteBank& operator[](int i) const {return banks[i];}
         unsigned int Size() const {return banks.size();}
+        int FindBestMatch(const ColorArray& palette) const;
         void WriteData(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         std::vector<PaletteBank> banks;

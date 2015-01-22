@@ -35,6 +35,7 @@ class MapScene : public Scene
     public:
         MapScene(const std::vector<Image16Bpp>& images, const std::string& name, int bpp);
         MapScene(const std::vector<Image16Bpp>& images, const std::string& name, std::shared_ptr<Tileset>& tileset);
+        const Map& GetMap(int index) const;
         void WriteData(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         std::shared_ptr<Tileset> tileset;

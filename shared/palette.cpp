@@ -131,6 +131,14 @@ Magick::Image Palette::ToMagick() const
     return ret;
 }
 
+struct ColorError
+{
+    ColorError(const Color16& c, unsigned long e) : color(c), error(e) {}
+    bool operator<(const ColorError& rhs) const {return error < rhs.error;}
+    Color16 color;
+    unsigned long error;
+};
+
 void PaletteBank::CanMerge(const ColorArray& palette, int& colors_left, int& delta) const
 {
     int size = colorSet.size();
@@ -147,6 +155,52 @@ void PaletteBank::Merge(const ColorArray& palette)
 {
     for (const auto& color : palette.GetColors())
         Add(color);
+}
+
+void PaletteBank::BestMerge(const ColorArray& palette)
+{
+    // Add the colors that will reduce error the most
+    // The rest will be matched.
+    int dropX = 16 - colorSet.size();
+
+    std::vector<ColorError> colors;
+    for (const auto& color : palette.GetColors())
+        colors.push_back(ColorError(color, CalculateError(color)));
+    std::sort(colors.begin(), colors.end(), std::less<ColorError>());
+
+    for (int i = 0; i < dropX; i++)
+        Add(colors[colors.size() - 1 - i].color);
+}
+
+unsigned long PaletteBank::CalculateError(const Color16& color) const
+{
+    unsigned long min = 0xFFFFFFFF;
+    ColorLAB lcolor(color);
+    for (const auto& c : labColors)
+    {
+        unsigned long dist = c.Distance(lcolor);
+        if (dist < min)
+            min = dist;
+    }
+    return min;
+}
+
+unsigned long PaletteBank::CalculateError(const ColorArray& palette) const
+{
+    int dropX = 16 - colorSet.size();
+    std::vector<unsigned long> errors;
+    errors.reserve(palette.Size());
+
+    for (const auto& color : palette.GetColors())
+        errors.push_back(CalculateError(color));
+
+    std::sort(errors.begin(), errors.end(), std::less<unsigned long>());
+
+    unsigned long sum = 0;
+    for (unsigned int i = 0; i < errors.size() - dropX; i++)
+        sum += errors[i];
+
+    return sum;
 }
 
 std::ostream& operator<<(std::ostream& file, const PaletteBank& bank)
@@ -172,6 +226,22 @@ PaletteBankManager::PaletteBankManager(const std::string& name) : Exportable(nam
 
 PaletteBankManager::PaletteBankManager(const std::string& _name, const std::vector<PaletteBank>& paletteBanks) : Exportable(_name), banks(paletteBanks)
 {
+}
+
+int PaletteBankManager::FindBestMatch(const ColorArray& palette) const
+{
+    unsigned long min = 0x7FFFFFFF;
+    int index = -1;
+    for (unsigned int i = 0; i < banks.size(); i++)
+    {
+        unsigned long error_dist = banks[i].CalculateError(palette);
+        if (error_dist < min)
+        {
+            min = error_dist;
+            index = i;
+        }
+    }
+    return index;
 }
 
 void PaletteBankManager::WriteData(std::ostream& file) const

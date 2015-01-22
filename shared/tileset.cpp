@@ -67,6 +67,11 @@ bool Tileset::Match(const ImageTile& tile, int& tile_id, int& pal_id) const
         const Tile& tile = foundTile->second;
         tile_id = tile.id;
         pal_id = tile.palette_bank;
+
+        std::stringstream oss;
+        oss << tile;
+        if (!tile_id)
+            VerboseLog("%s %d %d", oss.str().c_str(), tile_id, pal_id);
         return true;
     }
 
@@ -178,8 +183,18 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
         if (pbank == -1 && !params.force)
             FatalLog("More than 16 distinct palettes found, please use 8bpp mode.");
 
-        // Merge step and assign palette bank
-        paletteBanks[pbank].Merge(tile.palette);
+        // Alright...
+        if (pbank == -1)
+        {
+            pbank = paletteBanks.FindBestMatch(tile.palette);
+            paletteBanks[pbank].BestMerge(tile.palette);
+        }
+        else
+        {
+            // Merge step and assign palette bank
+            paletteBanks[pbank].Merge(tile.palette);
+        }
+
         tile.palette_bank = pbank;
         tile.UsePalette(paletteBanks[pbank]);
 

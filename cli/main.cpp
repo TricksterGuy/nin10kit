@@ -211,12 +211,6 @@ IMPLEMENT_APP_NO_MAIN(Nin10KitApp);
 
 int main(int argc, char** argv)
 {
-    /*if (MagickCore::ExpandFilenames(&argc, &argv) == MagickCore::MagickFalse)
-        FatalLog("Unable to expand filenames");
-
-    for (int i = 0; i < argc+1; i++)
-        InfoLog(argv[i]);*/
-
     Magick::InitializeMagick(*argv);
     cpercep_init();
 

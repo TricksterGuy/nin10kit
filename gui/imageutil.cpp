@@ -7,11 +7,13 @@ extern ExportParams params;
 
 void DefaultParams()
 {
-    params.transparent_color = -1;
+    params.transparent_color = Color(0, 0, 0);
+    params.transparent_given = false;
     params.dither_level = 10 / 100.0f;
     params.offset = 0;
     params.palette = 256;
     params.border = 0;
+    params.force = true;
 }
 
 ImageInfo::ImageInfo(const std::string& _filename) : filename(_filename)
@@ -45,9 +47,20 @@ void ConvertToMode4(std::map<std::string, ImageInfo>& images, std::vector<Image8
     DefaultParams();
     std::vector<Image16Bpp> images16;
     ConvertToMode3(images, images16);
-    //Image8BppScene scene(images16, "");
-    //for (unsigned int i = 0; i < scene.NumImages(); i++)
-        images8.emplace_back(images16[0]);
+    Image8BppScene scene(images16, "");
+    for (unsigned int i = 0; i < scene.NumImages(); i++)
+        images8.emplace_back(scene.GetImage(i));
+}
+
+void ConvertToMode0(std::map<std::string, ImageInfo>& images, std::vector<Map>& maps, int bpp)
+{
+    DefaultParams();
+    params.bpp = bpp;
+    std::vector<Image16Bpp> images16;
+    ConvertToMode3(images, images16);
+    MapScene scene(images16, "", bpp);
+    for (unsigned int i = 0; i < scene.NumImages(); i++)
+        maps.emplace_back(scene.GetMap(i));
 }
 
 wxBitmap MagickToBitmap(Magick::Image image, int width, int height)
@@ -95,8 +108,106 @@ void TransferToWx(const Palette& palette, wxImage& wx)
     for (unsigned int i = 0; i < palette.Size(); i++)
     {
         const Color16& c = palette.At(i);
-        InfoLog("%d %d %d\n", c.r, c.g, c.b);
         wx.SetRGB(i % 16, i / 16, c.r << 3, c.g << 3, c.b << 3);
+    }
+}
+
+void TransferToWx(const PaletteBankManager& pbmanager, wxImage& wx)
+{
+    wx.Create(16, 16);
+    for (unsigned int bank_id = 0; bank_id < pbmanager.Size(); bank_id++)
+    {
+        const PaletteBank& bank = pbmanager[bank_id];
+        int bx = (bank_id % 4) * 4;
+        int by = (bank_id / 4) * 4;
+        for (unsigned int i = 0; i < bank.Size(); i++)
+        {
+            const Color16& c = bank.At(i);
+            wx.SetRGB(i % 4 + bx, i / 4 + by, c.r << 3, c.g << 3, c.b << 3);
+        }
+    }
+}
+
+void TransferToWx(const Tileset& tileset, wxImage& wx)
+{
+    // 16 x 64
+    const int tilesX = 32;
+    const int tilesY = 32;
+    wx.Create(tilesX * 8, tilesY * 8);
+    int bpp = tileset.bpp;
+    if (bpp == 4)
+    {
+        for (unsigned int i = 0; i < tileset.tilesExport.size(); i++)
+        {
+            const Tile& tile = tileset.tilesExport[i];
+            const PaletteBank& palette = tileset.paletteBanks[tile.palette_bank];
+            int tx = i % tilesX;
+            int ty = i / tilesX;
+            for (unsigned int j = 0; j < TILE_SIZE; j++)
+            {
+                unsigned char pix = tile.pixels[j];
+                const auto& c = palette.At(pix);
+                wx.SetRGB(tx * 8 + j % 8, ty * 8 + j / 8, c.r << 3, c.g << 3, c.b << 3);
+            }
+        }
+    }
+    else
+    {
+        const Palette& palette = *tileset.palette;
+        for (unsigned int i = 0; i < tileset.tilesExport.size(); i++)
+        {
+            const Tile& tile = tileset.tilesExport[i];
+            int tx = i % tilesX;
+            int ty = i / tilesX;
+            for (unsigned int j = 0; j < TILE_SIZE; j++)
+            {
+                unsigned char pix = tile.pixels[j];
+                const auto& c = palette.At(pix);
+                wx.SetRGB(tx * 8 + j % 8, ty * 8 + j / 8, c.r << 3, c.g << 3, c.b << 3);
+            }
+        }
+    }
+}
+
+void TransferToWx(const Map& map, wxImage& wx)
+{
+    wx.Create(map.width * 8, map.height * 8);
+    if (map.tileset->bpp == 4)
+    {
+        for (unsigned int i = 0; i < map.data.size(); i++)
+        {
+            int x = i % map.width;
+            int y = i / map.width;
+            int tile_id = map.data[i] & 0x3FF;
+            int pal_id = (map.data[i] >> 12) & 0xF;
+            const Tile& tile = map.tileset->tilesExport[tile_id];
+            const PaletteBank& palette = map.tileset->paletteBanks[pal_id];
+            for (unsigned int j = 0; j < TILE_SIZE; j++)
+            {
+                unsigned char pix = tile.pixels[j];
+                if (!pix) continue;
+                const auto& c = palette.At(pix);
+                wx.SetRGB(x * 8 + j % 8, y * 8 + j / 8, c.r << 3, c.g << 3, c.b << 3);
+            }
+        }
+    }
+    else
+    {
+        for (unsigned int i = 0; i < map.data.size(); i++)
+        {
+            int x = i % map.width;
+            int y = i / map.width;
+            int tile_id = map.data[i] & 0x3FF;
+            const Tile& tile = map.tileset->tilesExport[tile_id];
+            const Palette& palette = *map.tileset->palette;
+            for (unsigned int j = 0; j < TILE_SIZE; j++)
+            {
+                unsigned char pix = tile.pixels[j];
+                if (!pix) continue;
+                const auto& c = palette.At(pix);
+                wx.SetRGB(x * 8 + j % 8, y * 8 + j / 8, c.r << 3, c.g << 3, c.b << 3);
+            }
+        }
     }
 }
 

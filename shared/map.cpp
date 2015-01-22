@@ -52,6 +52,7 @@ void Map::Init4bpp(const Image16Bpp& image)
             WarnLog("Image: %s No match for tile starting at (%d %d) px, using empty tile instead.", image.name.c_str(), tilex * 8, tiley * 8);
             WarnLog("Image: %s No match for palette for tile starting at (%d %d) px, using palette 0 instead.", image.name.c_str(), tilex * 8, tiley * 8);
         }
+        VerboseLog("%d %d => %d %d", tilex, tiley, pal_id, tile_id);
         data[i] = pal_id << 12 | tile_id;
     }
 }
@@ -153,6 +154,14 @@ MapScene::MapScene(const std::vector<Image16Bpp>& images16, const std::string& _
 {
     for (const auto& image : images16)
         images.emplace_back(new Map(image, tileset));
+}
+
+const Map& MapScene::GetMap(int index) const
+{
+    const Image* image = images[index].get();
+    const Map* map = dynamic_cast<const Map*>(image);
+    if (!map) FatalLog("Could not cast Image to Map. This shouldn't happen");
+    return *map;
 }
 
 void MapScene::WriteData(std::ostream& file) const

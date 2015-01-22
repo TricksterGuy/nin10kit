@@ -46,8 +46,10 @@ class Nin10KitViewerGUI : public wxFrame
 		wxStaticBoxSizer* paletteSizer;
 		wxScrolledWindow* m_scrolledWindow2;
 		wxStaticBitmap* paletteBitmap;
-		wxScrolledWindow* m_scrolledWindow1;
+		wxStaticBoxSizer* graphicsSizer;
+		wxScrolledWindow* graphicsWindow;
 		wxStaticBitmap* graphicsBitmap;
+		wxBoxSizer* buttonSizer;
 		wxButton* m_button8;
 		wxButton* m_button9;
 		
@@ -58,7 +60,7 @@ class Nin10KitViewerGUI : public wxFrame
 	
 	public:
 		
-		Nin10KitViewerGUI( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Viewer"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		Nin10KitViewerGUI( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Viewer"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 640,480 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		
 		~Nin10KitViewerGUI();
 	

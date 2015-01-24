@@ -44,7 +44,7 @@ bool Nin10KitApp::OnInit()
     wxInitAllImageHandlers();
     wxDialog::EnableLayoutAdaptation(true);
 #ifndef _WIN32
-    wxHandleFatalExceptions();
+    //wxHandleFatalExceptions();
 #endif
 
     frame = new Nin10KitFrame();
@@ -73,10 +73,10 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     return true;
 }
 
-void Nin10KitApp::OnFatalException()
-{
-    wxPuts("LOL");
-}
+//void Nin10KitApp::OnFatalException()
+//{
+//    wxPuts("LOL");
+//}
 
 void Nin10KitApp::OnUnhandledException()
 {

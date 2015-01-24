@@ -35,6 +35,7 @@ class Sprite : public Image
         int size;
         int shape;
         int offset;
+        int bpp;
 
     friend std::ostream& operator<<(std::ostream& file, const Sprite& sprite);
 };
@@ -99,7 +100,7 @@ class SpriteScene : public Scene
 {
     public:
         SpriteScene(const std::vector<Image16Bpp>& images, const std::string& name, bool is2d, int bpp);
-        SpriteScene(const std::vector<Image16Bpp>& images, const std::string& name, bool is2d, std::shared_ptr<Palette>& tileset);
+        SpriteScene(const std::vector<Image16Bpp>& images, const std::string& name, bool is2d, std::shared_ptr<Palette>& global_palette);
         SpriteScene(const std::vector<Image16Bpp>& images, const std::string& name, bool is2d, const std::vector<PaletteBank>& paletteBanks);
         void Build();
         const Sprite& GetSprite(int index) const;

@@ -63,6 +63,19 @@ void ConvertToMode0(std::map<std::string, ImageInfo>& images, std::vector<Map>& 
         maps.emplace_back(scene.GetMap(i));
 }
 
+void ConvertToSprites(std::map<std::string, ImageInfo>& images, std::vector<Sprite>& sprites, std::vector<PaletteBank>& banks, int bpp)
+{
+    DefaultParams();
+    params.bpp = bpp;
+    std::vector<Image16Bpp> images16;
+    ConvertToMode3(images, images16);
+    SpriteScene scene(images16, "", false, bpp);
+    scene.Build();
+    for (unsigned int i = 0; i < scene.NumImages(); i++)
+        sprites.emplace_back(scene.GetSprite(i));
+    banks = scene.paletteBanks.banks;
+}
+
 wxBitmap MagickToBitmap(Magick::Image image, int width, int height)
 {
     Magick::Geometry geom(width, height);
@@ -112,12 +125,12 @@ void TransferToWx(const Palette& palette, wxImage& wx)
     }
 }
 
-void TransferToWx(const PaletteBankManager& pbmanager, wxImage& wx)
+void TransferToWx(const std::vector<PaletteBank>& banks, wxImage& wx)
 {
     wx.Create(16, 16);
-    for (unsigned int bank_id = 0; bank_id < pbmanager.Size(); bank_id++)
+    for (unsigned int bank_id = 0; bank_id < banks.size(); bank_id++)
     {
-        const PaletteBank& bank = pbmanager[bank_id];
+        const PaletteBank& bank = banks[bank_id];
         int bx = (bank_id % 4) * 4;
         int by = (bank_id / 4) * 4;
         for (unsigned int i = 0; i < bank.Size(); i++)
@@ -157,6 +170,44 @@ void TransferToWx(const Tileset& tileset, wxImage& wx)
         for (unsigned int i = 0; i < tileset.tilesExport.size(); i++)
         {
             const Tile& tile = tileset.tilesExport[i];
+            int tx = i % tilesX;
+            int ty = i / tilesX;
+            for (unsigned int j = 0; j < TILE_SIZE; j++)
+            {
+                unsigned char pix = tile.pixels[j];
+                const auto& c = palette.At(pix);
+                wx.SetRGB(tx * 8 + j % 8, ty * 8 + j / 8, c.r << 3, c.g << 3, c.b << 3);
+            }
+        }
+    }
+}
+
+void TransferToWx(const Sprite& sprite, const std::vector<PaletteBank>& banks, wxImage& wx)
+{
+    wx.Create(sprite.width * 8, sprite.height * 8);
+    int tilesX = sprite.width;
+    if (sprite.bpp == 4)
+    {
+        for (unsigned int i = 0; i < sprite.data.size(); i++)
+        {
+            const Tile& tile = sprite.data[i];
+            const PaletteBank& palette = banks[sprite.palette_bank];
+            int tx = i % tilesX;
+            int ty = i / tilesX;
+            for (unsigned int j = 0; j < TILE_SIZE; j++)
+            {
+                unsigned char pix = tile.pixels[j];
+                const auto& c = palette.At(pix);
+                wx.SetRGB(tx * 8 + j % 8, ty * 8 + j / 8, c.r << 3, c.g << 3, c.b << 3);
+            }
+        }
+    }
+    else
+    {
+        const Palette& palette = *sprite.palette;
+        for (unsigned int i = 0; i < sprite.data.size(); i++)
+        {
+            const Tile& tile = sprite.data[i];
             int tx = i % tilesX;
             int ty = i / tilesX;
             for (unsigned int j = 0; j < TILE_SIZE; j++)

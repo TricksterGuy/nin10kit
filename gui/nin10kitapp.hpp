@@ -11,7 +11,7 @@ class Nin10KitApp : public wxApp
         virtual int OnExit();
         virtual void OnInitCmdLine(wxCmdLineParser& parser);
         virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
-        void OnFatalException();
+        //void OnFatalException();
         void OnUnhandledException();
         Nin10KitFrame* GetFrame() {return frame;}
     private:

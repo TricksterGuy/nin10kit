@@ -26,7 +26,7 @@ const int sprite_sizes[16] =
 
 Sprite::Sprite(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette) :
     Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated), palette(global_palette),
-    palette_bank(-1), size(0), shape(0), offset(0)
+    palette_bank(-1), size(0), shape(0), offset(0), bpp(8)
 {
     unsigned int key = (log2(width) << 2) | log2(height);
     shape = sprite_shapes[key];
@@ -42,8 +42,8 @@ Sprite::Sprite(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette
         data.emplace_back(image8, i % width, i / width, 0, 8);
 }
 
-Sprite::Sprite(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
-    palette(new Palette()), palette_bank(-1), size(0), shape(0), offset(0)
+Sprite::Sprite(const Image16Bpp& image, int _bpp) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
+    palette(new Palette()), palette_bank(-1), size(0), shape(0), offset(0), bpp(_bpp)
 {
     unsigned int key = (log2(width) << 2) | log2(height);
     shape = sprite_shapes[key];

@@ -22,6 +22,7 @@ void Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& i
     int bpp;
 
     GetModeInfo(prog_mode, mode, device, bpp);
+    VerboseLog("Viewing in mode %s", mode.c_str());
 
     if (mode == "3")
         UpdateMode3(images);
@@ -29,7 +30,7 @@ void Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& i
         UpdateMode4(images);
     else if (mode == "0")
         UpdateMode0(images, bpp);
-    else if (mode == "sprites")
+    else if (mode == "SPRITES")
         UpdateSprites(images, bpp);
 }
 
@@ -98,7 +99,7 @@ void Nin10KitViewerFrame::UpdateMode0(std::map<std::string, ImageInfo>& images, 
     wxImage wxpalette;
 
     if (bpp == 4)
-        TransferToWx(tileset.paletteBanks, wxpalette);
+        TransferToWx(tileset.paletteBanks.banks, wxpalette);
     else
         TransferToWx(*tileset.palette, wxpalette);
     wxpalette.Rescale(256, 256, wxIMAGE_QUALITY_NORMAL);
@@ -119,9 +120,40 @@ void Nin10KitViewerFrame::UpdateMode0(std::map<std::string, ImageInfo>& images, 
     tilesetBitmap->SetBitmap(wxBitmap(wxtileset));
 }
 
+
+
 void Nin10KitViewerFrame::UpdateSprites(std::map<std::string, ImageInfo>& images, int bpp)
 {
     EventLog l(__func__);
+    sharedSizer->Show(paletteSizer, true, true);
+    sharedSizer->Show(tilesetSizer, false, true);
+    graphics.clear();
+    selectedGraphic = 0;
+
+    std::vector<Sprite> sprites;
+    std::vector<PaletteBank> paletteBanks;
+    Palette palette;
+
+    ConvertToSprites(images, sprites, paletteBanks, bpp);
+    InfoLog("%d", sprites.size());
+
+    wxImage wxpalette;
+    if (bpp == 4)
+        TransferToWx(paletteBanks, wxpalette);
+    else
+        TransferToWx(*sprites[0].palette, wxpalette);
+    wxpalette.Rescale(256, 256, wxIMAGE_QUALITY_NORMAL);
+
+    for (const auto& sprite : sprites)
+    {
+        wxImage wxImage;
+        TransferToWx(sprite, paletteBanks, wxImage);
+        graphics.push_back(wxBitmap(wxImage));
+    }
+
+    wxBitmap& bitmap = graphics[selectedGraphic];
+    graphicsBitmap->SetBitmap(bitmap);
+    paletteBitmap->SetBitmap(wxBitmap(wxpalette));
 }
 
 void Nin10KitViewerFrame::OnPrev(wxCommandEvent& event)

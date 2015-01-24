@@ -156,11 +156,26 @@ void Nin10KitFrame::OnExport(wxCommandEvent& event)
 void Nin10KitFrame::OnView(wxCommandEvent& event)
 {
     EventLog l(__func__);
+    if (images.empty())
+    {
+        WarnLog("No images given.");
+        return;
+    }
+
     if (!viewer)
         viewer = new Nin10KitViewerFrame();
 
+    viewer->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(Nin10KitFrame::OnCloseView), NULL, this);
     viewer->Set(mode->GetSelection(), images);
     viewer->Show(true);
+}
+
+void Nin10KitFrame::OnCloseView(wxCloseEvent& event)
+{
+    EventLog l(__func__);
+    if (viewer)
+        viewer = NULL;
+    event.Skip();
 }
 
 void Nin10KitFrame::OnEditor(wxCommandEvent& event)

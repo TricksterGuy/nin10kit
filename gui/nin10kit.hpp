@@ -23,6 +23,7 @@ class Nin10KitFrame : public Nin10KitGUI
 		void OnDeleteCurrentImage(wxCommandEvent& event);
 		void OnExport(wxCommandEvent& event);
 		void OnView(wxCommandEvent& event);
+		void OnCloseView(wxCloseEvent& event);
 		void OnEditor(wxCommandEvent& event);
     private:
         std::unique_ptr<wxImageList> imageList;

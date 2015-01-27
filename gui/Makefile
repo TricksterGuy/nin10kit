@@ -13,7 +13,10 @@ FILES := exporter.o \
 	imageutil.o \
 	nin10kitapp.o \
 	nin10kit.o \
+	nin10kitapp.o \
 	nin10kitgui.o \
+	nin10kitviewer.o \
+	nin10kitviewergui.o \
 
 
 all : $(OUTPUT)

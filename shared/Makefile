@@ -18,7 +18,6 @@ FILES := 3ds-exporter.o \
 	exportfile.o \
 	fileutils.o \
 	gba-exporter.o \
-	gettimeofday.o \
 	headerfile.o \
 	image16.o \
 	image32.o \

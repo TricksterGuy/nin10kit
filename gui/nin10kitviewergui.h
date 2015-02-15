@@ -41,7 +41,7 @@ class Nin10KitViewerGUI : public wxFrame
 		wxPanel* m_panel3;
 		wxBoxSizer* sharedSizer;
 		wxStaticBoxSizer* tilesetSizer;
-		wxScrolledWindow* m_scrolledWindow3;
+		wxScrolledWindow* tilesetWindow;
 		wxStaticBitmap* tilesetBitmap;
 		wxStaticBoxSizer* paletteSizer;
 		wxScrolledWindow* m_scrolledWindow2;

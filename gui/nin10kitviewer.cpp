@@ -32,6 +32,7 @@ void Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& i
         UpdateMode0(images, bpp);
     else if (mode == "SPRITES")
         UpdateSprites(images, bpp);
+    UpdateGraphicsWindow();
 }
 
 void Nin10KitViewerFrame::UpdateMode3(std::map<std::string, ImageInfo>& images)
@@ -80,6 +81,8 @@ void Nin10KitViewerFrame::UpdateMode4(std::map<std::string, ImageInfo>& images)
     wxBitmap& bitmap = graphics[selectedGraphic];
     graphicsBitmap->SetBitmap(bitmap);
     paletteBitmap->SetBitmap(wxBitmap(palette));
+    graphicsWindow->SetVirtualSize(graphics[selectedGraphic].GetSize());
+    graphicsWindow->Refresh();
 }
 
 void Nin10KitViewerFrame::UpdateMode0(std::map<std::string, ImageInfo>& images, int bpp)
@@ -118,9 +121,9 @@ void Nin10KitViewerFrame::UpdateMode0(std::map<std::string, ImageInfo>& images, 
     graphicsBitmap->SetBitmap(bitmap);
     paletteBitmap->SetBitmap(wxBitmap(wxpalette));
     tilesetBitmap->SetBitmap(wxBitmap(wxtileset));
+    tilesetWindow->SetVirtualSize(tilesetBitmap->GetSize());
+    tilesetWindow->Refresh();
 }
-
-
 
 void Nin10KitViewerFrame::UpdateSprites(std::map<std::string, ImageInfo>& images, int bpp)
 {
@@ -162,7 +165,7 @@ void Nin10KitViewerFrame::OnPrev(wxCommandEvent& event)
     selectedGraphic = std::max(std::min(selectedGraphic - 1, (int)graphics.size() - 1), 0);
     VerboseLog("%d is now selected", selectedGraphic);
     graphicsBitmap->SetBitmap(graphics[selectedGraphic]);
-
+    UpdateGraphicsWindow();
 }
 
 void Nin10KitViewerFrame::OnNext(wxCommandEvent& event)
@@ -171,4 +174,13 @@ void Nin10KitViewerFrame::OnNext(wxCommandEvent& event)
     selectedGraphic = std::max(std::min(selectedGraphic + 1, (int)graphics.size() - 1), 0);
     VerboseLog("%d is now selected", selectedGraphic);
     graphicsBitmap->SetBitmap(graphics[selectedGraphic]);
+    UpdateGraphicsWindow();
+}
+
+void Nin10KitViewerFrame::UpdateGraphicsWindow()
+{
+    if (selectedGraphic < 0 || selectedGraphic > (int)graphics.size())
+        return;
+    graphicsWindow->SetVirtualSize(graphics[selectedGraphic].GetSize());
+    graphicsWindow->Refresh();
 }

@@ -245,7 +245,7 @@
                                                             <property name="minimize_button">0</property>
                                                             <property name="minimum_size">256,256</property>
                                                             <property name="moveable">1</property>
-                                                            <property name="name">m_scrolledWindow3</property>
+                                                            <property name="name">tilesetWindow</property>
                                                             <property name="pane_border">1</property>
                                                             <property name="pane_position"></property>
                                                             <property name="pane_size"></property>
@@ -293,8 +293,8 @@
                                                                 <property name="permission">none</property>
                                                                 <object class="sizeritem" expanded="0">
                                                                     <property name="border">0</property>
-                                                                    <property name="flag">wxALL|wxEXPAND</property>
-                                                                    <property name="proportion">1</property>
+                                                                    <property name="flag">wxALL</property>
+                                                                    <property name="proportion">0</property>
                                                                     <object class="wxStaticBitmap" expanded="0">
                                                                         <property name="BottomDockable">1</property>
                                                                         <property name="LeftDockable">1</property>
@@ -674,8 +674,8 @@
                                                 <property name="permission">none</property>
                                                 <object class="sizeritem" expanded="1">
                                                     <property name="border">0</property>
-                                                    <property name="flag">wxALL|wxEXPAND</property>
-                                                    <property name="proportion">1</property>
+                                                    <property name="flag">wxALL</property>
+                                                    <property name="proportion">0</property>
                                                     <object class="wxStaticBitmap" expanded="1">
                                                         <property name="BottomDockable">1</property>
                                                         <property name="LeftDockable">1</property>

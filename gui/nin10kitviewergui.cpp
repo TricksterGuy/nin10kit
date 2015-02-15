@@ -27,21 +27,21 @@ Nin10KitViewerGUI::Nin10KitViewerGUI( wxWindow* parent, wxWindowID id, const wxS
 	
 	tilesetSizer = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, _("Tileset") ), wxVERTICAL );
 	
-	m_scrolledWindow3 = new wxScrolledWindow( m_panel3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
-	m_scrolledWindow3->SetScrollRate( 5, 5 );
-	m_scrolledWindow3->SetMinSize( wxSize( 256,256 ) );
+	tilesetWindow = new wxScrolledWindow( m_panel3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	tilesetWindow->SetScrollRate( 5, 5 );
+	tilesetWindow->SetMinSize( wxSize( 256,256 ) );
 	
 	wxBoxSizer* bSizer15;
 	bSizer15 = new wxBoxSizer( wxVERTICAL );
 	
-	tilesetBitmap = new wxStaticBitmap( m_scrolledWindow3, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer15->Add( tilesetBitmap, 1, wxALL|wxEXPAND, 0 );
+	tilesetBitmap = new wxStaticBitmap( tilesetWindow, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer15->Add( tilesetBitmap, 0, wxALL, 0 );
 	
 	
-	m_scrolledWindow3->SetSizer( bSizer15 );
-	m_scrolledWindow3->Layout();
-	bSizer15->Fit( m_scrolledWindow3 );
-	tilesetSizer->Add( m_scrolledWindow3, 1, wxEXPAND | wxALL, 0 );
+	tilesetWindow->SetSizer( bSizer15 );
+	tilesetWindow->Layout();
+	bSizer15->Fit( tilesetWindow );
+	tilesetSizer->Add( tilesetWindow, 1, wxEXPAND | wxALL, 0 );
 	
 	
 	bSizer8->Add( tilesetSizer, 0, wxEXPAND, 0 );
@@ -91,7 +91,7 @@ Nin10KitViewerGUI::Nin10KitViewerGUI( wxWindow* parent, wxWindowID id, const wxS
 	bSizer13 = new wxBoxSizer( wxVERTICAL );
 	
 	graphicsBitmap = new wxStaticBitmap( graphicsWindow, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer13->Add( graphicsBitmap, 1, wxALL|wxEXPAND, 0 );
+	bSizer13->Add( graphicsBitmap, 0, wxALL, 0 );
 	
 	
 	graphicsWindow->SetSizer( bSizer13 );

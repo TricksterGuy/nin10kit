@@ -91,12 +91,20 @@ void DoExport(int mode, const std::string& filename, std::vector<std::string>& f
         }
     }
 
-    if (params.device == "GBA")
-        DoGBAExport(params.images, params.tileset_images);
-    else if (params.device == "DS")
-        DoDSExport(params.images, params.tileset_images);
-    else if (params.device == "3DS")
-        Do3DSExport(params.images, params.tileset_images);
+    try
+    {
+        if (params.device == "GBA")
+            DoGBAExport(params.images, params.tileset_images);
+        else if (params.device == "DS")
+            DoDSExport(params.images, params.tileset_images);
+        else if (params.device == "3DS")
+            Do3DSExport(params.images, params.tileset_images);
+    }
+    catch (const char* e)
+    {
+        WarnLog("Export failed");
+        return;
+    }
 
     InfoLog("Export complete now writing files");
     // Write the files

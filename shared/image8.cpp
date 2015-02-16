@@ -74,11 +74,16 @@ Magick::Image Image8Bpp::ToMagick() const
 
 Image8BppScene::Image8BppScene(const std::vector<Image16Bpp>& images16, const std::string& name) : Scene(name), palette(new Palette(name))
 {
+    for (const auto& image : images16)
+    {
+        if (image.width & 1)
+            FatalLog("Image: %s width is not a multiple of 2. Please fix", name.c_str());
+    }
     GetPalette(images16, params.palette, params.transparent_color, params.offset, *palette);
 
     images.reserve(images16.size());
-    for (unsigned int i = 0; i < images16.size(); i++)
-        images.emplace_back(new Image8Bpp(images16[i], palette));
+    for (const auto& image : images16)
+        images.emplace_back(new Image8Bpp(image, palette));
 }
 
 const Image8Bpp& Image8BppScene::GetImage(int index) const

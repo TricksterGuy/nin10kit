@@ -166,7 +166,13 @@ void Nin10KitFrame::OnView(wxCommandEvent& event)
         viewer = new Nin10KitViewerFrame();
 
     viewer->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(Nin10KitFrame::OnCloseView), NULL, this);
-    viewer->Set(mode->GetSelection(), images);
+    if (!viewer->Set(mode->GetSelection(), images))
+    {
+        viewer->Close(true);
+        delete viewer;
+        viewer = NULL;
+        return;
+    }
     viewer->Show(true);
 }
 

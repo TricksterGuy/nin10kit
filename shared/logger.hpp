@@ -20,14 +20,13 @@ class AbstractLogger
     public:
         AbstractLogger(std::ostream* target = &std::cerr) : out(target), log_level(LogLevel::INFO), log_time(true) {}
         virtual ~AbstractLogger() {}
-        void Log(LogLevel level, const char* format, va_list ap);
+        virtual void Log(LogLevel level, const char* format, va_list ap);
         virtual void DoLog(LogLevel level, const char* format, va_list ap) {}
         void SetLogTarget(std::ostream* stream) {out = stream;}
         void SetLogLevel(LogLevel level) {log_level = level;}
         void SetLogTime(bool logging_time) {log_time = logging_time;}
     protected:
         std::ostream* out;
-    private:
         LogLevel log_level;
         bool log_time;
 };

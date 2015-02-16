@@ -16,7 +16,7 @@ Nin10KitViewerFrame::~Nin10KitViewerFrame()
 {
 }
 
-void Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& images)
+bool Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& images)
 {
     std::string mode, device;
     int bpp;
@@ -24,15 +24,24 @@ void Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& i
     GetModeInfo(prog_mode, mode, device, bpp);
     VerboseLog("Viewing in mode %s", mode.c_str());
 
-    if (mode == "3")
-        UpdateMode3(images);
-    else if (mode == "4")
-        UpdateMode4(images);
-    else if (mode == "0")
-        UpdateMode0(images, bpp);
-    else if (mode == "SPRITES")
-        UpdateSprites(images, bpp);
+    try
+    {
+        if (mode == "3")
+            UpdateMode3(images);
+        else if (mode == "4")
+            UpdateMode4(images);
+        else if (mode == "0")
+            UpdateMode0(images, bpp);
+        else if (mode == "SPRITES")
+            UpdateSprites(images, bpp);
+    }
+    catch (const char* e)
+    {
+        WarnLog("Conversion failed");
+        return false;
+    }
     UpdateGraphicsWindow();
+    return true;
 }
 
 void Nin10KitViewerFrame::UpdateMode3(std::map<std::string, ImageInfo>& images)

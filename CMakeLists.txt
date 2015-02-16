@@ -82,6 +82,7 @@ set(SRC_NIN10KITGUI
     gui/nin10kitviewer.cpp
     gui/imageutil.cpp
     gui/exporter.cpp
+    gui/wxlogger.cpp
 )
 
 find_package(wxWidgets REQUIRED core base)

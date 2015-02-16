@@ -12,7 +12,7 @@ class Nin10KitViewerFrame : public Nin10KitViewerGUI
     public:
         Nin10KitViewerFrame();
         ~Nin10KitViewerFrame();
-        void Set(int mode, std::map<std::string, ImageInfo>& images);
+        bool Set(int mode, std::map<std::string, ImageInfo>& images);
         void OnPrev(wxCommandEvent& event);
 		void OnNext(wxCommandEvent& event);
     private:

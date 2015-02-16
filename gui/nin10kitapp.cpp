@@ -5,12 +5,13 @@
 
 #include "cmd-line-parser-helper.hpp"
 #include "cpercep.hpp"
-#include "logger.hpp"
+#include "wxlogger.hpp"
 
 IMPLEMENT_APP_NO_MAIN(Nin10KitApp);
 
 int main(int argc, char** argv)
 {
+    logger.reset(new LoggerWx());
     Magick::InitializeMagick(*argv);
     cpercep_init();
 

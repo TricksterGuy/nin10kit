@@ -8,6 +8,8 @@
 Map::Map(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
     data(width * height), tileset(NULL), export_shared_info(true)
 {
+    if ((image.width != 256 && image.width != 512) || (image.height != 256 && image.height != 512))
+        FatalLog("Invalid map size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
     // Create tileset according to bpp
     tileset.reset(new Tileset(image, bpp));
 
@@ -26,6 +28,9 @@ Map::Map(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.height
 Map::Map(const Image16Bpp& image, std::shared_ptr<Tileset>& global_tileset) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
     data(width * height), tileset(global_tileset), export_shared_info(false)
 {
+    if ((image.width != 256 && image.width != 512) || (image.height != 256 && image.height != 512))
+        FatalLog("Invalid map size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
+
     switch(tileset->bpp)
     {
         case 4:
@@ -144,6 +149,12 @@ void Map::WriteExport(std::ostream& file) const
 
 MapScene::MapScene(const std::vector<Image16Bpp>& images16, const std::string& _name, int bpp) : Scene(_name), tileset(NULL)
 {
+    for (const auto& image : images16)
+    {
+        if ((image.width != 256 && image.width != 512) || (image.height != 256 && image.height != 512))
+            FatalLog("Invalid map size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
+    }
+
     tileset.reset(new Tileset(images16, name, bpp));
 
     for (const auto& image : images16)

@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (nin10kit)
 
-EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
+EXECUTE_PROCESS( COMMAND dpkg --print-architecture COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
 
 set(CPACK_BINARY_DEB "ON")
 set(CPACK_BINARY_RPM "ON")

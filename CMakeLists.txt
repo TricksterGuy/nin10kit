@@ -88,11 +88,9 @@ set(SRC_NIN10KITGUI
 find_package(wxWidgets REQUIRED core base)
 include(${wxWidgets_USE_FILE})
 find_package(ImageMagick COMPONENTS Magick++ MagickWand MagickCore REQUIRED)
-pkg_search_module(BABL REQUIRED babl)
 
 include_directories(${nin10kit_SOURCE_DIR}/shared)
 include_directories(${ImageMagick_INCLUDE_DIRS})
-include_directories("/usr/include/babl-0.1")
 link_directories(${nin10kit_SOURCE_DIR}/shared)
 
 add_definitions(-DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16)

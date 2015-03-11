@@ -17,6 +17,7 @@ FILES := exporter.o \
 	nin10kitgui.o \
 	nin10kitviewer.o \
 	nin10kitviewergui.o \
+	wxlogger.o \
 
 
 all : $(OUTPUT)

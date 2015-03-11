@@ -103,6 +103,7 @@ add_library(
 
 target_link_libraries(
 	shared_files
+	${ImageMagick_LIBRARIES}
 )
 
 add_executable(
@@ -114,7 +115,6 @@ target_link_libraries(
 	nin10kit
 	m
 	shared_files
-	${BABL_LIBRARIES}
 	${ImageMagick_LIBRARIES}
    	${wxWidgets_LIBRARIES}
 )
@@ -128,7 +128,6 @@ target_link_libraries(
 	nin10kitgui
 	m
 	shared_files
-	${BABL_LIBRARIES}
 	${ImageMagick_LIBRARIES}
     ${wxWidgets_LIBRARIES}
 )

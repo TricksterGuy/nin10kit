@@ -28,53 +28,53 @@
 			<Add directory="D:/src/wxWidgets-3.0.2-MSW/lib/mswu" />
 		</Compiler>
 		<Linker>
-			<Add library="D:\src\ImageMagick-6.8.5\lib\libMagick++-6.Q16.dll.a" />
-			<Add library="D:\src\ImageMagick-6.8.5\lib\libMagickCore-6.Q16.dll.a" />
-			<Add library="D:\src\ImageMagick-6.8.5\lib\libMagickWand-6.Q16.dll.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30u.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30u_net.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30u_xml.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30ud.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30ud_net.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxbase30ud_xml.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxexpat.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxexpatd.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxjpeg.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxjpegd.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_adv.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_aui.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_core.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_gl.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_html.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_media.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_propgrid.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_ribbon.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_richtext.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_stc.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_webview.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30u_xrc.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_adv.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_aui.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_core.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_gl.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_html.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_media.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_propgrid.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_ribbon.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_richtext.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_stc.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_webview.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxmsw30ud_xrc.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxpng.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxpngd.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxregexu.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxregexud.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxscintilla.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxscintillad.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxtiff.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxtiffd.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxzlib.a" />
-			<Add library="D:\src\wxWidgets-3.0.2-MSW\lib\libwxzlibd.a" />
+			<Add library="D:/src/ImageMagick-6.8.5/lib/libMagick++-6.Q16.dll.a" />
+			<Add library="D:/src/ImageMagick-6.8.5/lib/libMagickCore-6.Q16.dll.a" />
+			<Add library="D:/src/ImageMagick-6.8.5/lib/libMagickWand-6.Q16.dll.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxbase30u.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxbase30u_net.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxbase30u_xml.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxbase30ud.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxbase30ud_net.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxbase30ud_xml.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxexpat.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxexpatd.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxjpeg.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxjpegd.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_adv.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_aui.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_core.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_gl.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_html.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_media.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_propgrid.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_ribbon.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_richtext.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_stc.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_webview.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30u_xrc.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_adv.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_aui.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_core.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_gl.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_html.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_media.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_propgrid.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_ribbon.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_richtext.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_stc.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_webview.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxmsw30ud_xrc.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxpng.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxpngd.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxregexu.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxregexud.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxscintilla.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxscintillad.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxtiff.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxtiffd.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxzlib.a" />
+			<Add library="D:/src/wxWidgets-3.0.2-MSW/lib/libwxzlibd.a" />
 			<Add directory="D:/src/ImageMagick-6.8.5/lib" />
 			<Add directory="D:/src/wxWidgets-3.0.2-MSW/lib" />
 		</Linker>
@@ -112,6 +112,24 @@
 			<Option target="nin10kitgui" />
 		</Unit>
 		<Unit filename="gui/nin10kitgui.h">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/nin10kitviewer.cpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/nin10kitviewer.hpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/nin10kitviewergui.cpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/nin10kitviewergui.h">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/wxlogger.cpp">
+			<Option target="nin10kitgui" />
+		</Unit>
+		<Unit filename="gui/wxlogger.hpp">
 			<Option target="nin10kitgui" />
 		</Unit>
 		<Unit filename="shared/3ds-exporter.cpp" />

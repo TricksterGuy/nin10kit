@@ -1,7 +1,7 @@
 nin10kit
 ========
 
-#Compiling
+#Compiling (Recommended)
 You can run sudo ./setup.sh which does the tasks in the list below.
 
 1. Ensure you have a C++ compiler (sudo apt-get install build-essential)
@@ -10,6 +10,11 @@ You can run sudo ./setup.sh which does the tasks in the list below.
 4. Build the program (make)
 5. Install the program (sudo make install)
 
+
+#Installing from packages (Only for Ubuntu 14.04+ Linux Mint 17+)
+1. Under releases download the appropriate package for your architecture (i386 for 32 bit amd64 for 64 bit)
+2. Install dependencies (sudo apt-get install libwxgtk3.0-0 libmagick++5 libmagickcore5 libmagickwand5)
+3. Install the package using dpkg
 
 #Compiling with CMake (Advanced)
 

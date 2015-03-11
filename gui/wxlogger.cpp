@@ -10,7 +10,7 @@ void LoggerWx::Log(LogLevel level, const char* format, va_list ap)
     vsnprintf(buffer, 1024, format, ap);
     if (level == LogLevel::WARNING || level == LogLevel::FATAL)
     {
-        wxMessageBox(buffer, "");
+        wxMessageBox(buffer, level == LogLevel::WARNING ? "Warning!" : "Fatal!");
         if (level == LogLevel::FATAL)
             throw "Fatal exception occured";
     }

@@ -187,5 +187,6 @@ void Nin10KitFrame::OnCloseView(wxCloseEvent& event)
 void Nin10KitFrame::OnEditor(wxCommandEvent& event)
 {
     EventLog l(__func__);
-    wxMessageBox(_("Please pay me 20 dolla for the full version"), _("GET OUT MY STORE"));
+    wxMessageBox(_("Unfortunately this part of the program isn't implemented yet\n"
+                   "This is a planned feature to have a bitmap/palette/tilemap editor\n"), _("Coming soon"));
 }

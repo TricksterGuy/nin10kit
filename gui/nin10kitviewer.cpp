@@ -35,9 +35,9 @@ bool Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& i
         else if (mode == "SPRITES")
             UpdateSprites(images, bpp);
     }
+    // Catch FatalLogs from conversion.  This is handled in wxlogger
     catch (const char* e)
     {
-        WarnLog("Conversion failed");
         return false;
     }
     UpdateGraphicsWindow();

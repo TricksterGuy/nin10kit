@@ -45,7 +45,7 @@ bool Nin10KitApp::OnInit()
     wxInitAllImageHandlers();
     wxDialog::EnableLayoutAdaptation(true);
 #ifndef _WIN32
-    //wxHandleFatalExceptions();
+    wxHandleFatalExceptions();
 #endif
 
     frame = new Nin10KitFrame();
@@ -74,14 +74,16 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     return true;
 }
 
-//void Nin10KitApp::OnFatalException()
-//{
-//    wxPuts("LOL");
-//}
+void Nin10KitApp::OnFatalException()
+{
+    FatalLog("An Fatal exception occured\n"
+             "Please send the log messages to brandon - bwhitehead0308[AT]gmail[DOI]com");
+}
 
 void Nin10KitApp::OnUnhandledException()
 {
-    wxPuts("LOL2");
+    FatalLog("An Unhandled exception occured\n"
+             "Please send the log messages to brandon - bwhitehead0308[AT]gmail[DOI]com");
 }
 
 int Nin10KitApp::OnExit()

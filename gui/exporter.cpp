@@ -100,9 +100,9 @@ void DoExport(int mode, const std::string& filename, std::vector<std::string>& f
         else if (params.device == "3DS")
             Do3DSExport(params.images, params.tileset_images);
     }
+    // Catch FatalLogs from exporting.  This is handled in wxlogger
     catch (const char* e)
     {
-        WarnLog("Export failed");
         return;
     }
 

@@ -64,6 +64,7 @@ class Nin10KitApp : public wxAppConsole
 
 static const wxCmdLineEntryDesc help_description[] =
 {
+    // Help
     {wxCMD_LINE_OPTION, "h", "help", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_NONE}
 };
@@ -239,14 +240,17 @@ bool Nin10KitApp::OnInit()
         return false;
     }
 
-    wxCmdLineParser help_parser(argc, argv);
-    help_parser.SetDesc(help_description);
-    help_parser.Parse(false);
-    wxString help_topic;
-    if (help_parser.Found("help", &help_topic))
+    if (argc == 2)
     {
-        OnHelp(help_topic.ToStdString());
-        return false;
+      wxCmdLineParser help_parser(argc, argv);
+      help_parser.SetDesc(help_description);
+      help_parser.Parse(false);
+      wxString help_topic;
+      if (help_parser.Found("help", &help_topic))
+      {
+          OnHelp(help_topic.ToStdString());
+          return false;
+      }
     }
 
     wxCmdLineParser parser(argc, argv);

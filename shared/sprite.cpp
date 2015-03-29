@@ -29,10 +29,10 @@ Sprite::Sprite(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette
     palette_bank(-1), size(0), shape(0), offset(0), bpp(8)
 {
     unsigned int key = (log2(width) << 2) | log2(height);
+    if (key > 15 || sprite_sizes[key] == -1 || image.width & 7 || image.height & 7)
+        FatalLog("Invalid sprite size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
     shape = sprite_shapes[key];
     size = sprite_sizes[key];
-    if (size == -1 || image.width & 7 || image.height & 7)
-        FatalLog("Invalid sprite size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
 
     // Is actually an 8 or 4bpp image
     Image8Bpp image8(image, palette);
@@ -46,10 +46,10 @@ Sprite::Sprite(const Image16Bpp& image, int _bpp) : Image(image.width / 8, image
     palette(new Palette()), palette_bank(-1), size(0), shape(0), offset(0), bpp(_bpp)
 {
     unsigned int key = (log2(width) << 2) | log2(height);
+    if (key > 15 || sprite_sizes[key] == -1 || image.width & 7 || image.height & 7)
+        FatalLog("Invalid sprite size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
     shape = sprite_shapes[key];
     size = sprite_sizes[key];
-    if (size == -1 || image.width & 7 || image.height & 7)
-        FatalLog("Invalid sprite size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
 
     GetPalette(image.pixels, 1 << bpp, params.transparent_color, 0, *palette);
     // Is actually an 8 or 4bpp image

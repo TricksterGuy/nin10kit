@@ -37,7 +37,7 @@ wxBitmap MagickToBitmap(Magick::Image, int width, int height);
 void ConvertToMode3(std::map<std::string, ImageInfo>& images, std::vector<Image16Bpp>& images16);
 void ConvertToMode4(std::map<std::string, ImageInfo>& images, std::vector<Image8Bpp>& images8);
 void ConvertToMode0(std::map<std::string, ImageInfo>& images, std::vector<Map>& maps, int bpp);
-void ConvertToSprites(std::map<std::string, ImageInfo>& images, std::vector<Sprite>& sprites, std::vector<PaletteBank>& banks, int bpp);
+void ConvertToSprites(std::map<std::string, ImageInfo>& images, std::vector<Sprite>& sprites, std::vector<PaletteBank>& banks, int bpp, bool for_bitmap);
 void TransferToWx(const Image16Bpp& image, wxImage& wx);
 void TransferToWx(const Image8Bpp& image, wxImage& wx);
 void TransferToWx(const Palette& palette, wxImage& wx);

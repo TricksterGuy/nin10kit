@@ -12,9 +12,10 @@ void DoGBAExport(const std::vector<Image32Bpp>& images, const std::vector<Image3
 void DoDSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
 void Do3DSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
 
-void GetModeInfo(int prog_mode, std::string& mode, std::string& device, int& bpp)
+void GetModeInfo(int prog_mode, std::string& mode, std::string& device, int& bpp, bool& sprites_for_bitmap)
 {
     bpp = 0;
+    sprites_for_bitmap = false;
     switch (prog_mode)
     {
         case GBAMode3:
@@ -45,12 +46,24 @@ void GetModeInfo(int prog_mode, std::string& mode, std::string& device, int& bpp
             device = "GBA";
             bpp = 4;
             break;
+        case GBAMode3Sprites8Bpp:
+            mode = "SPRITES";
+            device = "GBA";
+            bpp = 8;
+            sprites_for_bitmap = true;
+            break;
+        case GBAMode3Sprites4Bpp:
+            mode = "SPRITES";
+            device = "GBA";
+            bpp = 4;
+            sprites_for_bitmap = true;
+            break;
     }
 }
 
 void DoExport(int mode, const std::string& filename, std::vector<std::string>& filenames, std::map<std::string, ImageInfo>& images)
 {
-    GetModeInfo(mode, params.mode, params.device, params.bpp);
+    GetModeInfo(mode, params.mode, params.device, params.bpp, params.for_bitmap);
 
     InfoLog("Using %s exporter mode %s", params.device.c_str(), params.mode.c_str());
 

@@ -63,10 +63,11 @@ void ConvertToMode0(std::map<std::string, ImageInfo>& images, std::vector<Map>& 
         maps.emplace_back(scene.GetMap(i));
 }
 
-void ConvertToSprites(std::map<std::string, ImageInfo>& images, std::vector<Sprite>& sprites, std::vector<PaletteBank>& banks, int bpp)
+void ConvertToSprites(std::map<std::string, ImageInfo>& images, std::vector<Sprite>& sprites, std::vector<PaletteBank>& banks, int bpp, bool for_bitmap)
 {
     DefaultParams();
     params.bpp = bpp;
+    params.for_bitmap = for_bitmap;
     std::vector<Image16Bpp> images16;
     ConvertToMode3(images, images16);
     SpriteScene scene(images16, "", false, bpp);

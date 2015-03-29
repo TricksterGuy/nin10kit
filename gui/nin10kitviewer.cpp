@@ -20,8 +20,9 @@ bool Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& i
 {
     std::string mode, device;
     int bpp;
+    bool for_bitmap;
 
-    GetModeInfo(prog_mode, mode, device, bpp);
+    GetModeInfo(prog_mode, mode, device, bpp, for_bitmap);
     VerboseLog("Viewing in mode %s", mode.c_str());
 
     try
@@ -33,7 +34,7 @@ bool Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& i
         else if (mode == "0")
             UpdateMode0(images, bpp);
         else if (mode == "SPRITES")
-            UpdateSprites(images, bpp);
+            UpdateSprites(images, bpp, for_bitmap);
     }
     // Catch FatalLogs from conversion.  This is handled in wxlogger
     catch (const char* e)
@@ -134,7 +135,7 @@ void Nin10KitViewerFrame::UpdateMode0(std::map<std::string, ImageInfo>& images, 
     tilesetWindow->Refresh();
 }
 
-void Nin10KitViewerFrame::UpdateSprites(std::map<std::string, ImageInfo>& images, int bpp)
+void Nin10KitViewerFrame::UpdateSprites(std::map<std::string, ImageInfo>& images, int bpp, bool for_bitmap)
 {
     EventLog l(__func__);
     sharedSizer->Show(paletteSizer, true, true);
@@ -146,8 +147,8 @@ void Nin10KitViewerFrame::UpdateSprites(std::map<std::string, ImageInfo>& images
     std::vector<PaletteBank> paletteBanks;
     Palette palette;
 
-    ConvertToSprites(images, sprites, paletteBanks, bpp);
-    InfoLog("%d", sprites.size());
+    ConvertToSprites(images, sprites, paletteBanks, bpp, for_bitmap);
+    VerboseLog("number of sprites %d", sprites.size());
 
     wxImage wxpalette;
     if (bpp == 4)

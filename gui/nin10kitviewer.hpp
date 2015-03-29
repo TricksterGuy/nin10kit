@@ -19,7 +19,7 @@ class Nin10KitViewerFrame : public Nin10KitViewerGUI
         void UpdateMode3(std::map<std::string, ImageInfo>& images);
         void UpdateMode4(std::map<std::string, ImageInfo>& images);
         void UpdateMode0(std::map<std::string, ImageInfo>& images, int bpp);
-        void UpdateSprites(std::map<std::string, ImageInfo>& images, int bpp);
+        void UpdateSprites(std::map<std::string, ImageInfo>& images, int bpp, bool for_bitmap);
         void UpdateGraphicsWindow();
         std::vector<wxBitmap> graphics;
         wxBitmap tileset;

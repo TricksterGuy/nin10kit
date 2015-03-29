@@ -47,7 +47,7 @@ Nin10KitGUI::Nin10KitGUI( wxWindow* parent, wxWindowID id, const wxString& title
 	m_staticText7->Wrap( -1 );
 	bSizer6->Add( m_staticText7, 0, wxALL|wxALIGN_CENTER_VERTICAL, 8 );
 	
-	wxString modeChoices[] = { _("GBA Mode 3 - 16 Bpp Bitmap BGR"), _("GBA Mode 4 - 8 Bpp Bitmap w/ Palette"), _("GBA Mode 0 - 8 Bpp Map+Tileset w/ Palette"), _("GBA Mode 0 - 4 Bpp Map+Tileset w/ 16 Palette Banks"), _("GBA Sprites - 8 Bpp Sprites w/ Palette"), _("GBA Sprites - 4 Bpp Sprites w/ 16 Palette Banks") };
+	wxString modeChoices[] = { _("GBA Mode 3 - 16 Bpp Bitmap BGR"), _("GBA Mode 4 - 8 Bpp Bitmap w/ Palette"), _("GBA Mode 0 - 8 Bpp Map+Tileset w/ Palette"), _("GBA Mode 0 - 4 Bpp Map+Tileset w/ 16 Palette Banks"), _("GBA Sprites - 8 Bpp Sprites w/ Palette"), _("GBA Sprites - 4 Bpp Sprites w/ 16 Palette Banks"), _("GBA Sprites (Mode 3) - 8 Bpp Sprites w/ Palette"), _("GBA Sprites (Mode 3) - 4 Bpp Sprites w/ 16 Palette Banks") };
 	int modeNChoices = sizeof( modeChoices ) / sizeof( wxString );
 	mode = new wxChoice( m_panel2, wxID_ANY, wxDefaultPosition, wxDefaultSize, modeNChoices, modeChoices, 0 );
 	mode->SetSelection( 0 );

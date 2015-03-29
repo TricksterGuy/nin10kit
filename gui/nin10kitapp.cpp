@@ -40,7 +40,7 @@ bool Nin10KitApp::OnInit()
 {
     logger->SetLogLevel(LogLevel::INFO);
     if (!wxApp::OnInit())
-        FatalLog("A problem occurred");
+        return false;
 
     wxInitAllImageHandlers();
     wxDialog::EnableLayoutAdaptation(true);

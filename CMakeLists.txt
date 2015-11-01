@@ -27,7 +27,7 @@ set(CPACK_SOURCE_TGZ "ON")
 
 set(CPACK_DEBIAN_PACKAGE_NAME "nin10kit")
 set(CPACK_DEBIAN_PACKAGE_VERSION "${MAJOR_VERSION}.${MINOR_VERSION}")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libwxgtk3.0-0, libmagick++5, libmagickcore5, libmagickwand5")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libwxgtk3.0-0, libmagick++-dev, libmagickcore-dev, libmagickwand-dev")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Brandon Whitehead <bwhitehead0308@gmail.com>")
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION ".")
 

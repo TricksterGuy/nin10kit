@@ -1,7 +1,7 @@
 # File intended only to be ran with GNU make. Use any other make program at your own risk!
 OUTPUT := libshared.a
 WXCPPFLAGS := $(shell wx-config --cppflags)
-CPPFLAGS := $(MASTER_CPP_FLAGS) -I. -I/usr/include/ImageMagick $(WXCPPFLAGS)
+CPPFLAGS := $(MASTER_CPP_FLAGS) -I. $(shell pkg-config --cflags Magick++) $(WXCPPFLAGS)
 LDFLAGS := $(MASTER_CPP_FLAGS)
 CC := g++
 CXX := $(CC)

@@ -2,9 +2,9 @@
 OUTPUT := nin10kitgui
 WXCPPFLAGS := $(shell wx-config --cppflags)
 WXCPPLIBS := $(shell wx-config --libs)
-CPPFLAGS := $(MASTER_CPP_FLAGS) -Wall -I. -I../shared -I/usr/include/ImageMagick $(WXCPPFLAGS)
+CPPFLAGS := $(MASTER_CPP_FLAGS) -Wall -I. -I../shared $(shell pkg-config --cflags Magick++) $(WXCPPFLAGS)
 LDFLAGS := $(MASTER_CPP_FLAGS) -Wall -L../shared
-LDLIBS := -lshared $(WXCPPLIBS) -lMagick++ -lMagickWand -lMagickCore
+LDLIBS := -lshared $(WXCPPLIBS) $(shell pkg-config --libs Magick++)
 CC := g++
 CXX := $(CC)
 RM := rm

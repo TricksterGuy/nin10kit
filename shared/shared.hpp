@@ -41,6 +41,7 @@ struct ExportParams
     std::vector<resize> resizes;
     bool transparent_given;
     Color transparent_color;
+    bool export_globals;
 
     // Palette options
     unsigned int offset;

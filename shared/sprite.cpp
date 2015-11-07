@@ -336,9 +336,27 @@ void SpriteSheet::SliceBlock(const BlockSize& size, const std::list<BlockSize>& 
     freeBlocks[toSplit.size].push_front(toSplit);
 }
 
+
+void SpriteGraphicsMemoryCheck(const std::vector<Image16Bpp>& images, int bpp)
+{
+    int width = bpp == 4 ? 32 : 16;
+    int height = !params.for_bitmap ? 32 : 16;
+    int maxtiles = width * height;
+    int current = 0;
+    for (const auto& image : images)
+    {
+        int imagetiles = image.width / 8 * image.height / 8;
+        VerboseLog("Image %s has %d tiles", image.name.c_str(), imagetiles);
+        current += imagetiles;
+    }
+    if (current > maxtiles && !params.force)
+        FatalLog("Found %d tiles, you can only have maximum %d tiles. You may pass in -force to override this.", current, maxtiles);
+}
+
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, int _bpp) : Scene(_name), bpp(_bpp), paletteBanks(name),
     is2d(_is2d)
 {
+    SpriteGraphicsMemoryCheck(images, bpp);
     switch(bpp)
     {
         case 4:
@@ -353,12 +371,14 @@ SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::strin
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, std::shared_ptr<Palette>& _palette) :
     Scene(_name), bpp(8), palette(_palette), paletteBanks(name), is2d(_is2d)
 {
+    SpriteGraphicsMemoryCheck(images, bpp);
     Init8bpp(images);
 }
 
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, const std::vector<PaletteBank>& _paletteBanks) :
     Scene(_name), bpp(4), paletteBanks(name, _paletteBanks), is2d(_is2d)
 {
+    SpriteGraphicsMemoryCheck(images, bpp);
     Init4bpp(images);
 }
 

@@ -11,7 +11,7 @@ Image8Bpp::Image8Bpp(const Image16Bpp& image) : Image(image), pixels(width * hei
 {
     // If the image width is odd error out
     if (width & 1)
-        FatalLog("Image: %s width is not a multiple of 2. Please fix", name.c_str());
+        FatalLog("Image: %s width is not a multiple of 2. Found (%d, %d). Please fix", name.c_str(), width, height);
 
     GetPalette(image, params.palette, params.transparent_color, params.offset, *palette);
     DitherAndReduceImage(image, params.transparent_color, params.dither, params.dither_level, params.offset, *this);
@@ -20,7 +20,7 @@ Image8Bpp::Image8Bpp(const Image16Bpp& image) : Image(image), pixels(width * hei
 Image8Bpp::Image8Bpp(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette) : Image(image), pixels(width * height), palette(global_palette), export_shared_info(false)
 {
     if (width & 1)
-        FatalLog("Image: %s width is not a multiple of 2. Please fix", name.c_str());
+        FatalLog("Image: %s width is not a multiple of 2. Found (%d, %d). Please fix", name.c_str(), width, height);
 
     DitherAndReduceImage(image, params.transparent_color, params.dither, params.dither_level, params.offset, *this);
 }
@@ -77,7 +77,7 @@ Image8BppScene::Image8BppScene(const std::vector<Image16Bpp>& images16, const st
     for (const auto& image : images16)
     {
         if (image.width & 1)
-            FatalLog("Image: %s width is not a multiple of 2. Please fix", name.c_str());
+            FatalLog("Image: %s width is not a multiple of 2.  Found (%d %d). Please fix", name.c_str(), image.width, image.height);
     }
     GetPalette(images16, params.palette, params.transparent_color, params.offset, *palette);
 

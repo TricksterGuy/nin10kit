@@ -33,7 +33,7 @@ enum
 int Dither(const Color16& color, std::shared_ptr<Palette>& palette, const Color16& transparent, int dither, float ditherlevel)
 {
     static int ex = 0, ey = 0, ez = 0;
-    //if (color == transparent) return 0;
+    if (color == transparent) return 0;
 
     Color16 newColor(CLAMP(color.r + ex), CLAMP(color.g + ey), CLAMP(color.b + ez));
     int index = palette->Search(newColor);

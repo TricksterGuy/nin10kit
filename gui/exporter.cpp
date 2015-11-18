@@ -8,9 +8,9 @@
 #include "shared.hpp"
 
 ExportParams params;
-void DoGBAExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
-void DoDSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
-void Do3DSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
+void DoGBAExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets, const std::vector<Image32Bpp>& palettes);
+void DoDSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets, const std::vector<Image32Bpp>& palettes);
+void Do3DSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets, const std::vector<Image32Bpp>& palettes);
 
 void GetModeInfo(int prog_mode, std::string& mode, std::string& device, int& bpp, bool& sprites_for_bitmap)
 {
@@ -70,7 +70,7 @@ void DoExport(int mode, const std::string& filename, std::vector<std::string>& f
     params.transparent_color = -1;
     params.dither_level = 10 / 100.0f;
     params.offset = 0;
-    params.palette = 256;
+    params.palette_size = 256;
     params.border = 0;
 
     header.SetMode(params.mode);
@@ -107,11 +107,11 @@ void DoExport(int mode, const std::string& filename, std::vector<std::string>& f
     try
     {
         if (params.device == "GBA")
-            DoGBAExport(params.images, params.tileset_images);
+            DoGBAExport(params.images, params.tileset_images, params.palette_images);
         else if (params.device == "DS")
-            DoDSExport(params.images, params.tileset_images);
+            DoDSExport(params.images, params.tileset_images, params.palette_images);
         else if (params.device == "3DS")
-            Do3DSExport(params.images, params.tileset_images);
+            Do3DSExport(params.images, params.tileset_images, params.palette_images);
     }
     // Catch FatalLogs from exporting.  This is handled in wxlogger
     catch (const char* e)

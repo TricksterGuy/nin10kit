@@ -11,7 +11,7 @@ void DefaultParams()
     params.transparent_given = false;
     params.dither_level = 10 / 100.0f;
     params.offset = 0;
-    params.palette = 256;
+    params.palette_size = 256;
     params.border = 0;
     params.force = true;
 }

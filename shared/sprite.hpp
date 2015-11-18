@@ -99,7 +99,7 @@ class SpriteSheet
 class SpriteScene : public Scene
 {
     public:
-        SpriteScene(const std::vector<Image16Bpp>& images, const std::string& name, bool is2d, int bpp);
+        SpriteScene(const std::vector<Image16Bpp>& images, const std::string& name, bool is2d, int bpp, const std::shared_ptr<Palette>& global_palette = nullptr);
         SpriteScene(const std::vector<Image16Bpp>& images, const std::string& name, bool is2d, std::shared_ptr<Palette>& global_palette);
         SpriteScene(const std::vector<Image16Bpp>& images, const std::string& name, bool is2d, const std::vector<PaletteBank>& paletteBanks);
         void Build();
@@ -117,6 +117,7 @@ class SpriteScene : public Scene
     private:
         void Init4bpp(const std::vector<Image16Bpp>& images);
         void Init8bpp(const std::vector<Image16Bpp>& images);
+        bool export_shared_data;
 };
 
 #endif

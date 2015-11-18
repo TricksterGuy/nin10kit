@@ -4,7 +4,7 @@
 #include "fileutils.hpp"
 #include "shared.hpp"
 
-void DoDSExport(const std::vector<Image32Bpp>& images32, const std::vector<Image32Bpp>& tilesets32)
+void DoDSExport(const std::vector<Image32Bpp>& images32, const std::vector<Image32Bpp>& tilesets32, const std::vector<Image32Bpp>& palettes)
 {
     // Add images to header and implementation files
     for (const auto& image : images32)

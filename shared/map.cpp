@@ -11,7 +11,7 @@ Map::Map(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.height
     if ((image.width != 256 && image.width != 512) || (image.height != 256 && image.height != 512))
         FatalLog("Invalid map size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
     // Create tileset according to bpp
-    tileset.reset(new Tileset(image, bpp));
+    tileset.reset(Tileset::FromImage(image, bpp));
 
     // Tile match each tile in image
     switch(bpp)

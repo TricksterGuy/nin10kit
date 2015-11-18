@@ -33,21 +33,23 @@ struct ExportParams
     std::vector<LutSpecification> functions;
     std::vector<std::string> files;
     std::vector<std::string> tilesets;
+    std::vector<std::string> palettes;
     std::vector<Image32Bpp> images;
     std::vector<Image32Bpp> tileset_images;
+    std::vector<Image32Bpp> palette_images;
     std::vector<std::string> names; // In batch names of the arrays for the images. if -names is given then it becomes those.
 
     // Optional stuff
     std::vector<resize> resizes;
     bool transparent_given;
     Color transparent_color;
-    bool export_globals;
+    bool export_images;
 
     // Palette options
     unsigned int offset;
     bool dither;
     float dither_level;
-    unsigned int palette;
+    unsigned int palette_size;
     bool split;
     int bpp;
 
@@ -60,9 +62,6 @@ struct ExportParams
     // Sprite stuff
     bool for_bitmap;
     bool export_2d;
-
-    std::vector<Image32Bpp> GetImages() const;
-    std::vector<Image32Bpp> GetTilesets() const;
 };
 
 std::string ToUpper(const std::string& str);

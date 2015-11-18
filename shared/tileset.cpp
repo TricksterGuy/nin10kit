@@ -7,11 +7,21 @@
 #include "image8.hpp"
 #include "shared.hpp"
 
-Tileset::Tileset(const std::vector<Image16Bpp>& images, const std::string& name, int _bpp) : Exportable(name), bpp(_bpp), paletteBanks(name)
+Tileset::Tileset(const std::vector<Image16Bpp>& images, const std::string& name, int _bpp, const std::shared_ptr<Palette>& global_palette) :
+    Exportable(name), bpp(_bpp), palette(global_palette), paletteBanks(name), export_shared_data(global_palette == nullptr)
 {
     switch(bpp)
     {
         case 4:
+            if (palette)
+            {
+                paletteBanks.Copy(*global_palette);
+            }
+            else
+            {
+                for (unsigned int i = 0; i < paletteBanks.Size(); i++)
+                    paletteBanks[i].Add(Color16(params.transparent_color));
+            }
             Init4bpp(images);
             break;
         case 8:
@@ -23,22 +33,11 @@ Tileset::Tileset(const std::vector<Image16Bpp>& images, const std::string& name,
     }
 }
 
-Tileset::Tileset(const Image16Bpp& image, int _bpp) : Exportable(image), bpp(_bpp), paletteBanks(name)
+Tileset* Tileset::FromImage(const Image16Bpp& image, int bpp)
 {
     std::vector<Image16Bpp> images;
     images.push_back(image);
-    switch(bpp)
-    {
-        case 4:
-            Init4bpp(images);
-            break;
-        case 8:
-            Init8bpp(images);
-            break;
-        case 16:
-            Init16bpp(images);
-            break;
-    }
+    return new Tileset(images, "", bpp);
 }
 
 int Tileset::Search(const Tile& tile) const
@@ -80,10 +79,13 @@ bool Tileset::Match(const ImageTile& tile, int& tile_id, int& pal_id) const
 
 void Tileset::WriteData(std::ostream& file) const
 {
-    if (bpp == 8)
-        palette->WriteData(file);
-    else
-        paletteBanks.WriteData(file);
+    if (export_shared_data)
+    {
+        if (bpp == 8)
+            palette->WriteData(file);
+        else
+            paletteBanks.WriteData(file);
+    }
 
     WriteBeginArray(file, "const unsigned short", name, "_tiles", Size());
     std::vector<Tile>::const_iterator tile_ptr = tilesExport.begin();
@@ -100,10 +102,13 @@ void Tileset::WriteData(std::ostream& file) const
 
 void Tileset::WriteExport(std::ostream& file) const
 {
-    if (bpp == 8)
-        palette->WriteExport(file);
-    else
-        paletteBanks.WriteExport(file);
+    if (export_shared_data)
+    {
+        if (bpp == 8)
+            palette->WriteExport(file);
+        else
+            paletteBanks.WriteExport(file);
+    }
 
     WriteDefine(file, name, "_PALETTE_TYPE", (bpp == 8), 7);
     WriteNewLine(file);
@@ -144,10 +149,6 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
 
     // Greedy approach deal with tiles with largest palettes first.
     std::sort(gbaTiles.begin(), gbaTiles.end(), TilesPaletteSizeComp);
-
-    // But deal with transparent color
-    for (unsigned int i = 0; i < paletteBanks.Size(); i++)
-        paletteBanks[i].Add(Color16(params.transparent_color));
 
     // Construct palette banks, assign bank id to tile, remap tile to palette bank given, assign tile ids
     for (auto& tile : gbaTiles)
@@ -234,7 +235,7 @@ void Tileset::Init8bpp(const std::vector<Image16Bpp>& images16)
     int tile_width = 8 + params.border;
 
     // Reduce all and get the global palette and reduced images.
-    Image8BppScene scene(images16, name);
+    Image8BppScene scene(images16, name, palette);
     palette = scene.palette;
 
     const Tile& nullTile = Tile::GetNullTile8();

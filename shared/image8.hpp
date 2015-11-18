@@ -18,8 +18,7 @@ class Image16Bpp;
 class Image8Bpp : public Image
 {
     public:
-        Image8Bpp(const Image16Bpp& image);
-        Image8Bpp(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette);
+        Image8Bpp(const Image16Bpp& image, std::shared_ptr<Palette> global_palette = nullptr);
         void WriteData(std::ostream& file) const;
         void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
@@ -40,11 +39,14 @@ class Image8Bpp : public Image
 class Image8BppScene : public Scene
 {
     public:
-        Image8BppScene(const std::vector<Image16Bpp>& images, const std::string& name);
+        Image8BppScene(const std::vector<Image16Bpp>& images, const std::string& name, std::shared_ptr<Palette> global_palette = nullptr);
         const Image8Bpp& GetImage(int index) const;
         void WriteData(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         std::shared_ptr<Palette> palette;
+    private:
+        /** If true also export palette. */
+        bool export_shared_info;
 };
 
 #endif

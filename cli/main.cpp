@@ -45,9 +45,9 @@ void PrintMagickFormats(void)
     exception = MagickCore::DestroyExceptionInfo(exception);
 }
 
-void DoGBAExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
-void DoDSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
-void Do3DSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets);
+void DoGBAExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets, const std::vector<Image32Bpp>& palettes);
+void DoDSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets, const std::vector<Image32Bpp>& palettes);
+void Do3DSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets, const std::vector<Image32Bpp>& palettes);
 void DoLUTExport(const std::vector<LutSpecification>& functions);
 
 class Nin10KitApp : public wxAppConsole
@@ -95,11 +95,12 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
     // Mode 0/4 options
     {wxCMD_LINE_OPTION, "start", "start", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_OPTION, "palette", "palette", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "palette_image", "palette_image", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_OPTION, "split", "split", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
     // Mode 0 exclusive options
     {wxCMD_LINE_OPTION, "split_sbb", "split_sbb", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "tileset", "tileset", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "tileset_image", "tileset_image", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_OPTION, "border", "border", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_OPTION, "force", "force", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
@@ -108,6 +109,9 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
     {wxCMD_LINE_OPTION, "for_bitmap", "for_bitmap", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
     // Other
+    {wxCMD_LINE_OPTION, "export_images", "export_images", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+
+    // To accept the list of images this is used.
     {wxCMD_LINE_PARAM,  NULL, NULL, "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE},
     {wxCMD_LINE_NONE}
 };
@@ -195,15 +199,25 @@ const std::map<std::string, HelpDesc> help_text = {
                              "In mode 4 using this will export each image with its own palette instead of a global palette.\n"
                              "In mode 0 using this will export each map with its own palette and tileset instead of a global tileset/palette.\n"
                              "In all other modes this option is ignored.")},
-{"tileset", HelpDesc("list_of_images_or_urls", "Tileset image(s) to match tiles against when using -mode=map.\n"
-                                               "\tTo use form an image with the tileset you will use.\n"
-                                               "\tExport the tileset using -mode=tiles\n"
-                                               "\tThen form map images using the tiles in your tileset\n"
-                                               "\tThen export the maps using -mode=map with -tileset=tileset_image")},
+{"tileset_image", HelpDesc("list_of_images_or_urls", "Tileset image(s) to match tiles against when using -mode=map.\n"
+                                                     "\tTo use form an image with the tileset you will use.\n"
+                                                     "\tExport the tileset using -mode=tiles\n"
+                                                     "\tThen form map images using the tiles in your tileset\n"
+                                                     "\tThen export the maps using -mode=map with -tileset_image=tileset_image")},
+{"palette_image", HelpDesc("list_of_images_or_urls", "Palette images(s) to match image against when using -mode=(4, tiles, sprites).\n"
+                                                     "\tTo use form an image with the palette you will use.\n"
+                                                     "\tAlternative just use -mode=palette and give it a set of images.\n"
+                                                     "\tThen form images using the colors in your palette.\n"
+                                                     "\tExport the images using -mode=mode with -palette_image=palette_image")},
 {"border", HelpDesc("number", "Border around each tile in tileset image\n"
                               "Only for use with -mode=tiles")},
 {"export_2d", HelpDesc("0 or 1", "Exports sprites for use in sprite 2d mode default 0.")},
 {"for_bitmap", HelpDesc("0 or 1", "Exports sprites for use in modes 3 and 4 default 0.")},
+{"export_images", HelpDesc("0 or 1", "In addition to generating a .c.h pair\n"
+                                     "\texport images of each array generated as if it were displayed on the gba.\n"
+                                     "\tThis means in a mode 4 export you will get a palette image showing the palette.\n"
+                                     "\tIn a mode 0 export you will get a tileset image, a palette image, and a map image.\n"
+                                     "\tIn sprites export you will get a palette image, and a sprite image.")},
 {"force", HelpDesc("0 or 1", "NOT IMPLEMENTED")},
 {"split_sbb", HelpDesc("number [0-3]", "NOT IMPLEMENTED")},
 };
@@ -372,13 +386,15 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     params.transparent_color = Color(transparent);
     params.dither = parse.GetBoolean("dither", true);
     params.dither_level = parse.GetInt("dither_level", 10, 0, 100) / 100.0f;
+    params.export_images = parse.GetBoolean("export_images", false);
 
     params.offset = parse.GetInt("start", 0, 0, 255);
-    params.palette = parse.GetInt("palette", 256, 1, 256);
+    params.palette_size = parse.GetInt("palette", 256, 1, 256);
+    params.palettes = parse.GetListString("palette_image");
     params.split = parse.GetBoolean("split", false);
 
     params.split_sbb = parse.GetBoolean("split_sbb", false);
-    params.tilesets = parse.GetListString("tileset");
+    params.tilesets = parse.GetListString("tileset_image");
     params.border = parse.GetInt("border", 0, 0);
     params.force = parse.GetBoolean("force", false);
 
@@ -484,6 +500,7 @@ bool Nin10KitApp::DoExportImages()
     VerboseLog("DoLoadImages");
     std::map<std::string, std::vector<Magick::Image>> file_images;
     std::map<std::string, std::vector<Magick::Image>> file_tilesets;
+    std::map<std::string, std::vector<Magick::Image>> file_palettes;
     for (const auto& filename : params.files)
     {
         InfoLog("Reading image %s", filename.c_str());
@@ -492,8 +509,15 @@ bool Nin10KitApp::DoExportImages()
     }
     for (const auto& tileset : params.tilesets)
     {
+        InfoLog("Reading tileset %s", tileset.c_str());
         file_tilesets[tileset] = std::vector<Magick::Image>();
         readImages(&file_tilesets[tileset], tileset);
+    }
+    for (const auto& palette : params.palettes)
+    {
+        InfoLog("Reading image (for palette) %s", palette.c_str());
+        file_palettes[palette] = std::vector<Magick::Image>();
+        readImages(&file_palettes[palette], palette);
     }
 
     VerboseLog("DoHandleResize");
@@ -504,6 +528,7 @@ bool Nin10KitApp::DoExportImages()
         if (!size.IsValid()) continue;
         Magick::Geometry geom(size.width, size.height);
         geom.aspect(true);
+        InfoLog("Resizing %s to (%d %d)", filename.c_str(), size.width, size.height);
         for (auto& image : file_images[filename])
             image.resize(geom);
     }
@@ -514,9 +539,20 @@ bool Nin10KitApp::DoExportImages()
         const std::string& filename = params.files[i];
         const std::vector<Magick::Image> images = file_images[filename];
         bool isAnim = images.size() > 1;
+        if (isAnim)
+          InfoLog("%s, detected as having %d frames", filename.c_str(), images.size());
+        unsigned int anim_width = images[0].columns();
+        unsigned int anim_height = images[0].rows();
         for (unsigned int j = 0; j < images.size(); j++)
         {
             const Magick::Image& image = images[j];
+            // Grumble some animations can have frames of different size
+            if (anim_width != image.columns() || anim_height != image.rows())
+            {
+                WarnLog("Animated image %s has frames that aren't the same size expected (%d %d) got (%d %d). "
+                        "You should resize this image via the --resize parameter.", filename.c_str(), anim_width,
+                        anim_height, image.columns(), image.rows());
+            }
             header.AddImageInfo(filename, j, image.columns(), image.rows(), isAnim);
             implementation.AddImageInfo(filename, j, image.columns(), image.rows(), isAnim);
         }
@@ -545,6 +581,17 @@ bool Nin10KitApp::DoExportImages()
         }
     }
 
+    for (unsigned int i = 0; i < params.palettes.size(); i++)
+    {
+        const std::string& filename = params.palettes[i];
+        std::vector<Magick::Image>& images = file_palettes[filename];
+        for (unsigned int j = 0; j < images.size(); j++)
+        {
+            const auto& image = images[j];
+            params.palette_images.push_back(Image32Bpp(image, params.names[i], filename, j, images.size() > 1));
+        }
+    }
+
     VerboseLog("DoExportImages");
     InfoLog("Using %s exporter mode %s", params.device.c_str(), params.mode.c_str());
 
@@ -554,11 +601,11 @@ bool Nin10KitApp::DoExportImages()
     if (params.mode == "LUT")
         DoLUTExport(params.functions);
     else if (params.device == "GBA")
-        DoGBAExport(params.images, params.tileset_images);
+        DoGBAExport(params.images, params.tileset_images, params.palette_images);
     else if (params.device == "DS")
-        DoDSExport(params.images, params.tileset_images);
+        DoDSExport(params.images, params.tileset_images, params.palette_images);
     else if (params.device == "3DS")
-        Do3DSExport(params.images, params.tileset_images);
+        Do3DSExport(params.images, params.tileset_images, params.palette_images);
 
     InfoLog("Export complete now writing files");
     // Write the files

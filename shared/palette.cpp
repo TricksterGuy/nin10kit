@@ -13,6 +13,15 @@ ColorArray::ColorArray(const std::vector<Color16>& _colors) : colors(_colors), c
         labColors.push_back(ColorLAB(color));
 }
 
+void ColorArray::Clear()
+{
+    labColors.clear();
+    colors.clear();
+    colorSet.clear();
+    paletteEntryStats.clear();
+    colorEntryStats.clear();
+}
+
 void ColorArray::Set(const std::vector<Color16>& _colors)
 {
     colors = _colors;
@@ -63,10 +72,10 @@ int ColorArray::Search(const Color16& color) const
     paletteEntryStats[index].used_count += 1;
     paletteEntryStats[index].error += bestd;
 
-    /*if (bestd != 0)
+    if (bestd != 0)
         VerboseLog("Color remap: Color (%d %d %d) (%d %d %d) given to palette not an exact match. palette entry: %d - (%d %d %d) (%d %d %d).  dist: %f.",
                    color.r, color.g, color.b, a.l, a.a, a.b, index, colors[index].r, colors[index].g, colors[index].b,
-                   labColors[index].l, labColors[index].a, labColors[index].b, bestd);*/
+                   labColors[index].l, labColors[index].a, labColors[index].b, bestd);
 
     return index;
 }
@@ -226,6 +235,19 @@ PaletteBankManager::PaletteBankManager(const std::string& name) : Exportable(nam
 
 PaletteBankManager::PaletteBankManager(const std::string& _name, const std::vector<PaletteBank>& paletteBanks) : Exportable(_name), banks(paletteBanks)
 {
+}
+
+void PaletteBankManager::Copy(const Palette& palette)
+{
+    const auto& colors = palette.GetColors();
+    banks.resize(16);
+    for (auto& bank : banks)
+      bank.Clear();
+
+    for (unsigned int i = 0; i < colors.size(); i++)
+    {
+        banks[i / 16].Add(colors[i]);
+    }
 }
 
 int PaletteBankManager::FindBestMatch(const ColorArray& palette) const

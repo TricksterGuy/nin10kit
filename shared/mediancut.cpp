@@ -449,9 +449,13 @@ void DitherAndReduceImage(const Image16Bpp& image, const Color16& transparent, b
     RiemersmaDither(image, indexedImage, transparent, dither, dither_level);
     if (offset > 0)
     {
-        for (unsigned char& pix : indexedImage.pixels)
-            if (pix)
-                pix += offset;
+        for (unsigned int i = 0; i < indexedImage.pixels.size(); i++)
+        {
+            unsigned char& index = indexedImage.pixels[i];
+            const Color16& color = image.pixels[i];
+            if (color != transparent)
+                index += offset;
+        }
     }
 }
 

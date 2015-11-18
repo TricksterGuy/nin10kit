@@ -13,12 +13,12 @@ class Scanner : public wxStringTokenizer
           * @param str String to use as tokenizer
           * @param delims Delimiters for str
           */
-        Scanner(const std::string& str, const std::string& delims = " ,\t\r\n") : wxStringTokenizer(str, delims, wxTOKEN_STRTOK) {}
+        Scanner(const std::string& str, const std::string& delims = " ,\t\r\n") : wxStringTokenizer(str, delims, wxTOKEN_RET_EMPTY_ALL) {}
         /** Constructor
           * @param str String to use as tokenizer
           * @param delims Delimiters for str
           */
-        Scanner(const wxString& str, const wxString& delims = " ,\t\r\n") : wxStringTokenizer(str, delims, wxTOKEN_STRTOK) {}
+        Scanner(const wxString& str, const wxString& delims = " ,\t\r\n") : wxStringTokenizer(str, delims, wxTOKEN_RET_EMPTY_ALL) {}
         ~Scanner() {}
         /** Reads next integer from Scanner
           * @param var value to store integer in

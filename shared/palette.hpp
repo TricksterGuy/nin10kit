@@ -30,6 +30,8 @@ class ColorArray
 {
     public:
         ColorArray(const std::vector<Color16>& _colors = std::vector<Color16>());
+        /** Clears the color array */
+        void Clear();
         /** Sets array to contain colors passed in */
         void Set(const std::vector<Color16>& _colors);
         /** Gets color at palette index */
@@ -85,6 +87,7 @@ class PaletteBankManager : public Exportable
     public:
         PaletteBankManager(const std::string& _name);
         PaletteBankManager(const std::string& _name, const std::vector<PaletteBank>& paletteBanks);
+        void Copy(const Palette& palette);
         PaletteBank& operator[](int i) {return banks[i];}
         const PaletteBank& operator[](int i) const {return banks[i];}
         unsigned int Size() const {return banks.size();}

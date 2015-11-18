@@ -353,30 +353,40 @@ void SpriteGraphicsMemoryCheck(const std::vector<Image16Bpp>& images, int bpp)
         FatalLog("Found %d tiles, you can only have maximum %d tiles. You may pass in -force to override this.", current, maxtiles);
 }
 
-SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, int _bpp) : Scene(_name), bpp(_bpp), paletteBanks(name),
-    is2d(_is2d)
+SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, int _bpp, const std::shared_ptr<Palette>& global_palette) :
+    Scene(_name), bpp(_bpp), paletteBanks(name), is2d(_is2d), export_shared_data(global_palette == nullptr)
 {
     SpriteGraphicsMemoryCheck(images, bpp);
     switch(bpp)
     {
         case 4:
+            if (global_palette)
+            {
+                paletteBanks.Copy(*global_palette);
+            }
+            else
+            {
+                for (unsigned int i = 0; i < paletteBanks.Size(); i++)
+                    paletteBanks[i].Add(Color16(params.transparent_color));
+            }
             Init4bpp(images);
             break;
         default:
+            palette = global_palette;
             Init8bpp(images);
             break;
     }
 }
 
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, std::shared_ptr<Palette>& _palette) :
-    Scene(_name), bpp(8), palette(_palette), paletteBanks(name), is2d(_is2d)
+    Scene(_name), bpp(8), palette(_palette), paletteBanks(name), is2d(_is2d), export_shared_data(true)
 {
     SpriteGraphicsMemoryCheck(images, bpp);
     Init8bpp(images);
 }
 
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, const std::vector<PaletteBank>& _paletteBanks) :
-    Scene(_name), bpp(4), paletteBanks(name, _paletteBanks), is2d(_is2d)
+    Scene(_name), bpp(4), paletteBanks(name, _paletteBanks), is2d(_is2d), export_shared_data(true)
 {
     SpriteGraphicsMemoryCheck(images, bpp);
     Init4bpp(images);
@@ -427,10 +437,13 @@ unsigned int SpriteScene::Size() const
 
 void SpriteScene::WriteData(std::ostream& file) const
 {
-    if (bpp == 4)
-        paletteBanks.WriteData(file);
-    else
-        palette->WriteData(file);
+    if (export_shared_data)
+    {
+        if (bpp == 4)
+            paletteBanks.WriteData(file);
+        else
+            palette->WriteData(file);
+    }
 
     if (is2d)
     {
@@ -456,10 +469,13 @@ void SpriteScene::WriteExport(std::ostream& file) const
     WriteDefine(file, name, "_DIMENSION_TYPE", !is2d, 6);
     WriteNewLine(file);
 
-    if (bpp == 4)
-        paletteBanks.WriteExport(file);
-    else
-        palette->WriteExport(file);
+    if (export_shared_data)
+    {
+        if (bpp == 4)
+            paletteBanks.WriteExport(file);
+        else
+            palette->WriteExport(file);
+    }
 
 
     if (is2d)
@@ -503,10 +519,6 @@ void SpriteScene::Init4bpp(const std::vector<Image16Bpp>& images16)
 
     // Greedy approach deal with tiles with largest palettes first.
     std::sort(sprites.begin(), sprites.end(), SpritePaletteSizeComp);
-
-    // But deal with transparent color
-    for (unsigned int i = 0; i < paletteBanks.Size(); i++)
-        paletteBanks[i].Add(Color16(params.transparent_color));
 
     // Construct palette banks, assign bank id to tile, remap sprite to palette bank given, assign tile ids
     for (auto& sprite : sprites)
@@ -557,7 +569,7 @@ void SpriteScene::Init8bpp(const std::vector<Image16Bpp>& images16)
     if (!palette)
     {
         palette.reset(new Palette(name));
-        GetPalette(images16, params.palette, params.transparent_color, params.offset, *palette);
+        GetPalette(images16, params.palette_size, params.transparent_color, params.offset, *palette);
     }
 
     for (const auto& image : images16)

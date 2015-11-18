@@ -13,6 +13,7 @@ class Color
         Color(const ColorLAB& color);
         bool operator<(const Color& color) const;
         bool operator==(const Color& color) const;
+        bool operator!=(const Color& color) const {return !(*this == color);}
         /** Color components range 0-255 */
         unsigned char a, r, g, b;
 };
@@ -27,6 +28,7 @@ class Color16
         Color16(const ColorLAB& color);
         bool operator<(const Color16& color) const;
         bool operator==(const Color16& color) const;
+        bool operator!=(const Color16& color) const {return !(*this == color);}
         unsigned short ToGBAShort() const {return r | (g << 5) | (b << 10);}
         Color ToColor() const {return Color(r << 3, g << 3, b << 3, a * 255);}
         /** Color components range 0-31 */
@@ -44,6 +46,7 @@ class ColorLAB
         ColorLAB(const Color16& color);
         bool operator<(const ColorLAB& color) const;
         bool operator==(const ColorLAB& color) const;
+        bool operator!=(const ColorLAB& color) const {return !(*this == color);}
         unsigned long Distance(const ColorLAB& color) const;
         int l, a, b;
 };

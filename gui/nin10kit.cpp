@@ -142,12 +142,25 @@ void Nin10KitFrame::OnExport(wxCommandEvent& event)
         WarnLog("No images loaded not exporting");
         return;
     }
-    std::string filename = wxSaveFileSelector(_("Export Images"), "", "", this).ToStdString();
-    if (filename.empty())
+
+    std::string filename;
+    bool save_ok;
+    do
     {
-        WarnLog("Filename empty not saving");
-        return;
-    }
+        save_ok = true;
+        filename = wxSaveFileSelector(_("Export Images"), "", "", this).ToStdString();
+        if (filename.empty())
+        {
+            WarnLog("Filename empty not saving.");
+            return;
+        }
+        if (wxFile::Exists(filename + ".c") || wxFileExists(filename + ".h"))
+        {
+            int ans = wxMessageBox(wxString::Format(_("Ok to overwrite %s(.c|.h)?"), filename), _("Confirm"), wxYES_NO | wxCANCEL, this);
+            if (ans == wxNO) save_ok = false;
+            if (ans == wxCANCEL) return;
+        }
+    } while (!save_ok);
 
     InfoLog("Saving exported file to %s", filename.c_str());
     DoExport(mode->GetSelection(), filename, filenames, images);

@@ -41,9 +41,9 @@ include(FindPkgConfig)
 option(ENABLE_DEBUG "Build debug version" OFF)
 
 IF(ENABLE_DEBUG)
-    set(CMAKE_CXX_FLAGS "-g -pg -Wall -std=c++11")
+    set(CMAKE_CXX_FLAGS "-g -pg -Wall -std=c++11 -fopenmp")
 ELSE()
-    set(CMAKE_CXX_FLAGS "-O3 -Wall -std=c++11")
+    set(CMAKE_CXX_FLAGS "-O3 -Wall -std=c++11 -fopenmp")
     set(CMAKE_EXE_LINKER_FLAGS "-s")
 ENDIF(ENABLE_DEBUG)
 

@@ -30,7 +30,7 @@ void DoGBAExport(const std::vector<Image32Bpp>& images32, const std::vector<Imag
         std::vector<Image16Bpp> palettes;
         for (const auto& image : palettes32)
             palettes.push_back(Image16Bpp(image));
-        Image8BppScene scene(images, params.symbol_base_name);
+        Image8BppScene scene(palettes, params.symbol_base_name);
         palette = scene.palette;
     }
 

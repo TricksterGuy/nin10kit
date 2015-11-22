@@ -12,9 +12,9 @@ You can run sudo ./setup.sh which does the tasks in the list below.
 
 #Installing via apt-get (for ubuntu versions trusty and beyond)
 Execute these commands
-sudo add-apt-repository ppa:tricksterguy87/ppa-gt-cs2110
-sudo apt-get update
-sudo apt-get install nin10kit
+* sudo add-apt-repository ppa:tricksterguy87/ppa-gt-cs2110
+* sudo apt-get update
+* sudo apt-get install nin10kit
 
 #Compiling with CMake
 

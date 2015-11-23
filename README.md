@@ -1,7 +1,7 @@
 nin10kit
 ========
 
-#Compiling
+#Compiling from source via provided Makefiles
 You can run sudo ./setup.sh which does the tasks in the list below.
 
 1. Ensure you have a C++ compiler (sudo apt-get install build-essential)
@@ -10,10 +10,13 @@ You can run sudo ./setup.sh which does the tasks in the list below.
 4. Build the program (make)
 5. Install the program (sudo make install)
 
-#Installing from packages (For Ubuntu 14.04+)
-Coming soon
+#Installing via apt-get (for ubuntu versions trusty and beyond)
+Execute these commands
+* sudo add-apt-repository ppa:tricksterguy87/ppa-gt-cs2110
+* sudo apt-get update
+* sudo apt-get install nin10kit
 
-#Compiling with CMake (Advanced)
+#Compiling with CMake
 
 To compile this program you will need the following things installed
 

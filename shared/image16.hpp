@@ -20,7 +20,6 @@ class Image16Bpp : public Image
         void WriteCommonExport(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         const Color16& At(int x, int y) const {return pixels[y * width + x];}
-        Magick::Image ToMagick() const;
         std::vector<Color16> pixels;
 };
 

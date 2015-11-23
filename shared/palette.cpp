@@ -129,20 +129,6 @@ void Palette::WriteExport(std::ostream& file) const
     WriteNewLine(file);
 }
 
-Magick::Image Palette::ToMagick() const
-{
-    Magick::Image ret(Magick::Geometry(16, 16), Magick::Color(0, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, 16, 16);
-    for (unsigned int i = 0; i < colors.size(); i++)
-    {
-        const Color color = colors[i].ToColor();
-        packet[i] = Magick::Color(color.r << 8, color.g << 8, color.b << 8);
-    }
-    ret.syncPixels();
-    ret.write("pal.png");
-    return ret;
-}
-
 struct ColorError
 {
     ColorError(const Color16& c, unsigned long e) : color(c), error(e) {}

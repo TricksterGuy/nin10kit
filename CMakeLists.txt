@@ -33,6 +33,7 @@ set(SRC_SHARED
     shared/lut-exporter.cpp
     shared/lutgen.cpp
     shared/map.cpp
+    shared/magick_interface.cpp
     shared/mediancut.cpp
     shared/palette.cpp
     shared/scanner.cpp
@@ -101,7 +102,7 @@ target_link_libraries(
     nin10kitgui
     m
     shared_files
-    ${ImageMagick_LIBRARIES}    
+    ${ImageMagick_LIBRARIES}
     ${wxWidgets_LIBRARIES}
 )
 

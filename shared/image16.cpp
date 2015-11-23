@@ -45,20 +45,3 @@ void Image16Bpp::WriteExport(std::ostream& file) const
     }
     WriteNewLine(file);
 }
-
-Magick::Image Image16Bpp::ToMagick() const
-{
-    Magick::Image ret(Magick::Geometry(width, height), Magick::Color(0, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, width, height);
-    for (unsigned int i = 0; i < height; i++)
-    {
-        for (unsigned int j = 0; j < width; j++)
-        {
-            const Color color = pixels[i * width + j].ToColor();
-            packet[i * width + j] = Magick::Color(color.r << 8, color.g << 8, color.b << 8);
-        }
-    }
-    ret.syncPixels();
-    ret.write("image16.png");
-    return ret;
-}

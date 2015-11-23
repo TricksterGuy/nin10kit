@@ -627,9 +627,7 @@ int Nin10KitApp::OnRun()
     VerboseLog("OnRun");
     try
     {
-
         if (!DoExportImages()) return EXIT_FAILURE;
-
         InfoLog("File exported successfully as %s.c and %s.h", params.filename.c_str(), params.filename.c_str());
     }
     catch(Magick::Exception &error_)

@@ -54,22 +54,6 @@ void Image8Bpp::WriteExport(std::ostream& file) const
     WriteNewLine(file);
 }
 
-Magick::Image Image8Bpp::ToMagick() const
-{
-    Magick::Image ret(Magick::Geometry(width, height), Magick::Color(255, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, width, height);
-    for (unsigned int i = 0; i < height; i++)
-    {
-        for (unsigned int j = 0; j < width; j++)
-        {
-            const Color color = palette->At(pixels[i * width + j]).ToColor();
-            packet[i * width + j] = Magick::Color(color.r << 8, color.g << 8, color.b << 8);
-        }
-    }
-    ret.syncPixels();
-    return ret;
-}
-
 Image8BppScene::Image8BppScene(const std::vector<Image16Bpp>& images16, const std::string& name, std::shared_ptr<Palette> global_palette) :
     Scene(name), palette(global_palette), export_shared_info(global_palette == nullptr)
 {

@@ -3,42 +3,12 @@
 #include "fileutils.hpp"
 #include "logger.hpp"
 #include "image32.hpp"
+#include "magick_interface.hpp"
 
 Image32Bpp::Image32Bpp(const Magick::Image& image, const std::string& name, const std::string& filename, unsigned int frame, bool animated) :
-    Image(image.columns(), image.rows(), name, filename, frame, animated), pixels(width * height)
+    Image(image.columns(), image.rows(), name, filename, frame, animated)
 {
-    unsigned int num_pixels = width * height;
-    const Magick::PixelPacket* imageData = image.getConstPixels(0, 0, image.columns(), image.rows());
-
-    size_t depth;
-    MagickCore::GetMagickQuantumDepth(&depth);
-    for (unsigned int i = 0; i < num_pixels; i++)
-    {
-        const Magick::PixelPacket& packet = imageData[i];
-        unsigned char r, g, b, a;
-        if (depth == 8)
-        {
-            r = packet.red;
-            g = packet.green;
-            b = packet.blue;
-            a = packet.opacity;
-        }
-        else if (depth == 16)
-        {
-            r = (packet.red >> 8) & 0xFF;
-            g = (packet.green >> 8) & 0xFF;
-            b = (packet.blue >> 8) & 0xFF;
-            a = (packet.opacity >> 8) * 0xFF;
-        }
-        else
-        {
-            // To get rid of warning
-            b = g = r = a = 0;
-            FatalLog("Image quantum not supported");
-        }
-
-        pixels[i] = Color(r, g, b, a);
-    }
+    CopyMagickPixels(image, pixels);
 }
 
 void Image32Bpp::WriteData(std::ostream& file) const

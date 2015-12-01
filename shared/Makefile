@@ -27,6 +27,7 @@ FILES := 3ds-exporter.o \
 	logger.o \
 	lutgen.o \
 	lut-exporter.o \
+	magick_interface.o \
 	map.o \
 	mediancut.o \
 	palette.o \

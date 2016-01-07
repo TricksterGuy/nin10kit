@@ -379,6 +379,11 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
 
     // Helpful options
     params.output_dir = parse.GetString("output_dir");
+    if (!params.output_dir.empty())
+    {
+        if (params.output_dir[params.output_dir.size() - 1] != '/')
+            params.output_dir += "/";
+    }
     params.names = parse.GetListString("names");
     std::vector<std::string> resizes = parse.GetListString("resize");
     unsigned int transparent = parse.GetHexInt("transparent", 0xFF000000, 0, 0xFFFFFF);

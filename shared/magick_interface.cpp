@@ -16,6 +16,7 @@ void CopyMagickPixels(const Magick::Image& image, std::vector<Color>& out)
 
     size_t depth;
     MagickCore::GetMagickQuantumDepth(&depth);
+    unsigned char alpha_mask = image.matte() ? 0 : 0xFF;
     for (unsigned int i = 0; i < num_pixels; i++)
     {
         const Magick::PixelPacket& packet = imageData[i];
@@ -25,14 +26,14 @@ void CopyMagickPixels(const Magick::Image& image, std::vector<Color>& out)
             r = packet.red;
             g = packet.green;
             b = packet.blue;
-            a = packet.opacity;
+            a = 0xff - packet.opacity;
         }
         else if (depth == 16)
         {
             r = (packet.red >> 8) & 0xFF;
             g = (packet.green >> 8) & 0xFF;
             b = (packet.blue >> 8) & 0xFF;
-            a = (packet.opacity >> 8) * 0xFF;
+            a = 0xff - ((packet.opacity >> 8) & 0xFF);
         }
         else
         {
@@ -41,7 +42,7 @@ void CopyMagickPixels(const Magick::Image& image, std::vector<Color>& out)
             FatalLog("Image quantum not supported");
         }
 
-        out.emplace_back(r, g, b, a);
+        out.emplace_back(r, g, b, a | alpha_mask);
     }
 }
 

@@ -30,6 +30,7 @@ class Color16
         bool operator==(const Color16& color) const;
         bool operator!=(const Color16& color) const {return !(*this == color);}
         unsigned short ToGBAShort() const {return r | (g << 5) | (b << 10);}
+        unsigned short ToDSShort() const {return r | (g << 5) | (b << 10) | (a << 15);}
         Color ToColor() const {return Color(r << 3, g << 3, b << 3, a * 255);}
         /** Color components range 0-31 */
         bool a;

@@ -19,7 +19,6 @@ set(SRC_SHARED
     shared/gba-exporter.cpp
     shared/cmd-line-parser-helper.cpp
     shared/color.cpp
-    shared/color-format.cpp
     shared/cpercep.cpp
     shared/dither.cpp
     shared/exportfile.cpp

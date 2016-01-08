@@ -5,6 +5,9 @@
 #include <sstream>
 #include <wx/filename.h>
 
+const std::set<std::string> valid_3ds_modes {"RGBA8", "RGB8", "RGB5A1", "RGB5551", "RGB565", "RGBA4"};
+const std::set<std::string> valid_gba_modes {"3", "4", "0", "SPRITES", "TILES", "MAP", "PALETTE"};
+
 std::string ToUpper(const std::string& str)
 {
     std::string cap = str;

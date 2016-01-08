@@ -372,7 +372,13 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
 
     // mode params
     params.mode = ToUpper(parse.GetString("mode", ""));
-    params.device = ToUpper(parse.GetString("device", "GBA"));
+
+    // device auto detection
+    params.device = "GBA";
+    if (valid_3ds_modes.find(params.mode) != valid_3ds_modes.end())
+        params.device = "3DS";
+
+    params.device = ToUpper(parse.GetString("device", params.device));
     params.bpp = parse.GetInt("bpp", 8);
 
     std::string function = parse.GetString("func");

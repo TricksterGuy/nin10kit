@@ -26,6 +26,16 @@ void WriteBeginArray(std::ostream& file, const std::string& type, const std::str
     file << type << " " << name << append << "[" << size << "] =\n{\n\t";
 }
 
+void WriteColor16Array(std::ostream& file, const std::vector<Color16>& pixels, int colors_per_row, bool is_gba)
+{
+    char buffer[7];
+    for (unsigned int i = 0; i < pixels.size(); i++)
+    {
+        snprintf(buffer, 7, "0x%04hx", is_gba ? pixels[i].ToGBAShort() : pixels[i].ToDSShort());
+        WriteElement(file, buffer, pixels.size(), i, colors_per_row);
+    }
+}
+
 void WriteEndArray(std::ostream& file)
 {
     VerboseLog("Writing end array");

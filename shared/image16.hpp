@@ -9,8 +9,8 @@
 
 class Image32Bpp;
 
-/** 16 Bit Image BGR
-  * Used for GBA mode 3.
+/** 16 Bit Image BGR / ABGR
+  * Used for GBA mode 3 and DS bitmap mode
   */
 class Image16Bpp : public Image
 {

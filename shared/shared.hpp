@@ -63,6 +63,9 @@ struct ExportParams
     // Sprite stuff
     bool for_bitmap;
     bool export_2d;
+
+    // 3ds stuff
+    bool rotate;
 };
 
 std::string ToUpper(const std::string& str);

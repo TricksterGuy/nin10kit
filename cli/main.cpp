@@ -108,6 +108,9 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
     {wxCMD_LINE_OPTION, "export_2d", "export_2d", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_OPTION, "for_bitmap", "for_bitmap", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
+    // 3ds exclusive options
+    {wxCMD_LINE_OPTION, "3ds_rotate", "3ds_rotate", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+
     // Other
     {wxCMD_LINE_OPTION, "export_images", "export_images", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
@@ -213,6 +216,7 @@ const std::map<std::string, HelpDesc> help_text = {
                               "Only for use with -mode=tiles")},
 {"export_2d", HelpDesc("0 or 1", "Exports sprites for use in sprite 2d mode default 0.")},
 {"for_bitmap", HelpDesc("0 or 1", "Exports sprites for use in modes 3 and 4 default 0.")},
+{"3ds_rotate", HelpDesc("0 or 1", "Rotates the image for use in 3ds framebuffer mode, default 0.")},
 {"export_images", HelpDesc("0 or 1", "In addition to generating a .c.h pair\n"
                                      "\texport images of each array generated as if it were displayed on the gba.\n"
                                      "\tThis means in a mode 4 export you will get a palette image showing the palette.\n"
@@ -411,6 +415,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
 
     params.export_2d = parse.GetBoolean("export_2d", false);
     params.for_bitmap = parse.GetBoolean("for_bitmap", false);
+    params.rotate = parse.GetBoolean("3ds_rotate", false);
 
     std::string export_file = parser.GetParam(0).ToStdString();
     params.export_file = Chop(export_file);
@@ -576,7 +581,9 @@ bool Nin10KitApp::DoExportImages()
         std::vector<Magick::Image>& images = file_images[filename];
         for (unsigned int j = 0; j < images.size(); j++)
         {
-            const auto& image = images[j];
+            auto& image = images[j];
+            if (params.rotate)
+                image.rotate(90);
             params.images.push_back(Image32Bpp(image, params.names[i], filename, j, images.size() > 1));
         }
     }

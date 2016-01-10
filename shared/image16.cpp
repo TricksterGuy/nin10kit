@@ -4,6 +4,7 @@
 #include "fileutils.hpp"
 #include "image16.hpp"
 #include "image32.hpp"
+#include "shared.hpp"
 
 Image16Bpp::Image16Bpp(const Image32Bpp& image) : Image(image), pixels(width * height)
 {
@@ -16,13 +17,8 @@ Image16Bpp::Image16Bpp(const Image32Bpp& image) : Image(image), pixels(width * h
 
 void Image16Bpp::WriteData(std::ostream& file) const
 {
-    char buffer[7];
     WriteBeginArray(file, "const unsigned short", export_name, "", pixels.size());
-    for (unsigned int i = 0; i < pixels.size(); i++)
-    {
-        snprintf(buffer, 7, "0x%04x", pixels[i].ToGBAShort());
-        WriteElement(file, buffer, pixels.size(), i, 16);
-    }
+    WriteColor16Array(file, pixels, 16, params.device == "GBA");
     WriteEndArray(file);
     WriteNewLine(file);
 }

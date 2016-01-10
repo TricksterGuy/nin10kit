@@ -34,11 +34,11 @@ void DoGBAExport(const std::vector<Image32Bpp>& images32, const std::vector<Imag
         palette = scene.palette;
     }
 
-    if (params.mode == "0")
+    if (params.mode == "0" || params.mode == "TILEMAP")
         DoMode0Export(images);
-    else if (params.mode == "3")
+    else if (params.mode == "3" || params.mode == "BITMAP")
         DoMode3Export(images);
-    else if (params.mode == "4")
+    else if (params.mode == "4" || params.mode == "INDEXED")
         DoMode4Export(images, palette);
     else if (params.mode == "SPRITES")
         DoSpriteExport(images, palette);

@@ -111,13 +111,8 @@ Palette::Palette(const std::vector<Color16>& colors, const std::string& name) : 
 
 void Palette::WriteData(std::ostream& file) const
 {
-    char buffer[7];
     WriteBeginArray(file, "const unsigned short", name, "_palette", colors.size());
-    for (unsigned int i = 0; i < colors.size(); i++)
-    {
-        snprintf(buffer, 7, "0x%04x", colors[i].ToGBAShort());
-        WriteElement(file, buffer, colors.size(), i, 8);
-    }
+    WriteColor16Array(file, colors, 8, params.device == "GBA");
     WriteEndArray(file);
     WriteNewLine(file);
 }
@@ -205,14 +200,7 @@ std::ostream& operator<<(std::ostream& file, const PaletteBank& bank)
 {
     std::vector<Color16> colors = bank.GetColors();
     colors.resize(16);
-
-    char buffer[7];
-    for (unsigned int i = 0; i < colors.size(); i++)
-    {
-        snprintf(buffer, 7, "0x%04x", colors[i].ToGBAShort());
-        WriteElement(file, buffer, colors.size(), i, 8);
-    }
-
+    WriteColor16Array(file, colors, 8, params.device == "GBA");
     return file;
 }
 

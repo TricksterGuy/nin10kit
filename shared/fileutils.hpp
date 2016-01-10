@@ -15,6 +15,8 @@ void WriteElement(std::ostream& file, const std::string& data, unsigned int size
 void WriteBeginArray(std::ostream& file, const std::string& type, const std::string& name, const std::string& append, unsigned int size);
 void WriteEndArray(std::ostream& file);
 
+void WriteColor16Array(std::ostream& file, const std::vector<Color16>& pixels, int colors_per_row, bool is_gba);
+
 void WriteShortArray(std::ostream& file, const std::string& name, const std::string& append,
                      const std::vector<unsigned short>& data, unsigned int items_per_row);
 void WriteShortArray(std::ostream& file, const std::string& name, const std::string& append,

@@ -420,7 +420,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     std::string export_file = parser.GetParam(0).ToStdString();
     params.export_file = Chop(export_file);
     params.filename = params.output_dir.empty() ? export_file : params.output_dir + Chop(export_file);
-    params.symbol_base_name = Sanitize(export_file);
+    params.symbol_base_name = Sanitize(params.export_file);
     InfoLog("Exporting to %s symbol base name is %s", params.filename.c_str(), params.symbol_base_name.c_str());
 
     // get unnamed parameters

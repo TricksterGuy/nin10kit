@@ -14,8 +14,10 @@ ENDIF(ENABLE_DEBUG)
 
 IF(ENABLE_MAGICK7_SUPPORT)
     add_definitions(-DMAGICK7_SUPPORT)
+    add_definitions(-DMAGICKCORE_HDRI_ENABLE=1 -DMAGICKCORE_QUANTUM_DEPTH=16)
 ELSE()
     add_definitions(-DMAGICK6_SUPPORT)
+    add_definitions(-DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16)
 ENDIF(ENABLE_MAGICK7_SUPPORT)
 set(CMAKE_SKIP_RPATH TRUE)
 
@@ -73,8 +75,6 @@ find_package(ImageMagick COMPONENTS Magick++ MagickWand MagickCore REQUIRED)
 include_directories(${nin10kit_SOURCE_DIR}/shared)
 include_directories(${ImageMagick_INCLUDE_DIRS})
 link_directories(${nin10kit_SOURCE_DIR}/shared)
-
-add_definitions(-DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16)
 
 add_library(
     shared_files

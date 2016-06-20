@@ -36,11 +36,11 @@ public:
 #ifdef MAGICK7_SUPPORT
         r = g = b = a = 0;
         const Magick::Quantum* loc = constPixels + index * channels;
-        r = loc[0] >> (depth - 8) & 0xFF;
-        g = loc[1] >> (depth - 8) & 0xFF;
-        b = loc[2] >> (depth - 8) & 0xFF;
+        r = ((unsigned int) loc[0]) >> (depth - 8) & 0xFF;
+        g = ((unsigned int) loc[1]) >> (depth - 8) & 0xFF;
+        b = ((unsigned int) loc[2]) >> (depth - 8) & 0xFF;
         if (channels == 4)
-            a = loc[3] >> (depth - 8) & 0xFF;
+            a = ((unsigned int) loc[3]) >> (depth - 8) & 0xFF;
 #endif
     }
 

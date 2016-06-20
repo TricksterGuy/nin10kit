@@ -1,5 +1,16 @@
 #include "magick_interface.hpp"
 #include "logger.hpp"
+#include <algorithm>
+
+#ifdef MAGICK7_SUPPORT
+// Moan... Apparently these guys can be negative or outside quantum range
+unsigned int clamp_quantum(Magick::Quantum q, size_t depth)
+{
+    int ret = (int) q;
+    return std::min(std::max(0, ret), (1 << depth) - 1);
+}
+
+#endif // MAGICK7_SUPPORT
 
 class MagickImageDataWrapper
 {
@@ -36,11 +47,11 @@ public:
 #ifdef MAGICK7_SUPPORT
         r = g = b = a = 0;
         const Magick::Quantum* loc = constPixels + index * channels;
-        r = ((unsigned int) loc[0]) >> (depth - 8) & 0xFF;
-        g = ((unsigned int) loc[1]) >> (depth - 8) & 0xFF;
-        b = ((unsigned int) loc[2]) >> (depth - 8) & 0xFF;
+        r = clamp_quantum(loc[0], depth) >> (depth - 8) & 0xFF;
+        g = clamp_quantum(loc[1], depth) >> (depth - 8) & 0xFF;
+        b = clamp_quantum(loc[2], depth) >> (depth - 8) & 0xFF;
         if (channels == 4)
-            a = ((unsigned int) loc[3]) >> (depth - 8) & 0xFF;
+            a = clamp_quantum(loc[3], depth) >> (depth - 8) & 0xFF;
 #endif
     }
 

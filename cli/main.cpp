@@ -17,6 +17,7 @@
 #include "cmd-line-parser-helper.hpp"
 #include "cpercep.hpp"
 #include "headerfile.hpp"
+#include "export_params.hpp"
 #include "fileutils.hpp"
 #include "implementationfile.hpp"
 #include "logger.hpp"

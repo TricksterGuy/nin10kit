@@ -1,6 +1,7 @@
 #include <memory>
 #include <vector>
 
+#include "export_params.hpp"
 #include "fileutils.hpp"
 #include "lutgen.hpp"
 #include "shared.hpp"

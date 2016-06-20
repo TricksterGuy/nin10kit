@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <sstream>
 
+#include "export_params.hpp"
 #include "fileutils.hpp"
 #include "logger.hpp"
 #include "scanner.hpp"

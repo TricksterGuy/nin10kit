@@ -4,6 +4,7 @@
 #include <ctime>
 #include <sstream>
 
+#include "export_params.hpp"
 #include "scene.hpp"
 #include "shared.hpp"
 #include "version.h"

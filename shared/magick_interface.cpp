@@ -1,61 +1,98 @@
 #include "magick_interface.hpp"
 #include "logger.hpp"
 
-Magick::Color ToMagickColor(const Color& color)
+class MagickImageDataWrapper
 {
+public:
+    MagickImageDataWrapper(const Magick::Image& image) : constPixels(image.getConstPixels(0, 0, image.columns(), image.rows()))
+    {
+#ifdef MAGICK6_SUPPORT
+        alpha_mask = image.matte() ? 0 : 0xFF;
+#endif
+        MagickCore::GetMagickQuantumDepth(&depth);
+        if (depth != 8 && depth != 16)
+            FatalLog("Image quantum not supported");
+        channels = image.channels();
+    }
+    MagickImageDataWrapper(Magick::Image& img) : pixels(img.getPixels(0, 0, img.columns(), img.rows()))
+    {
+#ifdef MAGICK6_SUPPORT
+        alpha_mask = image.matte() ? 0 : 0xFF;
+#endif
+        MagickCore::GetMagickQuantumDepth(&depth);
+        if (depth != 8 && depth != 16)
+            FatalLog("Image quantum not supported");
+        channels = img.channels();
+    }
+    void getPixel(int index, unsigned char& r, unsigned char& g, unsigned char& b, unsigned char& a) const
+    {
+#ifdef MAGICK6_SUPPORT
+        const Magick::PixelPacket& p = constPixels[index];
+        r = p.red >> (depth - 8) & 0xFF;
+        g = p.green >> (depth - 8) & 0xFF;
+        b = p.blue >> (depth - 8) & 0xFF;
+        a = (0xff - (packet.opacity >> (depth - 8) & 0xFF)) | alpha_mask;
+#endif
+#ifdef MAGICK7_SUPPORT
+        r = g = b = a = 0;
+        const Magick::Quantum* loc = constPixels + index * channels;
+        r = loc[0] >> (depth - 8) & 0xFF;
+        g = loc[1] >> (depth - 8) & 0xFF;
+        b = loc[2] >> (depth - 8) & 0xFF;
+        if (channels == 4)
+            a = loc[3] >> (depth - 8) & 0xFF;
+#endif
+    }
+
+    void setPixel(int index, const Color& color)
+    {
+#ifdef MAGICK6_SUPPORT
+        const Magick::PixelPacket& p = pixels[index];
+        p.red = color.r << (depth - 8);
+        p.green = color.g << (depth - 8);
+        p.blue = color.b << (depth - 8);
+#endif
+#ifdef MAGICK7_SUPPORT
+        Magick::Quantum* loc = pixels + index * channels;
+        loc[0] = color.r << (depth - 8);
+        loc[1] = color.g << (depth - 8);
+        loc[2] = color.b << (depth - 8);
+#endif
+    }
+private:
+#ifdef MAGICK6_SUPPORT
+    const Magick::PixelPacket* constPixels;
+    Magick::PixelPacket* pixels;
+    unsigned char alpha_mask;
+#endif
+#ifdef MAGICK7_SUPPORT
+    const Magick::Quantum* constPixels;
+    Magick::Quantum* pixels;
+#endif
+    size_t channels;
     size_t depth;
-    MagickCore::GetMagickQuantumDepth(&depth);
-    const unsigned int shift = 16 - depth;
-    return Magick::Color(color.r << shift, color.g << shift, color.b << shift);
-}
+};
 
 void CopyMagickPixels(const Magick::Image& image, std::vector<Color>& out)
 {
     unsigned int num_pixels = image.rows() * image.columns();
-    const Magick::PixelPacket* imageData = image.getConstPixels(0, 0, image.columns(), image.rows());
-
-    size_t depth;
-    MagickCore::GetMagickQuantumDepth(&depth);
-    unsigned char alpha_mask = image.matte() ? 0 : 0xFF;
+    MagickImageDataWrapper imageData(image);
     for (unsigned int i = 0; i < num_pixels; i++)
     {
-        const Magick::PixelPacket& packet = imageData[i];
         unsigned char r, g, b, a;
-        if (depth == 8)
-        {
-            r = packet.red;
-            g = packet.green;
-            b = packet.blue;
-            a = 0xff - packet.opacity;
-        }
-        else if (depth == 16)
-        {
-            r = (packet.red >> 8) & 0xFF;
-            g = (packet.green >> 8) & 0xFF;
-            b = (packet.blue >> 8) & 0xFF;
-            a = 0xff - ((packet.opacity >> 8) & 0xFF);
-        }
-        else
-        {
-            // To get rid of warning
-            b = g = r = a = 0;
-            FatalLog("Image quantum not supported");
-        }
-
-        out.emplace_back(r, g, b, a | alpha_mask);
+        imageData.getPixel(i, r, g, b, a);
+        out.emplace_back(r, g, b, a);
     }
 }
 
 Magick::Image ToMagick(const Image32Bpp& image)
 {
     Magick::Image ret(Magick::Geometry(image.width, image.height), Magick::Color(0, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, image.width, image.height);
+    MagickImageDataWrapper imageData(ret);
     for (unsigned int i = 0; i < image.height; i++)
     {
         for (unsigned int j = 0; j < image.width; j++)
-        {
-            packet[i * image.width + j] = ToMagickColor(image.pixels[i * image.width + j]);
-        }
+            imageData.setPixel(i * image.width + j, image.pixels[i * image.width + j]);
     }
     ret.syncPixels();
     return ret;
@@ -64,13 +101,11 @@ Magick::Image ToMagick(const Image32Bpp& image)
 Magick::Image ToMagick(const Image16Bpp& image)
 {
     Magick::Image ret(Magick::Geometry(image.width, image.height), Magick::Color(0, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, image.width, image.height);
+    MagickImageDataWrapper imageData(ret);
     for (unsigned int i = 0; i < image.height; i++)
     {
         for (unsigned int j = 0; j < image.width; j++)
-        {
-            packet[i * image.width + j] = ToMagickColor(image.pixels[i * image.width + j].ToColor());
-        }
+            imageData.setPixel(i * image.width + j, image.pixels[i * image.width + j].ToColor());
     }
     ret.syncPixels();
     return ret;
@@ -79,13 +114,11 @@ Magick::Image ToMagick(const Image16Bpp& image)
 Magick::Image ToMagick(const Image8Bpp& image)
 {
     Magick::Image ret(Magick::Geometry(image.width, image.height), Magick::Color(0, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, image.width, image.height);
+    MagickImageDataWrapper imageData(ret);
     for (unsigned int i = 0; i < image.height; i++)
     {
         for (unsigned int j = 0; j < image.width; j++)
-        {
-            packet[i * image.width + j] = ToMagickColor(image.palette->At(image.pixels[i * image.width + j]).ToColor());
-        }
+            imageData.setPixel(i * image.width + j, image.palette->At(image.pixels[i * image.width + j]).ToColor());
     }
     ret.syncPixels();
     return ret;
@@ -94,10 +127,10 @@ Magick::Image ToMagick(const Image8Bpp& image)
 Magick::Image ToMagick(const Palette& palette)
 {
     Magick::Image ret(Magick::Geometry(16, 16), Magick::Color(0, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, 16, 16);
+    MagickImageDataWrapper imageData(ret);
     const std::vector<Color16>& colors = palette.GetColors();
     for (unsigned int i = 0; i < colors.size(); i++)
-        packet[i] = ToMagickColor(colors[i].ToColor());
+        imageData.setPixel(i, colors[i].ToColor());
     ret.syncPixels();
     return ret;
 }
@@ -105,13 +138,12 @@ Magick::Image ToMagick(const Palette& palette)
 Magick::Image ToMagick(const PaletteBankManager& paletteBanks)
 {
     Magick::Image ret(Magick::Geometry(16, 16), Magick::Color(0, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, 16, 16);
+    MagickImageDataWrapper imageData(ret);
     for (unsigned int i = 0; i < paletteBanks.banks.size(); i++)
     {
         const std::vector<Color16>& colors = paletteBanks.banks[i].GetColors();
         for (unsigned int j = 0; j < colors.size(); i++)
-            packet[i] = ToMagickColor(colors[i].ToColor());
-
+            imageData.setPixel(i, colors[j].ToColor());
     }
     ret.syncPixels();
     return ret;
@@ -125,7 +157,7 @@ Magick::Image ToMagick(const Tileset& tileset)
     const int height = tilesY * 8;
     const std::vector<Tile>& tiles = tileset.tilesExport;
     Magick::Image ret(Magick::Geometry(width, height), Magick::Color(0, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, width, height);
+    MagickImageDataWrapper imageData(ret);
 
     if (tileset.bpp == 4)
     {
@@ -138,7 +170,7 @@ Magick::Image ToMagick(const Tileset& tileset)
             for (unsigned int j = 0; j < TILE_SIZE; j++)
             {
                 unsigned char pix = tile.pixels[j];
-                packet[sx + j % 8 + (sy + j / 8) * width] = ToMagickColor(palette.At(pix).ToColor());
+                imageData.setPixel(sx + j % 8 + (sy + j / 8) * width, palette.At(pix).ToColor());
             }
         }
     }
@@ -153,7 +185,7 @@ Magick::Image ToMagick(const Tileset& tileset)
             for (unsigned int j = 0; j < TILE_SIZE; j++)
             {
                 unsigned char pix = tile.pixels[j];
-                packet[sx + j % 8 + (sy + j / 8) * width] = ToMagickColor(palette.At(pix).ToColor());
+                imageData.setPixel(sx + j % 8 + (sy + j / 8) * width, palette.At(pix).ToColor());
             }
         }
     }
@@ -168,7 +200,7 @@ Magick::Image ToMagick(const Sprite& sprite, const std::vector<PaletteBank>& ban
     const int width = tilesX * 8;
     const int height = tilesY * 8;
     Magick::Image ret(Magick::Geometry(width, height), Magick::Color(0, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, width, height);
+    MagickImageDataWrapper imageData(ret);
 
     if (sprite.bpp == 4)
     {
@@ -181,7 +213,7 @@ Magick::Image ToMagick(const Sprite& sprite, const std::vector<PaletteBank>& ban
             for (unsigned int j = 0; j < TILE_SIZE; j++)
             {
                 unsigned char pix = tile.pixels[j];
-                packet[sx + j % 8 + (sy + j / 8) * width] = ToMagickColor(palette.At(pix).ToColor());
+                imageData.setPixel(sx + j % 8 + (sy + j / 8) * width, palette.At(pix).ToColor());
             }
         }
     }
@@ -196,7 +228,7 @@ Magick::Image ToMagick(const Sprite& sprite, const std::vector<PaletteBank>& ban
             for (unsigned int j = 0; j < TILE_SIZE; j++)
             {
                 unsigned char pix = tile.pixels[j];
-                packet[sx + j % 8 + (sy + j / 8) * width] = ToMagickColor(palette.At(pix).ToColor());
+                imageData.setPixel(sx + j % 8 + (sy + j / 8) * width, palette.At(pix).ToColor());
             }
         }
     }
@@ -211,7 +243,7 @@ Magick::Image ToMagick(const Map& map)
     const int width = tilesX * 8;
     const int height = tilesY * 8;
     Magick::Image ret(Magick::Geometry(width, height), Magick::Color(0, 0, 0));
-    Magick::PixelPacket* packet = ret.getPixels(0, 0, width, height);
+    MagickImageDataWrapper imageData(ret);
 
     const Tileset& tileset = *map.tileset;
     if (tileset.bpp == 4)
@@ -228,7 +260,7 @@ Magick::Image ToMagick(const Map& map)
             {
                 unsigned char pix = tile.pixels[j];
                 if (!pix) continue;
-                packet[sx + j % 8 + (sy + j / 8) * width] = ToMagickColor(palette.At(pix).ToColor());
+                imageData.setPixel(sx + j % 8 + (sy + j / 8) * width, palette.At(pix).ToColor());
             }
         }
     }
@@ -245,7 +277,7 @@ Magick::Image ToMagick(const Map& map)
             {
                 unsigned char pix = tile.pixels[j];
                 if (!pix) continue;
-                packet[sx + j % 8 + (sy + j / 8) * width] = ToMagickColor(palette.At(pix).ToColor());
+                imageData.setPixel(sx + j % 8 + (sy + j / 8) * width, palette.At(pix).ToColor());
             }
         }
     }

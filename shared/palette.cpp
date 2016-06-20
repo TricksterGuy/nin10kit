@@ -3,6 +3,7 @@
 #include <cstdio>
 
 #include "logger.hpp"
+#include "export_params.hpp"
 #include "fileutils.hpp"
 #include "shared.hpp"
 

@@ -2,7 +2,9 @@
 #include <set>
 #include <vector>
 
+#include "export_params.hpp"
 #include "fileutils.hpp"
+#include "image32.hpp"
 #include "logger.hpp"
 #include "shared.hpp"
 

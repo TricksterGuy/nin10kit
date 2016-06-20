@@ -82,8 +82,9 @@ wxBitmap MagickToBitmap(Magick::Image image, int width, int height)
     Magick::Geometry geom(width, height);
     geom.aspect(true);
     image.resize(geom);
-    unsigned char* rgb = static_cast<unsigned char*>(malloc(sizeof(char) * 3 * width * height));
-    image.write(0, 0, image.columns(), image.rows(), "RGB", Magick::CharPixel, rgb);
+    void* rgb = static_cast<unsigned char*>(malloc(sizeof(char) * 3 * width * height));
+    const std::string channels = "RGB";
+    image.write(0, 0, image.columns(), image.rows(), channels, Magick::CharPixel, rgb);
     return wxBitmap(wxImage(width, height, rgb));
 }
 

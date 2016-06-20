@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 
+#include "export_params.hpp"
 #include "fileutils.hpp"
 #include "shared.hpp"
 

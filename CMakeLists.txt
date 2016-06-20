@@ -3,6 +3,7 @@ project (nin10kit)
 include(FindPkgConfig)
 
 option(ENABLE_DEBUG "Build debug version" OFF)
+option(ENABLE_MAGICK7_SUPPORT "Support ImageMagick7 API instead of ImageMagick6" OFF)
 
 IF(ENABLE_DEBUG)
     set(CMAKE_CXX_FLAGS "-g -pg -Wall -std=c++11")
@@ -10,6 +11,12 @@ ELSE()
     set(CMAKE_CXX_FLAGS "-O3 -Wall -std=c++11")
     set(CMAKE_EXE_LINKER_FLAGS "-s")
 ENDIF(ENABLE_DEBUG)
+
+IF(ENABLE_MAGICK7_SUPPORT)
+    add_definitions(-DMAGICK7_SUPPORT)
+ELSE()
+    add_definitions(-DMAGICK6_SUPPORT)
+ENDIF(ENABLE_MAGICK7_SUPPORT)
 set(CMAKE_SKIP_RPATH TRUE)
 
 # Source files definition

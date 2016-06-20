@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "alltypes.hpp"
+#include "export_params.hpp"
 #include "fileutils.hpp"
 #include "logger.hpp"
 #include "shared.hpp"

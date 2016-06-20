@@ -1,6 +1,7 @@
 #include "tile.hpp"
 
 #include "logger.hpp"
+#include "export_params.hpp"
 #include "fileutils.hpp"
 #include "image16.hpp"
 #include "image8.hpp"

@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include "logger.hpp"
+#include "export_params.hpp"
 #include "fileutils.hpp"
 #include "image16.hpp"
 #include "image32.hpp"

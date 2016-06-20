@@ -143,6 +143,7 @@
 		<Unit filename="shared/dither.cpp" />
 		<Unit filename="shared/dither.hpp" />
 		<Unit filename="shared/ds-exporter.cpp" />
+		<Unit filename="shared/export_params.hpp" />
 		<Unit filename="shared/exportable.hpp" />
 		<Unit filename="shared/exportfile.cpp" />
 		<Unit filename="shared/exportfile.hpp" />
@@ -166,6 +167,8 @@
 		<Unit filename="shared/lut-exporter.cpp" />
 		<Unit filename="shared/lutgen.cpp" />
 		<Unit filename="shared/lutgen.hpp" />
+		<Unit filename="shared/magick_interface.cpp" />
+		<Unit filename="shared/magick_interface.hpp" />
 		<Unit filename="shared/map.cpp" />
 		<Unit filename="shared/map.hpp" />
 		<Unit filename="shared/mediancut.cpp" />

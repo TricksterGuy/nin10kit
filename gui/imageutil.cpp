@@ -1,5 +1,6 @@
 #include "imageutil.hpp"
 
+#include "export_params.hpp"
 #include "image16.hpp"
 #include "logger.hpp"
 

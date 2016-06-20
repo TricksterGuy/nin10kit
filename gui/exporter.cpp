@@ -3,6 +3,7 @@
 #include <wx/filename.h>
 #include <fstream>
 
+#include "export_params.hpp"
 #include "fileutils.hpp"
 #include "logger.hpp"
 #include "shared.hpp"

@@ -1,15 +1,6 @@
 nin10kit
 ========
 
-#Compiling from source via provided Makefiles
-You can run sudo ./setup.sh which does the tasks in the list below.
-
-1. Ensure you have a C++ compiler (sudo apt-get install build-essential)
-2. Install dependency wxWidgets 3.0 (sudo apt-get install libwxgtk3.0-dev)
-3. Install dependency Magick++ (sudo apt-get install libmagick++-dev libmagickcore-dev libmagickwand-dev)
-4. Build the program (make)
-5. Install the program (sudo make install)
-
 #Installing via apt-get (for ubuntu versions trusty and beyond)
 Execute these commands
 * sudo add-apt-repository ppa:tricksterguy87/ppa-gt-cs2110

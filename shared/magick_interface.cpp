@@ -23,17 +23,21 @@ public:
         MagickCore::GetMagickQuantumDepth(&depth);
         if (depth != 8 && depth != 16)
             FatalLog("Image quantum not supported");
+#ifdef MAGICK7_SUPPORT
         channels = image.channels();
+#endif
     }
     MagickImageDataWrapper(Magick::Image& img) : pixels(img.getPixels(0, 0, img.columns(), img.rows()))
     {
 #ifdef MAGICK6_SUPPORT
-        alpha_mask = image.matte() ? 0 : 0xFF;
+        alpha_mask = img.matte() ? 0 : 0xFF;
 #endif
         MagickCore::GetMagickQuantumDepth(&depth);
         if (depth != 8 && depth != 16)
             FatalLog("Image quantum not supported");
+#ifdef MAGICK7_SUPPORT
         channels = img.channels();
+#endif
     }
     void getPixel(int index, unsigned char& r, unsigned char& g, unsigned char& b, unsigned char& a) const
     {
@@ -42,7 +46,7 @@ public:
         r = p.red >> (depth - 8) & 0xFF;
         g = p.green >> (depth - 8) & 0xFF;
         b = p.blue >> (depth - 8) & 0xFF;
-        a = (0xff - (packet.opacity >> (depth - 8) & 0xFF)) | alpha_mask;
+        a = (0xff - (p.opacity >> (depth - 8) & 0xFF)) | alpha_mask;
 #endif
 #ifdef MAGICK7_SUPPORT
         r = g = b = a = 0;
@@ -58,7 +62,7 @@ public:
     void setPixel(int index, const Color& color)
     {
 #ifdef MAGICK6_SUPPORT
-        const Magick::PixelPacket& p = pixels[index];
+        Magick::PixelPacket& p = pixels[index];
         p.red = color.r << (depth - 8);
         p.green = color.g << (depth - 8);
         p.blue = color.b << (depth - 8);

@@ -57,6 +57,12 @@ public:
         if (channels == 4)
             a = clamp_quantum(loc[3], depth) >> (depth - 8) & 0xFF;
 #endif
+        if (a == 0)
+        {
+            r = 0;
+            g = 0;
+            b = 0;
+        }
     }
 
     void setPixel(int index, const Color& color)

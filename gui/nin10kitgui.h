@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun  6 2014)
+// C++ code generated with wxFormBuilder (version Feb 16 2016)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -44,6 +44,7 @@ class Nin10KitGUI : public wxFrame
 		wxPanel* m_panel1;
 		wxListCtrl* imagesList;
 		wxPanel* m_panel2;
+		wxStaticText* m_staticText71;
 		wxStaticText* m_staticText7;
 		wxChoice* mode;
 		wxButton* m_button2;

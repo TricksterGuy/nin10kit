@@ -83,7 +83,8 @@ void AbstractLogger::Log(LogLevel level, const char* format, va_list ap)
     if (log_time)
     {
         std::chrono::time_point<std::chrono::system_clock> time_now(std::chrono::system_clock::now());
-        (*out) << GetLogColor(level) << GetLogAbbrev(level) << "[" << time_to_string(time_now) << "]" << EndLogColor();
+		std::string curtime = time_to_string(time_now);
+        (*out) << GetLogColor(level) << GetLogAbbrev(level) << "[" << curtime.c_str() << "]" << EndLogColor();
     }
 
     DoLog(level, format, ap);

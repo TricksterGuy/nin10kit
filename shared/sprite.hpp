@@ -49,7 +49,7 @@ class BlockSize
         bool operator==(const BlockSize& rhs) const;
         bool operator<(const BlockSize& rhs) const;
         unsigned int Size() const {return width * height;};
-        bool IsBiggestSize() const {return width == 8 and height == 8;};
+        bool IsBiggestSize() const {return width == 8 && height == 8;};
         static std::vector<BlockSize> BiggerSizes(const BlockSize& b);
         unsigned int width, height;
 };

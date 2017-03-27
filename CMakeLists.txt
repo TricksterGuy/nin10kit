@@ -101,7 +101,7 @@ set(SRC_NIN10KITGUI
 
 find_package(wxWidgets REQUIRED core base)
 include(${wxWidgets_USE_FILE})
-find_package(ImageMagick COMPONENTS Magick++ MagickWand MagickCore REQUIRED)
+pkg_check_modules(ImageMagick Magick++ MagickWand MagickCore)
 
 include_directories(${nin10kit_SOURCE_DIR}/shared)
 include_directories(${ImageMagick_INCLUDE_DIRS})

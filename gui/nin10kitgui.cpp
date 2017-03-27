@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun  6 2014)
+// C++ code generated with wxFormBuilder (version Feb 16 2016)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -37,8 +37,12 @@ Nin10KitGUI::Nin10KitGUI( wxWindow* parent, wxWindowID id, const wxString& title
 	wxBoxSizer* bSizer5;
 	bSizer5 = new wxBoxSizer( wxHORIZONTAL );
 
+	m_staticText71 = new wxStaticText( m_panel2, wxID_ANY, _("Warning: Do not edit loaded images here with another program. Delete the image before edting!"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText71->Wrap( -1 );
+	bSizer5->Add( m_staticText71, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	bSizer3->Add( bSizer5, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 0 );
+
+	bSizer3->Add( bSizer5, 0, wxALIGN_CENTER_HORIZONTAL, 0 );
 
 	wxBoxSizer* bSizer6;
 	bSizer6 = new wxBoxSizer( wxHORIZONTAL );
@@ -47,7 +51,7 @@ Nin10KitGUI::Nin10KitGUI( wxWindow* parent, wxWindowID id, const wxString& title
 	m_staticText7->Wrap( -1 );
 	bSizer6->Add( m_staticText7, 0, wxALL|wxALIGN_CENTER_VERTICAL, 8 );
 
-	wxString modeChoices[] = { _("GBA Mode 3 Bitmap"), _("GBA Mode 4 Bitmap with Palette"), _("GBA Mode 0 - 8 Bpp Map, Tileset, and Palette"), _("GBA Mode 0 - 4 Bpp Map, Tileset, and Palette Banks"), _("GBA Sprites - 8 Bpp Sprites and Palette"), _("GBA Sprites - 4 Bpp Sprites and Palette Banks"), _("GBA Sprites (Mode 3) - 8 Bpp Sprites and Palette"), _("GBA Sprites (Mode 3) - 4 Bpp Sprites and Palette Banks") };
+	wxString modeChoices[] = { _("GBA Mode 3 Bitmap"), _("GBA Mode 4 Bitmap with Palette"), _("GBA Mode 0 Map, Tileset, and Palette (8 Bpp)"), _("GBA Mode 0 Map, Tileset, and Palette Banks (4 Bpp)"), _("GBA Sprites with Palette for Tiled Modes (8 Bpp)"), _("GBA Sprites with Palette Banks for Tiled Modes (4 Bpp)"), _("GBA Sprites with Palette for Bitmap Modes (8 Bpp)"), _("GBA Sprites with Palette Banks for Bitmap Modes (4 Bpp)") };
 	int modeNChoices = sizeof( modeChoices ) / sizeof( wxString );
 	mode = new wxChoice( m_panel2, wxID_ANY, wxDefaultPosition, wxDefaultSize, modeNChoices, modeChoices, 0 );
 	mode->SetSelection( 0 );
@@ -89,37 +93,39 @@ Nin10KitGUI::Nin10KitGUI( wxWindow* parent, wxWindowID id, const wxString& title
 	fgSizer2->SetFlexibleDirection( wxBOTH );
 	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_staticText1 = new wxStaticText( m_panel2, wxID_ANY, _("Filename:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1 = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("Filename:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1->Wrap( -1 );
 	fgSizer2->Add( m_staticText1, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL, 8 );
 
-	imageFilename = new wxTextCtrl( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	imageFilename = new wxTextCtrl( sbSizer1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+
 	fgSizer2->Add( imageFilename, 0, wxALL|wxEXPAND, 8 );
 
-	m_staticText3 = new wxStaticText( m_panel2, wxID_ANY, _("Name:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText3 = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("Name:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText3->Wrap( -1 );
 	fgSizer2->Add( m_staticText3, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL, 8 );
 
-	imageName = new wxTextCtrl( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	imageName = new wxTextCtrl( sbSizer1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+
 	fgSizer2->Add( imageName, 0, wxEXPAND|wxALL, 8 );
 
-	m_staticText5 = new wxStaticText( m_panel2, wxID_ANY, _("Size (W x H):"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText5 = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("Size (W x H):"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText5->Wrap( -1 );
 	fgSizer2->Add( m_staticText5, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 8 );
 
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxHORIZONTAL );
 
-	imageWidth = new wxSpinCtrl( m_panel2, wxID_ANY, wxT("0"), wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 0, 8192, 0 );
+	imageWidth = new wxSpinCtrl( sbSizer1->GetStaticBox(), wxID_ANY, wxT("0"), wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 0, 8192, 0 );
 	imageWidth->SetMaxSize( wxSize( 80,-1 ) );
 
 	bSizer4->Add( imageWidth, 0, wxALL, 8 );
 
-	m_staticText6 = new wxStaticText( m_panel2, wxID_ANY, _("X"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText6 = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("X"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText6->Wrap( -1 );
 	bSizer4->Add( m_staticText6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 8 );
 
-	imageHeight = new wxSpinCtrl( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 8192, 0 );
+	imageHeight = new wxSpinCtrl( sbSizer1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 8192, 0 );
 	imageHeight->SetMaxSize( wxSize( 80,-1 ) );
 
 	bSizer4->Add( imageHeight, 0, wxALL, 8 );
@@ -127,11 +133,11 @@ Nin10KitGUI::Nin10KitGUI( wxWindow* parent, wxWindowID id, const wxString& title
 
 	fgSizer2->Add( bSizer4, 1, wxEXPAND, 5 );
 
-	m_staticText4 = new wxStaticText( m_panel2, wxID_ANY, _("Animated:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText4 = new wxStaticText( sbSizer1->GetStaticBox(), wxID_ANY, _("Animated:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText4->Wrap( -1 );
 	fgSizer2->Add( m_staticText4, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL, 8 );
 
-	imageAnimated = new wxCheckBox( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	imageAnimated = new wxCheckBox( sbSizer1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	imageAnimated->Enable( false );
 
 	fgSizer2->Add( imageAnimated, 0, wxALL, 5 );
@@ -142,10 +148,10 @@ Nin10KitGUI::Nin10KitGUI( wxWindow* parent, wxWindowID id, const wxString& title
 	wxGridSizer* gSizer2;
 	gSizer2 = new wxGridSizer( 0, 2, 0, 0 );
 
-	m_button6 = new wxButton( m_panel2, wxID_ANY, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button6 = new wxButton( sbSizer1->GetStaticBox(), wxID_ANY, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
 	gSizer2->Add( m_button6, 0, wxALL, 8 );
 
-	m_button1 = new wxButton( m_panel2, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button1 = new wxButton( sbSizer1->GetStaticBox(), wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	gSizer2->Add( m_button1, 0, wxALL, 8 );
 
 

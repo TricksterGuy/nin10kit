@@ -162,8 +162,12 @@ void Nin10KitFrame::OnExport(wxCommandEvent& event)
         }
     } while (!save_ok);
 
-    InfoLog("Saving exported file to %s", filename.c_str());
+    InfoLog("Exporting the following files to %s", filename.c_str());
+    for (const auto& exfilename : filenames)
+        InfoLog("%s", exfilename.c_str());
+
     DoExport(mode->GetSelection(), filename, filenames, images);
+    InfoLog("Export completed successfully");
 }
 
 void Nin10KitFrame::OnView(wxCommandEvent& event)

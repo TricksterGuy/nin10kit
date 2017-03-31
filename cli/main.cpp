@@ -133,7 +133,7 @@ struct HelpDesc
 // Help text
 const std::map<std::string, HelpDesc> help_text = {
 {"help", HelpDesc("one of command_line_flag, formats, basic, all","Display help on command line option.")},
-{"log", HelpDesc("number [0-4]", "Logging level (0=fatal,1=error,2=warn,3=info,4=verbose) default 3\n"
+{"log", HelpDesc("number [0-4]", "Logging level (0=fatal,1=error,2=warn,3=info,4=verbose). Default 3\n"
                                  "Any logging messages above the logging level will not be displayed.")},
 {"mode", HelpDesc("one of 0, 3, 4, palette, tiles, map, sprites, lut",
                   "Sets the mode to export to.\n"
@@ -149,7 +149,7 @@ const std::map<std::string, HelpDesc> help_text = {
                                             "GBA uses 16 bit color 0BGR 5 bits each for blue green and red.\n"
                                             "DS uses 16 bit color ABGR 5 bits each for blue green and red and A is 1 bit of transparency 1=opaque 0=transparent.\n"
                                             "3DS uses 32? bit color ABGR 8 bits for each channel.")},
-{"bpp", HelpDesc("number 4 or 8", "Bits per pixel for modes 0, tiles, map, and sprites default 8.")},
+{"bpp", HelpDesc("number 4 or 8", "Bits per pixel for modes 0, tiles, map, and sprites. Default 8.")},
 {"func", HelpDesc("function_name,type,start,end,step[,in_degrees]",
                   "For use with mode lut only adds lookup table for function\n"
                   "function_name: name of the function to generate a lut for see - http://www.cplusplus.com/reference/cmath/\n"
@@ -215,9 +215,9 @@ const std::map<std::string, HelpDesc> help_text = {
                                                      "\tExport the images using -mode=mode with -palette_image=palette_image")},
 {"border", HelpDesc("number", "Border around each tile in tileset image\n"
                               "Only for use with -mode=tiles")},
-{"export_2d", HelpDesc("0 or 1", "Exports sprites for use in sprite 2d mode default 0.")},
-{"for_bitmap", HelpDesc("0 or 1", "Exports sprites for use in modes 3 and 4 default 0.")},
-{"3ds_rotate", HelpDesc("0 or 1", "Rotates the image for use in 3ds framebuffer mode, default 0.")},
+{"export_2d", HelpDesc("0 or 1", "Exports sprites for use in sprite 2d mode. Default 0.")},
+{"for_bitmap", HelpDesc("0 or 1", "Exports sprites for use in modes 3 and 4. Default 0.")},
+{"3ds_rotate", HelpDesc("0 or 1", "Rotates the image for use in 3ds framebuffer mode. Default 0.")},
 {"export_images", HelpDesc("0 or 1", "In addition to generating a .c.h pair\n"
                                      "\texport images of each array generated as if it were displayed on the gba.\n"
                                      "\tThis means in a mode 4 export you will get a palette image showing the palette.\n"

@@ -1,13 +1,16 @@
 nin10kit
 ========
 
-#Installing via apt-get (for ubuntu versions trusty and beyond)
+# Installing via apt-get
+
+These instructions will only work on non EOL'd versions of ubuntu starting with trusty.
 Execute these commands
+
 * sudo add-apt-repository ppa:tricksterguy87/ppa-gt-cs2110
 * sudo apt-get update
 * sudo apt-get install nin10kit
 
-#Compiling with CMake
+# Compiling with CMake
 
 To compile this program you will need the following things installed
 

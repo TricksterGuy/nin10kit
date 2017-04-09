@@ -102,12 +102,12 @@ set(SRC_NIN10KITGUI
 find_package(wxWidgets REQUIRED core base)
 include(${wxWidgets_USE_FILE})
 
-if(APPLE)
-    message(STATUS "The platform appears to be macOS, so using pkg-config to find ImageMagick.")
+if(APPLE OR WIN32)
+    message(STATUS "The platform appears to be macOS or windows, so using pkg-config to find ImageMagick.")
     pkg_check_modules(ImageMagick Magick++ MagickWand MagickCore)
 else()
     find_package(ImageMagick COMPONENTS Magick++ MagickWand MagickCore REQUIRED)
-endif(APPLE)
+endif(APPLE OR WIN32)
 
 include_directories(${nin10kit_SOURCE_DIR}/shared)
 include_directories(${ImageMagick_INCLUDE_DIRS})

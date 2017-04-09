@@ -56,6 +56,8 @@ public:
         b = clamp_quantum(loc[2], depth) >> (depth - 8) & 0xFF;
         if (channels == 4)
             a = clamp_quantum(loc[3], depth) >> (depth - 8) & 0xFF;
+        else
+            a = 0xFF;
 #endif
         if (a == 0)
         {

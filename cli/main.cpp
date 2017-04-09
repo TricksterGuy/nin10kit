@@ -43,6 +43,7 @@ void PrintMagickFormats(void)
 {
     MagickCore::ExceptionInfo* exception = MagickCore::AcquireExceptionInfo();
     MagickCore::ListMagickInfo((FILE *)NULL, exception);
+    CatchException(exception);
     exception = MagickCore::DestroyExceptionInfo(exception);
 }
 

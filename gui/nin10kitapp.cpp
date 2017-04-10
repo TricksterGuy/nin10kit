@@ -20,7 +20,6 @@ int main(int argc, char** argv)
     magick.SetFullName("magick");
     Magick::InitializeMagick(magick.GetFullPath().ToStdString().c_str());
     MagickCore::SetClientPath(magick.GetFullPath().ToStdString().c_str());
-    printf("%s %s\n", MagickCore::GetClientPath(), MagickCore::GetClientName());
 #else
     Magick::InitializeMagick(*argv);
 #endif

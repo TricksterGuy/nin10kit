@@ -1,6 +1,7 @@
 #include "nin10kitapp.hpp"
 #include <wx/config.h>
 #include <wx/dialog.h>
+#include <wx/filename.h>
 #include <Magick++.h>
 
 #include "cmd-line-parser-helper.hpp"
@@ -12,7 +13,17 @@ IMPLEMENT_APP_NO_MAIN(Nin10KitApp);
 int main(int argc, char** argv)
 {
     logger.reset(new LoggerWx());
+#ifdef _WIN32
+    // InitializeMagick doesn't seem to play nice...
+    // Plus *argv is just the application binary name not a full path.
+    wxFileName magick = wxFileName::DirName(wxFileName::GetCwd());
+    magick.SetFullName("magick");
+    Magick::InitializeMagick(magick.GetFullPath().ToStdString().c_str());
+    MagickCore::SetClientPath(magick.GetFullPath().ToStdString().c_str());
+    printf("%s %s\n", MagickCore::GetClientPath(), MagickCore::GetClientName());
+#else
     Magick::InitializeMagick(*argv);
+#endif
     cpercep_init();
 
     wxEntryStart(argc, argv);

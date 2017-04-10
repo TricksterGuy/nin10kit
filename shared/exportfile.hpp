@@ -27,6 +27,8 @@ class ExportFile
         void AddLutInfo(const LutSpecification& spec);
         void Add(std::shared_ptr<Exportable>& image);
 
+        void Clear();
+
         virtual void Write(std::ostream& file);
 
     private:

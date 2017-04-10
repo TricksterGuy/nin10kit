@@ -121,3 +121,15 @@ std::map<std::string, std::vector<Image*>> ExportFile::GetAnimatedImages() const
     }
     return ret;
 }
+
+void ExportFile::Clear()
+{
+    invocation = "";
+    lines.clear();
+    imageInfos.clear();
+    tilesets.clear();
+    luts.clear();
+    transparent_color = 0;
+    mode = "";
+    exportables.clear();
+}

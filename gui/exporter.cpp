@@ -62,7 +62,7 @@ void GetModeInfo(int prog_mode, std::string& mode, std::string& device, int& bpp
     }
 }
 
-void DoExport(int mode, const std::string& filename, std::vector<std::string>& filenames, std::map<std::string, ImageInfo>& images)
+void DoExport(int mode, const std::string& filename, const std::vector<std::string>& filenames, const std::map<std::string, ImageInfo>& images)
 {
     GetModeInfo(mode, params.mode, params.device, params.bpp, params.for_bitmap);
 
@@ -90,9 +90,16 @@ void DoExport(int mode, const std::string& filename, std::vector<std::string>& f
 
     params.images.clear();
     params.names.clear();
+    params.functions.clear();
+    params.tilesets.clear();
+    params.palettes.clear();
+    params.tileset_images.clear();
+    params.palette_images.clear();
+    params.resizes.clear();
+
     for (const auto& filename : filenames)
     {
-        ImageInfo& info = images.at(filename);
+        const ImageInfo& info = images.at(filename);
         params.names.push_back(info.GetName());
         for (auto image : info.GetImages())
         {
@@ -130,4 +137,7 @@ void DoExport(int mode, const std::string& filename, std::vector<std::string>& f
 
     file_h.close();
     file_c.close();
+
+    header.Clear();
+    implementation.Clear();
 }

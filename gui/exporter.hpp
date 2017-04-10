@@ -16,6 +16,6 @@ enum Mode
 };
 
 void GetModeInfo(int prog_mode, std::string& mode, std::string& device, int& bpp, bool& sprites_for_bitmap);
-void DoExport(int mode, const std::string& filename, std::vector<std::string>& filenames, std::map<std::string, ImageInfo>& images);
+void DoExport(int mode, const std::string& filename, const std::vector<std::string>& filenames, const std::map<std::string, ImageInfo>& images);
 
 #endif

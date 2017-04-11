@@ -1,5 +1,5 @@
 # nin10kit
-(Formerly brandontools)
+(Formerly [brandontools](https://github.com/TricksterGuy/brandontools))
 
 A set of tools for doing homebrew game development, includes look up table generators and and image to C exporter for Nintendo's Gameboy Advance, DS, and 3DS systems. In addition the GUI version of the program allows you to see what the image would look like on a real gameboy advance before exporting.
 

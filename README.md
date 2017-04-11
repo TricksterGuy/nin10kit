@@ -1,9 +1,10 @@
 nin10kit
 ========
 
-# Installing via apt-get
+# Ubuntu/Debian Based Systems
+## Installing via apt-get
 
-These instructions will only work on non EOL'd versions of ubuntu starting with trusty.
+These instructions will only work on non EOL'd versions of ubuntu and derivatives starting with trusty.
 
 Execute these commands
 
@@ -11,8 +12,9 @@ Execute these commands
 * sudo apt-get update
 * sudo apt-get install nin10kit
 
-# Compiling with CMake
+## Compiling with CMake
 
+These instructions will work only on linux based systems, instructions assume a debian based system.
 To compile this program you will need the following things installed
 
 * Cmake (sudo apt-get install cmake)
@@ -24,3 +26,15 @@ To compile this program you will need the following things installed
 3. Then make to build the binaries
 4. Then sudo make install to install the binaries
 
+# Windows
+## Using precompiled binaries.
+Available in [Releases](https://github.com/TricksterGuy/nin10kit/releases).  Binaries are compiled in msys2+mingw and compiler gcc
+
+## Compiling with CMake
+Coming soon maybe?  Its kinda a bother though.
+
+# MacOSX
+## Installing via Homebrew
+Contributed by [skyman](https://github.com/skyman)
+
+brew install skyman/gt/nin10kit

@@ -13,6 +13,13 @@ enum Mode
     GBASprites4Bpp,
     GBAMode3Sprites8Bpp,
     GBAMode3Sprites4Bpp,
+    NDSBitmap,
+    NDSIndexedBitmap,
+    NDSMap8Bpp,
+    NDSMap4Bpp,
+    NDSSprites8Bpp,
+    NDSSprites4Bpp,
+
 };
 
 void GetModeInfo(int prog_mode, std::string& mode, std::string& device, int& bpp, bool& sprites_for_bitmap);

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb 16 2016)
+// C++ code generated with wxFormBuilder (version Apr 10 2017)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -44,11 +44,13 @@ class Nin10KitGUI : public wxFrame
 		wxPanel* m_panel1;
 		wxListCtrl* imagesList;
 		wxPanel* m_panel2;
+		wxBoxSizer* panelSizer;
 		wxStaticText* m_staticText71;
 		wxStaticText* m_staticText7;
 		wxChoice* mode;
 		wxButton* m_button2;
 		wxButton* m_button3;
+		wxPanel* imageInfoPanel;
 		wxStaticText* m_staticText1;
 		wxTextCtrl* imageFilename;
 		wxStaticText* m_staticText3;
@@ -66,6 +68,7 @@ class Nin10KitGUI : public wxFrame
 		wxButton* m_button5;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnImageDeselected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnImageSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnLoadImages( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteAllImages( wxCommandEvent& event ) { event.Skip(); }
@@ -78,13 +81,13 @@ class Nin10KitGUI : public wxFrame
 	
 	public:
 		
-		Nin10KitGUI( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Nin10Kit"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 960,480 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		Nin10KitGUI( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Nin10Kit"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 880,480 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		
 		~Nin10KitGUI();
 		
 		void m_splitter1OnIdle( wxIdleEvent& )
 		{
-			m_splitter1->SetSashPosition( 320 );
+			m_splitter1->SetSashPosition( 240 );
 			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( Nin10KitGUI::m_splitter1OnIdle ), NULL, this );
 		}
 	

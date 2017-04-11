@@ -26,11 +26,6 @@ Nin10KitFrame::Nin10KitFrame() : Nin10KitGUI(NULL), imageList(new wxImageList(TH
     imagesList->SetImageList(imageList.get(), wxIMAGE_LIST_NORMAL);
 }
 
-Nin10KitFrame::~Nin10KitFrame()
-{
-
-}
-
 void Nin10KitFrame::OnLoadImages(wxCommandEvent& event)
 {
     EventLog l(__func__);
@@ -71,6 +66,8 @@ void Nin10KitFrame::OnImageSelected(wxListEvent& event)
     if (index == -1)
     {
         WarnLog("No item selected ignoring");
+        imageInfoPanel->Hide();
+        panelSizer->Layout();
         return;
     }
 
@@ -83,6 +80,17 @@ void Nin10KitFrame::OnImageSelected(wxListEvent& event)
     imageWidth->SetValue(info.GetWidth());
     imageHeight->SetValue(info.GetHeight());
     imageAnimated->SetValue(info.IsAnimated());
+    imageInfoPanel->Show();
+    panelSizer->Layout();
+}
+
+void Nin10KitFrame::OnImageDeselected(wxListEvent& event)
+{
+    EventLog l(__func__);
+    InfoLog("No item selected");
+    imageInfoPanel->Hide();
+    panelSizer->Layout();
+    return;
 }
 
 void Nin10KitFrame::OnDeleteAllImages(wxCommandEvent& event)

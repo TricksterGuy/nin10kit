@@ -53,6 +53,7 @@ bool Nin10KitApp::OnInit()
         return false;
 
     wxInitAllImageHandlers();
+    wxBitmap::InitStandardHandlers();
     wxDialog::EnableLayoutAdaptation(true);
 #ifndef _WIN32
     wxHandleFatalExceptions();

@@ -59,6 +59,34 @@ void GetModeInfo(int prog_mode, std::string& mode, std::string& device, int& bpp
             bpp = 4;
             sprites_for_bitmap = true;
             break;
+        case NDSBitmap:
+            mode = "BITMAP";
+            device = "NDS";
+            break;
+        case NDSIndexedBitmap:
+            mode = "INDEXED";
+            device = "NDS";
+            break;
+        case NDSMap8Bpp:
+            mode = "TILEMAP";
+            device = "NDS";
+            bpp = 8;
+            break;
+        case NDSMap4Bpp:
+            mode = "TILEMAP";
+            device = "NDS";
+            bpp = 4;
+            break;
+        case NDSSprites8Bpp:
+            mode = "SPRITES";
+            device = "NDS";
+            bpp = 8;
+            break;
+        case NDSSprites4Bpp:
+            mode = "SPRITES";
+            device = "NDS";
+            bpp = 4;
+            break;
     }
 }
 
@@ -116,7 +144,7 @@ void DoExport(int mode, const std::string& filename, const std::vector<std::stri
     {
         if (params.device == "GBA")
             DoGBAExport(params.images, params.tileset_images, params.palette_images);
-        else if (params.device == "DS")
+        else if (params.device == "NDS")
             DoDSExport(params.images, params.tileset_images, params.palette_images);
         else if (params.device == "3DS")
             Do3DSExport(params.images, params.tileset_images, params.palette_images);

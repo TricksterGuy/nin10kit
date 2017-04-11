@@ -631,7 +631,7 @@ bool Nin10KitApp::DoExportImages()
         DoLUTExport(params.functions);
     else if (params.device == "GBA")
         DoGBAExport(params.images, params.tileset_images, params.palette_images);
-    else if (params.device == "DS")
+    else if (params.device == "DS" || params.device == "NDS")
         DoDSExport(params.images, params.tileset_images, params.palette_images);
     else if (params.device == "3DS")
         Do3DSExport(params.images, params.tileset_images, params.palette_images);

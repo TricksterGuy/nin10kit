@@ -15,9 +15,10 @@ class Nin10KitFrame : public Nin10KitGUI
 {
     public:
         Nin10KitFrame();
-        ~Nin10KitFrame();
+        ~Nin10KitFrame() {}
 		void OnLoadImages(wxCommandEvent& event);
         void OnImageSelected(wxListEvent& event);
+        void OnImageDeselected(wxListEvent& event);
 		void OnDeleteAllImages(wxCommandEvent& event);
 		void OnUpdateCurrentImage(wxCommandEvent& event);
 		void OnDeleteCurrentImage(wxCommandEvent& event);

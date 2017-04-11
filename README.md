@@ -3,6 +3,13 @@
 
 A set of tools for doing homebrew game development, includes look up table generators and and image to C exporter for Nintendo's Gameboy Advance, DS, and 3DS systems. In addition the GUI version of the program allows you to see what the image would look like on a real gameboy advance before exporting.
 
+* [Installation](#installation)
+  * [Ubuntu/Debian](#ubuntudebian-based-systems)
+  * [Windows](#windows)
+  * [macOS / OSX](#macososx)
+* [Usage](#usage)
+* [License](#license)
+
 ## Installation
 ### Ubuntu/Debian Based Systems
 #### Installing via apt-get
@@ -38,7 +45,7 @@ Available in [Releases](https://github.com/TricksterGuy/nin10kit/releases).  Bin
 #### Compiling with CMake
 Coming soon maybe?  Its kinda a bother though.
 
-### MacOSX
+### macOS / OSX
 #### Installing via Homebrew
 _Contributed by [skyman](https://github.com/skyman)._
 
@@ -63,3 +70,6 @@ Once you have that done, cd into the repository folder and follow these instruct
 
 ## Usage
 Run the command `nin10kit` for help using the command line interface and `nin10kitgui` to launch the GUI application.
+
+## License
+This project is licensed under the Apache License. More information can be found in the [LICENSE](LICENSE) file.

@@ -60,6 +60,9 @@ struct ExportParams
 
     // 3ds stuff
     bool rotate;
+
+    // Devkitpro stuff
+    bool for_devkitpro;
 };
 
 extern ExportParams params;

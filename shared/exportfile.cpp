@@ -58,10 +58,7 @@ void ExportFile::Write(std::ostream& file)
             file << " * " << lut.str() << "\n";
     }
     file << " * \n";
-    file << " * Quote/Fortune of the Day!\n";
-    file << " * -------------------------\n";
-    file << " * \n";
-    file << " * All bug reports / feature requests are to be sent to Brandon (bwhitehead0308@gmail.com)\n";
+    file << " * All bug reports / feature requests are to be filed here https://github.com/TricksterGuy/nin10kit/issues\n";
     for (unsigned int i = 0; i < lines.size() ; i++)
         file << " * " << lines[i] << "\n";
     file << " */\n\n";

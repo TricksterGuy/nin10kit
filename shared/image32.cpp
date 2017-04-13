@@ -114,7 +114,9 @@ void Image32Bpp::WriteData(std::ostream& file) const
 
 void Image32Bpp::WriteCommonExport(std::ostream& file) const
 {
-    WriteDefine(file, name, "_SIZE", ArraySize3DS(pixels.size(), params.mode));
+    unsigned int array_size = ArraySize3DS(pixels.size(), params.mode);
+    WriteDefine(file, name, "_SIZE", array_size * 2);
+    WriteDefine(file, name, "_LENGTH", array_size);
     WriteDefine(file, name, "_WIDTH", width);
     WriteDefine(file, name, "_HEIGHT", height);
 }
@@ -125,7 +127,8 @@ void Image32Bpp::WriteExport(std::ostream& file) const
     WriteExtern(file, "const unsigned char", export_name, "", array_size);
     if (!animated)
     {
-        WriteDefine(file, export_name, "_SIZE", array_size);
+        WriteDefine(file, export_name, "_SIZE", array_size * 2);
+        WriteDefine(file, export_name, "_LENGTH", array_size);
         WriteDefine(file, export_name, "_WIDTH", width);
         WriteDefine(file, export_name, "_HEIGHT", height);
     }

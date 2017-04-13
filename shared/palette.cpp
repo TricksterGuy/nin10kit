@@ -121,7 +121,8 @@ void Palette::WriteData(std::ostream& file) const
 void Palette::WriteExport(std::ostream& file) const
 {
     WriteExtern(file, "const unsigned short", name, "_palette", colors.size());
-    WriteDefine(file, name, "_PALETTE_SIZE", colors.size());
+    WriteDefine(file, name, "_PALETTE_SIZE", colors.size() * 2);
+    WriteDefine(file, name, "_PALETTE_LENGTH", colors.size());
     WriteNewLine(file);
 }
 
@@ -260,6 +261,7 @@ void PaletteBankManager::WriteData(std::ostream& file) const
 void PaletteBankManager::WriteExport(std::ostream& file) const
 {
     WriteExtern(file, "const unsigned short", name, "_palette", 256);
-    WriteDefine(file, name, "_PALETTE_SIZE", 256);
+    WriteDefine(file, name, "_PALETTE_SIZE", 512);
+    WriteDefine(file, name, "_PALETTE_LENGTH", 256);
     WriteNewLine(file);
 }

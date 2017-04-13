@@ -116,7 +116,8 @@ void Tileset::WriteExport(std::ostream& file) const
 
     WriteExtern(file, "const unsigned short", name, "_tiles", Size());
     WriteDefine(file, name, "_TILES", tiles.size());
-    WriteDefine(file, name, "_TILES_SIZE", Size());
+    WriteDefine(file, name, "_TILES_SIZE", Size() * 2);
+    WriteDefine(file, name, "_TILES_LENGTH", Size());
     WriteNewLine(file);
 }
 

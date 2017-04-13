@@ -16,15 +16,21 @@ void HeaderFile::Write(std::ostream& file)
 
     WriteHeaderGuard(file, params.symbol_base_name, "_H");
 
+    if (params.for_devkitpro && params.device == "NDS")
+    {
+        WriteSystemInclude(file, "nds.h");
+        WriteNewLine();
+    }
+
     std::map<std::string, std::vector<Image*>> name_frames = GetAnimatedImages();
 
     bool ok_newline = false;
-    if (params.transparent_given)
+    if (params.transparent_given && (mode == "3" || mode == "BITMAP"))
     {
         /// TODO This needs to change new devices different datatypes.
         char buffer[7];
         sprintf(buffer, "0x%04x", Color16(params.transparent_color).ToGBAShort());
-        WriteDefine(file, params.symbol_base_name, "_TRANSPARENT", (mode == "3") ? buffer : "0x00");
+        WriteDefine(file, params.symbol_base_name, "_TRANSPARENT", buffer);
         ok_newline = true;
     }
     if (params.offset)

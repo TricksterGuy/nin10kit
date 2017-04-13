@@ -116,6 +116,9 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
     // Other
     {wxCMD_LINE_OPTION, "export_images", "export_images", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
+    // Devkitpro
+    {wxCMD_LINE_OPTION, "for_devkitpro", "for_devkitpro", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+
     // To accept the list of images this is used.
     {wxCMD_LINE_PARAM,  NULL, NULL, "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE},
     {wxCMD_LINE_NONE}
@@ -218,6 +221,8 @@ const std::map<std::string, HelpDesc> help_text = {
                               "Only for use with -mode=tiles")},
 {"export_2d", HelpDesc("0 or 1", "Exports sprites for use in sprite 2d mode. Default 0.")},
 {"for_bitmap", HelpDesc("0 or 1", "Exports sprites for use in modes 3 and 4. Default 0.")},
+{"for_devkitpro", HelpDesc("0 or 1", "Exported definitions in header file are friendly with devkitpro libraries.\n"
+                                     "\tOnly for DS exports only no effect on GBA/3DS. Default 0.")},
 {"3ds_rotate", HelpDesc("0 or 1", "Rotates the image for use in 3ds framebuffer mode. Default 0.")},
 {"export_images", HelpDesc("0 or 1", "In addition to generating a .c.h pair\n"
                                      "\texport images of each array generated as if it were displayed on the gba.\n"
@@ -394,6 +399,9 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
         params.device = "3DS";
 
     params.device = ToUpper(parse.GetString("device", params.device));
+    if (params.device == "DS")
+        params.device = "NDS";
+
     params.bpp = parse.GetInt("bpp", 8);
 
     std::string function = parse.GetString("func");
@@ -426,6 +434,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
 
     params.export_2d = parse.GetBoolean("export_2d", false);
     params.for_bitmap = parse.GetBoolean("for_bitmap", false);
+    params.for_devkitpro = parse.GetBoolean("for_devkitpro", false);
     params.rotate = parse.GetBoolean("3ds_rotate", false);
 
     std::string export_file = parser.GetParam(0).ToStdString();
@@ -631,7 +640,7 @@ bool Nin10KitApp::DoExportImages()
         DoLUTExport(params.functions);
     else if (params.device == "GBA")
         DoGBAExport(params.images, params.tileset_images, params.palette_images);
-    else if (params.device == "DS" || params.device == "NDS")
+    else if (params.device == "NDS")
         DoDSExport(params.images, params.tileset_images, params.palette_images);
     else if (params.device == "3DS")
         Do3DSExport(params.images, params.tileset_images, params.palette_images);

@@ -136,6 +136,13 @@ void WriteDefine(std::ostream& file, const std::string& name, const std::string&
     file << "#define " << name_cap << append << " " << value << "\n";
 }
 
+void WriteDefineCast(std::ostream& file, const std::string& name, const std::string& append, int value, const std::string& type)
+{
+    std::string name_cap = ToUpper(name);
+    VerboseLog("Writing define %s%s value %d and cast as %s", name.c_str(), append.c_str(), value, type.c_str());
+    file << "#define " << name_cap << append << " ((" << type << ")" << value << ")\n";
+}
+
 void WriteHeaderGuard(std::ostream& file, const std::string& name, const std::string& append)
 {
     std::string name_cap = ToUpper(name);
@@ -146,7 +153,14 @@ void WriteHeaderGuard(std::ostream& file, const std::string& name, const std::st
 
 void WriteInclude(std::ostream& file, const std::string& filename)
 {
+    VerboseLog("Writing include \"%s\"", filename.c_str());
     file << "#include \"" << filename << "\"\n";
+}
+
+void WriteSystemInclude(std::ostream& file, const std::string& filename)
+{
+    VerboseLog("Writing include <%s>", filename.c_str());
+    file << "#include <" << filename << ">\n";
 }
 
 void WriteEndHeaderGuard(std::ostream& file)

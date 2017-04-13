@@ -80,19 +80,39 @@ void Sprite::WriteTile(unsigned char* arr, int x, int y) const
 
 void Sprite::WriteCommonExport(std::ostream& file) const
 {
-    WriteDefine(file, name, "_SPRITE_SHAPE", shape, 14);
-    WriteDefine(file, name, "_SPRITE_SIZE", size, 14);
+    if (params.for_devkitpro && params.device == "NDS")
+    {
+        WriteDefineCast(file, name, "_SPRITE_SHAPE", shape, "ObjShape");
+        WriteDefineCast(file, name, "_SPRITE_SIZE", size, "ObjSize");
+    }
+    else
+    {
+        WriteDefine(file, name, "_SPRITE_SHAPE", shape, 14);
+        WriteDefine(file, name, "_SPRITE_SIZE", size, 14);
+    }
 }
 
 void Sprite::WriteExport(std::ostream& file) const
 {
-    if (params.bpp == 4)
-        WriteDefine(file, export_name, "_PALETTE", palette_bank, 12);
-    if (!animated)
+    if (params.for_devkitpro && params.device == "NDS")
     {
-        WriteDefine(file, export_name, "_SPRITE_SHAPE", shape, 14);
-        WriteDefine(file, export_name, "_SPRITE_SIZE", size, 14);
+        WriteDefine(file, export_name, "_PALETTE", palette_bank);
+        if (!animated)
+        {
+            WriteDefineCast(file, export_name, "_SPRITE_SHAPE", shape, "ObjShape");
+            WriteDefineCast(file, export_name, "_SPRITE_SIZE", size, "ObjSize");
+        }
     }
+    else
+    {
+        WriteDefine(file, export_name, "_PALETTE", palette_bank, 12);
+        if (!animated)
+        {
+            WriteDefine(file, export_name, "_SPRITE_SHAPE", shape, 14);
+            WriteDefine(file, export_name, "_SPRITE_SIZE", size, 14);
+        }
+    }
+    /// TODO see if for_bitmap needs to be respected in NDS exports.
     WriteDefine(file, export_name, "_ID", offset | (params.for_bitmap ? 512 : 0));
     WriteNewLine(file);
 }
@@ -232,7 +252,8 @@ void SpriteSheet::WriteExport(std::ostream& file) const
 {
     unsigned int size = data.size() / (bpp == 4 ? 4 : 2);
     WriteExtern(file, "const unsigned short", name, "", size);
-    WriteDefine(file, name, "_SIZE", size);
+    WriteDefine(file, name, "_SIZE", size * 2);
+    WriteDefine(file, name, "_LENGTH", size);
     WriteNewLine(file);
 
     for (const auto& sprite : sprites)
@@ -466,8 +487,17 @@ void SpriteScene::WriteData(std::ostream& file) const
 
 void SpriteScene::WriteExport(std::ostream& file) const
 {
-    WriteDefine(file, name, "_PALETTE_TYPE", bpp == 8, 13);
-    WriteDefine(file, name, "_DIMENSION_TYPE", !is2d, 6);
+    if (params.for_devkitpro && params.device == "NDS")
+    {
+        WriteDefineCast(file, name, "_PALETTE_TYPE", bpp == 8, "ObjColMode");
+        WriteDefine(file, name, "_DIMENSION_TYPE", !is2d, 4);
+    }
+    else
+    {
+        WriteDefine(file, name, "_PALETTE_TYPE", bpp == 8, 13);
+        WriteDefine(file, name, "_DIMENSION_TYPE", !is2d, params.device == "GBA" ? 6 : 4);
+    }
+
     WriteNewLine(file);
 
     if (export_shared_data)
@@ -486,7 +516,8 @@ void SpriteScene::WriteExport(std::ostream& file) const
     else
     {
         WriteExtern(file, "const unsigned short", name, "", Size());
-        WriteDefine(file, name, "_SIZE", Size());
+        WriteDefine(file, name, "_SIZE", Size() * 2);
+        WriteDefine(file, name, "_LENGTH", Size());
         WriteNewLine(file);
 
         for (const auto& sprite : images)

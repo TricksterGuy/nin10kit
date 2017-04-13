@@ -26,7 +26,8 @@ void Image16Bpp::WriteData(std::ostream& file) const
 
 void Image16Bpp::WriteCommonExport(std::ostream& file) const
 {
-    WriteDefine(file, name, "_SIZE", pixels.size());
+    WriteDefine(file, name, "_SIZE", pixels.size() * 2);
+    WriteDefine(file, name, "_LENGTH", pixels.size());
     WriteDefine(file, name, "_WIDTH", width);
     WriteDefine(file, name, "_HEIGHT", height);
 }
@@ -36,7 +37,8 @@ void Image16Bpp::WriteExport(std::ostream& file) const
     WriteExtern(file, "const unsigned short", export_name, "", pixels.size());
     if (!animated)
     {
-        WriteDefine(file, export_name, "_SIZE", pixels.size());
+        WriteDefine(file, export_name, "_SIZE", pixels.size() * 2);
+        WriteDefine(file, export_name, "_LENGTH", pixels.size());
         WriteDefine(file, export_name, "_WIDTH", width);
         WriteDefine(file, export_name, "_HEIGHT", height);
     }

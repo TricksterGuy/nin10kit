@@ -21,7 +21,7 @@ static inline long GetSelectedIndex(wxListCtrl* listControl)
     return itemIndex;
 }
 
-Nin10KitFrame::Nin10KitFrame() : Nin10KitGUI(NULL), imageList(new wxImageList(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT))
+Nin10KitFrame::Nin10KitFrame() : Nin10KitGUI(NULL), imageList(new wxImageList(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT)), viewer(NULL)
 {
     imagesList->SetImageList(imageList.get(), wxIMAGE_LIST_NORMAL);
 }

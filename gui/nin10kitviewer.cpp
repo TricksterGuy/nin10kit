@@ -12,10 +12,6 @@ Nin10KitViewerFrame::Nin10KitViewerFrame() : Nin10KitViewerGUI(NULL)
     buttonSizer->SetMinSize(size);
 }
 
-Nin10KitViewerFrame::~Nin10KitViewerFrame()
-{
-}
-
 bool Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& images)
 {
     std::string mode, device;
@@ -27,11 +23,11 @@ bool Nin10KitViewerFrame::Set(int prog_mode, std::map<std::string, ImageInfo>& i
 
     try
     {
-        if (mode == "3")
+        if (mode == "3" || mode == "BITMAP")
             UpdateMode3(images);
-        else if (mode == "4")
+        else if (mode == "4" || mode == "INDEXED")
             UpdateMode4(images);
-        else if (mode == "0")
+        else if (mode == "0" || mode == "TILEMAP")
             UpdateMode0(images, bpp);
         else if (mode == "SPRITES")
             UpdateSprites(images, bpp, for_bitmap);

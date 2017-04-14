@@ -573,10 +573,21 @@ bool Nin10KitApp::DoExportImages()
     for (unsigned int i = 0; i < params.files.size(); i++)
     {
         const std::string& filename = params.files[i];
-        const std::vector<Magick::Image> images = file_images[filename];
-        bool isAnim = images.size() > 1;
+        bool isAnim = file_images[filename].size() > 1;
         if (isAnim)
-          InfoLog("%s, detected as having %d frames", filename.c_str(), images.size());
+        {
+            InfoLog("%s, detected as having %d frames", filename.c_str(), file_images[filename].size());
+            if (file_images[filename][0].magick() == "GIF")
+            {
+                size_t disposalMethod = file_images[filename][0].gifDisposeMethod();
+                VerboseLog("GIF Disposal Method is %d", disposalMethod);
+                std::vector<Magick::Image> images;
+                coalesceImages(&images, file_images[filename].begin(), file_images[filename].end());
+                file_images[filename] = images;
+            }
+        }
+
+        const std::vector<Magick::Image>& images = file_images[filename];
         unsigned int anim_width = images[0].columns();
         unsigned int anim_height = images[0].rows();
         for (unsigned int j = 0; j < images.size(); j++)

@@ -19,7 +19,7 @@ void HeaderFile::Write(std::ostream& file)
     if (params.for_devkitpro && params.device == "NDS")
     {
         WriteSystemInclude(file, "nds.h");
-        WriteNewLine();
+        WriteNewLine(file);
     }
 
     std::map<std::string, std::vector<Image*>> name_frames = GetAnimatedImages();

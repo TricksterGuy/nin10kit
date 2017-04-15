@@ -5,7 +5,7 @@
 #include "exporter.hpp"
 #include "logger.hpp"
 
-Nin10KitViewerFrame::Nin10KitViewerFrame() : Nin10KitViewerGUI(NULL)
+Nin10KitViewerFrame::Nin10KitViewerFrame() : Nin10KitViewerGUI(NULL), selectedGraphic(0), selectedPalette(0), selectedTile(0)
 {
     wxSize size = buttonSizer->GetSize();
     size.SetWidth(256);

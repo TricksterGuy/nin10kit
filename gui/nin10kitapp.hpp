@@ -15,7 +15,7 @@ class Nin10KitApp : public wxApp
         void OnUnhandledException();
         Nin10KitFrame* GetFrame() {return frame;}
     private:
-        Nin10KitFrame* frame;
+        Nin10KitFrame* frame = nullptr;
 };
 
 DECLARE_APP(Nin10KitApp);

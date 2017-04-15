@@ -12,10 +12,11 @@ unsigned int clamp_quantum(Magick::Quantum q, size_t depth)
 
 #endif // MAGICK7_SUPPORT
 
+// TODO clean this up this is a really confusing interface
 class MagickImageDataWrapper
 {
 public:
-    MagickImageDataWrapper(const Magick::Image& image) : constPixels(image.getConstPixels(0, 0, image.columns(), image.rows()))
+    MagickImageDataWrapper(const Magick::Image& image) : constPixels(image.getConstPixels(0, 0, image.columns(), image.rows())), pixels(nullptr), channels(0)
     {
 #ifdef MAGICK6_SUPPORT
         alpha_mask = image.matte() ? 0 : 0xFF;
@@ -27,7 +28,7 @@ public:
         channels = image.channels();
 #endif
     }
-    MagickImageDataWrapper(Magick::Image& img) : pixels(img.getPixels(0, 0, img.columns(), img.rows()))
+    MagickImageDataWrapper(Magick::Image& img) : constPixels(nullptr), pixels(img.getPixels(0, 0, img.columns(), img.rows())), channels(0)
     {
 #ifdef MAGICK6_SUPPORT
         alpha_mask = img.matte() ? 0 : 0xFF;

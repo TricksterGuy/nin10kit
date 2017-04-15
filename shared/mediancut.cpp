@@ -128,26 +128,6 @@ void Histogram::GetColors(std::vector<Color16>& colors) const
         colors.push_back(Color16(color_freq.first));
 }
 
-ColorLAB Histogram::GetMode() const
-{
-    const ColorLAB* mode = NULL;
-    unsigned long max = 0;
-
-    for (const auto& color_freq : frequencies)
-    {
-        const auto& color = color_freq.first;
-        unsigned long this_freq = color_freq.second;
-
-        if (this_freq > max)
-        {
-            max = this_freq;
-            mode = &color;
-        }
-    }
-
-    return (mode != NULL) ? *mode : ColorLAB();
-}
-
 void Box::Update(int boxes_left)
 {
     // Swap so that the mins and maxes will change after the for loop.

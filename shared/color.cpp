@@ -66,7 +66,7 @@ static inline unsigned long GenericComponentDistance(int a1, int b1, int c1, int
     return (ad * ad + bd * bd + cd * cd);
 }
 
-Color::Color(const ColorLAB& color)
+Color::Color(const ColorLAB& color) : a(0xFF)
 {
     lin_to_rgb(color.l, color.a, color.b, &r, &g, &b);
 }
@@ -81,7 +81,7 @@ bool Color::operator==(const Color& color) const
     return GenericComponentEquals(r, g, b, color.r, color.g, color.b);
 }
 
-Color16::Color16(const ColorLAB& color)
+Color16::Color16(const ColorLAB& color) : a(0x1f)
 {
     lin_to_rgb(color.l, color.a, color.b, &r, &g, &b);
     r >>= 3;

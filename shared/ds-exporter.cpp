@@ -49,7 +49,5 @@ void DoDSExport(const std::vector<Image32Bpp>& images32, const std::vector<Image
         DoMapExport(images, tilesets);
     else if (params.mode == "PALETTE")
         DoPaletteExport(images);
-    else
-        FatalLog("No/Invalid mode specified image not exported");
 }
 

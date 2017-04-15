@@ -1,11 +1,20 @@
 #include "cmd-line-parser-helper.hpp"
 #include "scanner.hpp"
 #include "logger.hpp"
+#include <sstream>
 #include <algorithm>
 
-bool CmdLineParserHelper::GetSwitch(const std::string& param)
+bool CmdLineParserHelper::GetSwitch(const std::string& param, bool def_value)
 {
-    return parser.Found(param);
+    std::string no_param = "no_" + param;
+    auto found_switch = parser.FoundSwitch(param);
+    auto no_found_switch = parser.FoundSwitch(no_param);
+    if (found_switch != wxCMD_SWITCH_NOT_FOUND && no_found_switch != wxCMD_SWITCH_NOT_FOUND)
+        FatalLog("-%s and -no_%s provided at the same time, only one of these switches can be given", param.c_str(), param.c_str());
+
+    if (found_switch == wxCMD_SWITCH_NOT_FOUND && no_found_switch == wxCMD_SWITCH_NOT_FOUND) return def_value;
+
+    return found_switch == wxCMD_SWITCH_ON || no_found_switch == wxCMD_SWITCH_OFF;
 }
 
 bool CmdLineParserHelper::GetBoolean(const std::string& param, bool def_value)
@@ -61,6 +70,25 @@ std::string CmdLineParserHelper::GetString(const std::string& param, const std::
 {
     wxString ret;
     return parser.Found(param, &ret) ? ret.ToStdString() : def_value;
+}
+
+std::string CmdLineParserHelper::GetChoice(const std::string& param, const std::set<std::string>& choices, const std::string& def_value)
+{
+    std::string ret = GetString(param, def_value);
+    if (choices.find(ret) == choices.end())
+    {
+        std::stringstream choices_str;
+        unsigned int i = 0;
+        for (const auto& choice : choices)
+        {
+            choices_str << choice;
+            if (i != choices.size() - 1)
+                choices_str << ",";
+            i++;
+        }
+        FatalLog("Invalid choice given for %s.  Valid choices are [%s].", param.c_str(), choices_str.str().c_str());
+    }
+    return ret;
 }
 
 std::vector<int> CmdLineParserHelper::GetListInt(const std::string& param, const std::vector<int>& def_value)

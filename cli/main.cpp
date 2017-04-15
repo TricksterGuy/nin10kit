@@ -35,8 +35,8 @@
 #else
 #define RED "<"
 #define END ">"
-#define EMPH
-#define ENDEMPH
+#define EMPH ""
+#define ENDEMPH ""
 #endif
 
 void PrintMagickFormats(void)
@@ -74,50 +74,59 @@ static const wxCmdLineEntryDesc help_description[] =
 static const wxCmdLineEntryDesc cmd_descriptions[] =
 {
     // Help
-    {wxCMD_LINE_OPTION, "h", "help", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "h", "help",             "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
     // Debugging
-    {wxCMD_LINE_OPTION, "log", "log", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "",  "log",              "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
     // Modes
-    {wxCMD_LINE_OPTION, "mode", "mode", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "device", "device", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "bpp", "bpp", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "mode",              "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "device",            "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "bpp",               "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
     // Lut options
-    {wxCMD_LINE_OPTION, "func", "func", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "func",              "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
 
     // General helpful options
-    {wxCMD_LINE_OPTION, "output_dir", "output_dir", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "names", "names", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "resize", "resize", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "transparent", "transparent", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "dither", "dither", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "dither_level", "dither_level", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "output_dir",        "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "names",             "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "resize",            "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "transparent",       "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "", "dither",            ""},
+    {wxCMD_LINE_SWITCH, "", "no_dither",         ""},
+    {wxCMD_LINE_OPTION, "", "dither_level",      "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
     // Mode 0/4 options
-    {wxCMD_LINE_OPTION, "start", "start", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "palette", "palette", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "palette_image", "palette_image", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "split", "split", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "start",             "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "palette",           "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "palette_image",     "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "", "split",             ""},
+    {wxCMD_LINE_SWITCH, "", "no_split",          ""},
 
     // Mode 0 exclusive options
-    {wxCMD_LINE_OPTION, "split_sbb", "split_sbb", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "tileset_image", "tileset_image", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "border", "border", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "force", "force", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "", "split_sbb",         ""},
+    {wxCMD_LINE_SWITCH, "", "no_split_sbb",      ""},
+    {wxCMD_LINE_OPTION, "", "tileset_image",     "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "", "border",            "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "", "force",             ""},
+    {wxCMD_LINE_SWITCH, "", "no_force",          ""},
 
     // Sprite exclusive options
-    {wxCMD_LINE_OPTION, "export_2d", "export_2d", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
-    {wxCMD_LINE_OPTION, "for_bitmap", "for_bitmap", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "", "export_2d",         ""},
+    {wxCMD_LINE_SWITCH, "", "no_export_2d",      ""},
+    {wxCMD_LINE_SWITCH, "", "for_bitmap",        ""},
+    {wxCMD_LINE_SWITCH, "", "no_for_bitmap",     ""},
 
     // 3ds exclusive options
-    {wxCMD_LINE_OPTION, "3ds_rotate", "3ds_rotate", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "", "3ds_rotate",        ""},
+    {wxCMD_LINE_SWITCH, "", "no_3ds_rotate",     ""},
 
     // Other
-    {wxCMD_LINE_OPTION, "export_images", "export_images", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "", "export_images",     ""},
+    {wxCMD_LINE_SWITCH, "", "no_export_images",  ""},
 
     // Devkitpro
-    {wxCMD_LINE_OPTION, "for_devkitpro", "for_devkitpro", "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "", "for_devkitpro",     ""},
+    {wxCMD_LINE_SWITCH, "", "no_for_devkitpro",  ""},
 
     // To accept the list of images this is used.
     {wxCMD_LINE_PARAM,  NULL, NULL, "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE},
@@ -139,7 +148,7 @@ const std::map<std::string, HelpDesc> help_text = {
 {"help", HelpDesc("one of command_line_flag, formats, basic, all","Display help on command line option.")},
 {"log", HelpDesc("number [0-4]", "Logging level (0=fatal,1=error,2=warn,3=info,4=verbose). Default 3\n"
                                  "Any logging messages above the logging level will not be displayed.")},
-{"mode", HelpDesc("one of 0, 3, 4, palette, tiles, map, sprites, lut",
+{"mode", HelpDesc("one of 0, 3, 4, palette, tiles, map, sprites, bitmap, indexed, tilemap, lut",
                   "Sets the mode to export to.\n"
                   "0       - Used for GBA Mode 0 Exports a palette, tileset, and map.\n"
                   "3       - Used for GBA Mode 3 Exports a 16 bits per pixel bitmap image.\n"
@@ -147,11 +156,14 @@ const std::map<std::string, HelpDesc> help_text = {
                   "palette - Exports only a palette from images given.\n"
                   "tiles   - Exports just a palette and tileset from images given.\n"
                   "map     - Exports a just map given from images. [see -tileset]\n"
-                  "sprites - Exports a bunch of sprites for use with the GBA.\n"
+                  "sprites - Exports a bunch of sprites for use with the GBA/NDS.\n"
+                  "bitmap  - Export a bitmap for use with the NDS.\n"
+                  "indexed - Export a bitmap and palette for use with the NDS.\n"
+                  "tilemap - Exports a palette, tileset, and map for use with the NDS.\n"
                   "lut     - Exports a look up table from a function. [see -func]")},
-{"device", HelpDesc("one of gba ds or 3ds", "Specifies device to output data for default gba.\n"
+{"device", HelpDesc("one of gba nds or 3ds", "Specifies device to output data for default gba.\n"
                                             "GBA uses 16 bit color 0BGR 5 bits each for blue green and red.\n"
-                                            "DS uses 16 bit color ABGR 5 bits each for blue green and red and A is 1 bit of transparency 1=opaque 0=transparent.\n"
+                                            "NDS uses 16 bit color ABGR 5 bits each for blue green and red and A is 1 bit of transparency 1=opaque 0=transparent.\n"
                                             "3DS uses 32? bit color ABGR 8 bits for each channel.")},
 {"bpp", HelpDesc("number 4 or 8", "Bits per pixel for modes 0, tiles, map, and sprites. Default 8.")},
 {"func", HelpDesc("function_name,type,start,end,step[,in_degrees]",
@@ -190,20 +202,20 @@ const std::map<std::string, HelpDesc> help_text = {
                          "\tIn mode 3 a #define is given with the color so you can use it to ignore those pixels when drawing.\n"
                          "\tIn mode 4 this color will become palette entry 0 and also the background color.\n"
                          "\tIn any other GBA mode it will become palette entry 0 and the gba hardware will colorkey the color.")},
-{"dither", HelpDesc("0 or 1", "Enables dithering for mode 4.\n"
+{"dither", HelpDesc("", "Enables dithering for mode 4.\n"
                               "Dithering makes the image look better by minimizing large areas of one color,\n"
-                              "due to reducing the number of colors in the image by adding noise.\n"
+                              "due to reducing the number of colors in the image by adding noise. default on\n"
                               "\tFor more information see: http://en.wikipedia.org/wiki/Dither")},
-{"dither_level", HelpDesc("number [0-100]", "Affects the strength of the dithering algorithm used default 10.")},
+{"dither_level", HelpDesc("number [0-100]", "Affects the strength of the dithering algorithm used. default 10.")},
 {"start", HelpDesc("number [0-255]", "Starts the palette off at index X.\n"
                                      "Useful if you have another image already exported that has X entries.\n"
                                      "This option is only available for mode 4.\n"
                                      "See also -palette")},
-{"palette", HelpDesc("number [0-256]", "Restricts the palette to X colors.\n"
+{"palette", HelpDesc("number [1-256]", "Restricts the palette to X colors.\n"
                                        "Useful for specifying the number of colors for each image.\n"
                                        "This option is only available for mode 4.\n"
                                        "See also -start")},
-{"split", HelpDesc("0 or 1", "Exports each individual image as if the program was called with just that one image.\n"
+{"split", HelpDesc("", "Exports each individual image as if the program was called with just that one image.\n"
                              "In mode 4 using this will export each image with its own palette instead of a global palette.\n"
                              "In mode 0 using this will export each map with its own palette and tileset instead of a global tileset/palette.\n"
                              "In all other modes this option is ignored.")},
@@ -219,17 +231,17 @@ const std::map<std::string, HelpDesc> help_text = {
                                                      "\tExport the images using -mode=mode with -palette_image=palette_image")},
 {"border", HelpDesc("number", "Border around each tile in tileset image\n"
                               "Only for use with -mode=tiles")},
-{"export_2d", HelpDesc("0 or 1", "Exports sprites for use in sprite 2d mode. Default 0.")},
-{"for_bitmap", HelpDesc("0 or 1", "Exports sprites for use in modes 3 and 4. Default 0.")},
-{"for_devkitpro", HelpDesc("0 or 1", "Exported definitions in header file are friendly with devkitpro libraries.\n"
+{"export_2d", HelpDesc("", "Exports sprites for use in sprite 2d mode. Default 0.")},
+{"for_bitmap", HelpDesc("", "Exports sprites for use in modes 3 and 4. Default 0.")},
+{"for_devkitpro", HelpDesc("", "Exported definitions in header file are friendly with devkitpro libraries.\n"
                                      "\tOnly for DS exports only no effect on GBA/3DS. Default 0.")},
-{"3ds_rotate", HelpDesc("0 or 1", "Rotates the image for use in 3ds framebuffer mode. Default 0.")},
-{"export_images", HelpDesc("0 or 1", "In addition to generating a .c.h pair\n"
+{"3ds_rotate", HelpDesc("", "Rotates the image for use in 3ds framebuffer mode. Default 0.")},
+{"export_images", HelpDesc("", "In addition to generating a .c.h pair\n"
                                      "\texport images of each array generated as if it were displayed on the gba.\n"
                                      "\tThis means in a mode 4 export you will get a palette image showing the palette.\n"
                                      "\tIn a mode 0 export you will get a tileset image, a palette image, and a map image.\n"
                                      "\tIn sprites export you will get a palette image, and a sprite image.")},
-{"force", HelpDesc("0 or 1", "NOT IMPLEMENTED")},
+{"force", HelpDesc("", "NOT IMPLEMENTED")},
 {"split_sbb", HelpDesc("number [0-3]", "NOT IMPLEMENTED")},
 };
 
@@ -318,7 +330,7 @@ void Nin10KitApp::ShowBasicHelp()
     printf("nin10kit version %s\n", AutoVersion::FULLVERSION_STRING);
     printf("Basic usage\n");
     printf("-----------\n");
-    printf("nin10kit -mode=" RED "mode" END " " RED "export_file_to" END " " RED "list_of_image_files_or_urls" END "\n");
+    printf("nin10kit --mode=" RED "mode" END " " RED "export_file_to" END " " RED "list_of_image_files_or_urls" END "\n");
     printf(RED "mode" END " is one of 0, 3, 4, palette, tiles, map, sprites, or lut\n");
     printf(RED "export_file_to" END " is the filename to export to (can include directories)\n"
            "\tex: my_images will create my_images.c and my_images.h in the current directory.\n");
@@ -334,7 +346,19 @@ void Nin10KitApp::OnHelp(const std::string& topic)
     {
         printf("Available command line flags are as follows\n");
         for (const auto& flag_desc : help_text)
-            printf(EMPH "%s" ENDEMPH "=%s\n", flag_desc.first.c_str(), flag_desc.second.usage.c_str());
+        {
+            const auto& flag = flag_desc.first;
+            const auto& desc = flag_desc.second;
+            printf(EMPH);
+            if (desc.usage.empty())
+                printf("-");
+            printf("%s" ENDEMPH, flag.c_str());
+            if (!desc.usage.empty())
+                printf("=%s", desc.usage.c_str());
+            printf("\n");
+        }
+        printf("\nTo negate a switch pass --no_switch instead!\n");
+        printf("For help on a specific command line flag pass --help=flag\n");
     }
     else if (topic == "formats")
     {
@@ -351,8 +375,14 @@ void Nin10KitApp::OnHelp(const std::string& topic)
         const auto& desc = help_text.at(topic);
         printf("Help on %s\n"
                "-----------------\n", topic.c_str());
-        printf("Usage: " EMPH "%s" ENDEMPH "=%s\n", topic.c_str(), desc.usage.c_str());
-        printf("%s\n", desc.text.c_str());
+
+        printf("Usage: " EMPH);
+        if (desc.usage.empty())
+            printf("-");
+        printf("%s" ENDEMPH, topic.c_str());
+        if (!desc.usage.empty())
+            printf("=%s", desc.usage.c_str());
+        printf("\n%s\n", desc.text.c_str());
     }
     else
     {
@@ -391,18 +421,31 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     logger->SetLogLevel((LogLevel)parse.GetInt("log", 3, 0, 4));
 
     // mode params
+    const std::set<std::string> valid_3ds_modes {"RGBA8", "RGB8", "RGB5A1", "RGB5551", "RGB565", "RGBA4", "LUT"};
+    const std::set<std::string> valid_gba_modes {"3", "4", "0", "SPRITES", "TILES", "MAP", "PALETTE", "LUT"};
+    const std::set<std::string> valid_nds_modes {"BITMAP", "INDEXED", "TILEMAP", "SPRITES", "TILES", "MAP", "PALETTE", "LUT"};
+    const std::set<std::string> valid_devices {"GBA", "DS", "NDS", "3DS"};
+
+    params.device = ToUpper(parse.GetString("device", "GBA"));
+    if (valid_devices.find(params.device) == valid_devices.end())
+        FatalLog("Invalid device %s given.  Valid devices are [GBA, NDS, 3DS].", params.device.c_str());
+    if (params.device == "DS") params.device = "NDS";
+
+
     params.mode = ToUpper(parse.GetString("mode", ""));
+    if (params.mode.empty())
+        FatalLog("No mode set.");
 
-    // device auto detection
-    params.device = "GBA";
-    if (valid_3ds_modes.find(params.mode) != valid_3ds_modes.end())
-        params.device = "3DS";
-
-    params.device = ToUpper(parse.GetString("device", params.device));
-    if (params.device == "DS")
-        params.device = "NDS";
+    if (params.device == "3DS" && valid_3ds_modes.find(params.mode) == valid_3ds_modes.end())
+        FatalLog("Invalid mode specified %s for 3ds export. Valid modes are [RGBA8, RGB8, RGB5A1, RGB5551, RGB565, RGBA4]. Image not exported", params.mode.c_str());
+    if (params.device == "NDS" && valid_nds_modes.find(params.mode) == valid_nds_modes.end())
+        FatalLog("Invalid mode %s specified for nds export. Valid modes are [BITMAP, INDEXED, TILEMAP, SPRITES, TILES, MAP, PALETTE]", params.mode.c_str());
+    if (params.device == "GBA" && valid_gba_modes.find(params.mode) == valid_gba_modes.end())
+        FatalLog("Invalid mode %s specified for gba export. Valid modes are [3, 4, 0, SPRITES, TILES, MAP, PALETTE]", params.mode.c_str());
 
     params.bpp = parse.GetInt("bpp", 8);
+    if (params.bpp != 4 && params.bpp != 8)
+        FatalLog("Invalid bpp given %d.  Bpp must be either 4 or 8", params.bpp);
 
     std::string function = parse.GetString("func");
 
@@ -413,29 +456,34 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
         if (params.output_dir[params.output_dir.size() - 1] != '/')
             params.output_dir += "/";
     }
+
     params.names = parse.GetListString("names");
+
     std::vector<std::string> resizes = parse.GetListString("resize");
+
     unsigned int transparent = parse.GetHexInt("transparent", 0xFF000000, 0, 0xFFFFFF);
     params.transparent_given = transparent != 0xFF000000;
     params.transparent_color = Color(transparent);
-    params.dither = parse.GetBoolean("dither", true);
+
+    params.dither = parse.GetSwitch("dither", true);
     params.dither_level = parse.GetInt("dither_level", 10, 0, 100) / 100.0f;
-    params.export_images = parse.GetBoolean("export_images", false);
+
+    params.export_images = parse.GetSwitch("export_images");
 
     params.offset = parse.GetInt("start", 0, 0, 255);
     params.palette_size = parse.GetInt("palette", 256, 1, 256);
     params.palettes = parse.GetListString("palette_image");
-    params.split = parse.GetBoolean("split", false);
+    params.split = parse.GetSwitch("split");
 
-    params.split_sbb = parse.GetBoolean("split_sbb", false);
+    params.split_sbb = parse.GetSwitch("split_sbb");
     params.tilesets = parse.GetListString("tileset_image");
     params.border = parse.GetInt("border", 0, 0);
-    params.force = parse.GetBoolean("force", false);
+    params.force = parse.GetSwitch("force");
 
-    params.export_2d = parse.GetBoolean("export_2d", false);
-    params.for_bitmap = parse.GetBoolean("for_bitmap", false);
-    params.for_devkitpro = parse.GetBoolean("for_devkitpro", false);
-    params.rotate = parse.GetBoolean("3ds_rotate", false);
+    params.export_2d = parse.GetSwitch("export_2d");
+    params.for_bitmap = parse.GetSwitch("for_bitmap");
+    params.for_devkitpro = parse.GetSwitch("for_devkitpro");
+    params.rotate = parse.GetSwitch("3ds_rotate");
 
     std::string export_file = parser.GetParam(0).ToStdString();
     params.export_file = Chop(export_file);
@@ -453,9 +501,6 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
         params.files.push_back(filename);
         filenames.insert(filename);
     }
-
-    if (params.mode.empty())
-        FatalLog("No mode set.");
 
     if (params.mode == "LUT")
     {

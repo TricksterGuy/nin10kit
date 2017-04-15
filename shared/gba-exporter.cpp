@@ -49,8 +49,6 @@ void DoGBAExport(const std::vector<Image32Bpp>& images32, const std::vector<Imag
         DoMapExport(images, tilesets);
     else if (params.mode == "PALETTE")
         DoPaletteExport(images);
-    else
-        FatalLog("No/Invalid mode specified image not exported");
 }
 
 void DoMode0Export(const std::vector<Image16Bpp>& images)

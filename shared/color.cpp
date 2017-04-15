@@ -9,7 +9,6 @@
 #define LRAT (2.55F)
 #define ARAT (255.0F / (HIGHA - LOWA))
 #define BRAT (255.0F / (HIGHB - LOWB))
-#define RINT(x) ((int)x)
 
 #ifndef CLAMP
 #define CLAMP(x, l, u) (((x) < l) ? l : (((x) > u) ? u : (x)))

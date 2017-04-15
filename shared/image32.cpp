@@ -7,7 +7,15 @@
 #include "magick_interface.hpp"
 #include "shared.hpp"
 
-unsigned int ArraySize3DS(unsigned int base_size, const std::string& pixel_format)
+enum ArrayDataType3DS {
+    INVALID_DATA = 0,
+    CHAR_DATA = 1,
+    SHORT_DATA = 2,
+};
+
+static const char* const data_type_to_name[3] = {"", "const unsigned char", "const unsigned short"};
+
+unsigned int GetArraySize3DS(unsigned int base_size, const std::string& pixel_format)
 {
     if (pixel_format == "RGBA8")
     {
@@ -25,18 +33,18 @@ unsigned int ArraySize3DS(unsigned int base_size, const std::string& pixel_forma
     return 0;
 }
 
-std::string ArrayDataType3DS(const std::string& pixel_format)
+ArrayDataType3DS GetArrayDataType3DS(const std::string& pixel_format)
 {
     if (pixel_format == "RGBA8" || pixel_format == "RGB8")
     {
-        return "const unsigned char";
+        return CHAR_DATA;
     }
     else if (pixel_format == "RGB5A1" || pixel_format == "RGBA5551" || pixel_format == "RGB565" || pixel_format == "RGBA4")
     {
-        return "const unsigned short";
+        return SHORT_DATA;
     }
     FatalLog("Invalid pixel format %s given (this shouldn't happen)", pixel_format.c_str());
-    return "";
+    return INVALID_DATA;
 }
 
 Image32Bpp::Image32Bpp(const Magick::Image& image, const std::string& name, const std::string& filename, unsigned int frame, bool animated) :
@@ -49,8 +57,8 @@ void Image32Bpp::WriteData(std::ostream& file) const
 {
     char buffer[32];
 
-    const std::string array_type = ArrayDataType3DS(params.mode);
-    unsigned int array_size = ArraySize3DS(pixels.size(), params.mode);
+    const std::string array_type = data_type_to_name[GetArrayDataType3DS(params.mode)];
+    unsigned int array_size = GetArraySize3DS(pixels.size(), params.mode);
     WriteBeginArray(file, array_type, export_name, "", array_size);
 
     if (params.mode == "RGBA8")
@@ -114,8 +122,9 @@ void Image32Bpp::WriteData(std::ostream& file) const
 
 void Image32Bpp::WriteCommonExport(std::ostream& file) const
 {
-    unsigned int array_size = ArraySize3DS(pixels.size(), params.mode);
-    WriteDefine(file, name, "_SIZE", array_size * 2);
+    unsigned int array_size = GetArraySize3DS(pixels.size(), params.mode);
+    ArrayDataType3DS array_type = GetArrayDataType3DS(params.mode);
+    WriteDefine(file, name, "_SIZE", array_size * (array_type == SHORT_DATA ? 2 : 1));
     WriteDefine(file, name, "_LENGTH", array_size);
     WriteDefine(file, name, "_WIDTH", width);
     WriteDefine(file, name, "_HEIGHT", height);
@@ -123,11 +132,14 @@ void Image32Bpp::WriteCommonExport(std::ostream& file) const
 
 void Image32Bpp::WriteExport(std::ostream& file) const
 {
-    unsigned int array_size = ArraySize3DS(pixels.size(), params.mode);
-    WriteExtern(file, "const unsigned char", export_name, "", array_size);
+    unsigned int array_size = GetArraySize3DS(pixels.size(), params.mode);
+    ArrayDataType3DS array_type = GetArrayDataType3DS(params.mode);
+    const std::string type = data_type_to_name[GetArrayDataType3DS(params.mode)];
+
+    WriteExtern(file, type, export_name, "", array_size);
     if (!animated)
     {
-        WriteDefine(file, export_name, "_SIZE", array_size * 2);
+        WriteDefine(file, export_name, "_SIZE", array_size * (array_type == SHORT_DATA ? 2 : 1));
         WriteDefine(file, export_name, "_LENGTH", array_size);
         WriteDefine(file, export_name, "_WIDTH", width);
         WriteDefine(file, export_name, "_HEIGHT", height);

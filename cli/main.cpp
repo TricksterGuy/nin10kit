@@ -421,7 +421,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     logger->SetLogLevel((LogLevel)parse.GetInt("log", 3, 0, 4));
 
     // mode params
-    const std::set<std::string> valid_3ds_modes {"RGBA8", "RGB8", "RGB5A1", "RGB5551", "RGB565", "RGBA4", "LUT"};
+    const std::set<std::string> valid_3ds_modes {"RGBA8", "RGB8", "RGB5A1", "RGBA5551", "RGB565", "RGBA4", "LUT"};
     const std::set<std::string> valid_gba_modes {"3", "4", "0", "SPRITES", "TILES", "MAP", "PALETTE", "LUT"};
     const std::set<std::string> valid_nds_modes {"BITMAP", "INDEXED", "TILEMAP", "SPRITES", "TILES", "MAP", "PALETTE", "LUT"};
     const std::set<std::string> valid_devices {"GBA", "DS", "NDS", "3DS"};

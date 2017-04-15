@@ -16,11 +16,11 @@
 #include "dither.hpp"
 #include "logger.hpp"
 
-#define R_SCALE 13              /*  scale R (L*) distances by this much  */
-#define G_SCALE 24              /*  scale G (a*) distances by this much  */
-#define B_SCALE 26              /*  and B (b*) by this much              */
+#define L_SCALE 13              /*  scale L distances by this much  */
+#define A_SCALE 24              /*  scale a distances by this much  */
+#define B_SCALE 26              /*  and b by this much              */
 
-typedef enum {AXIS_UNDEF, AXIS_RED, AXIS_BLUE, AXIS_GREEN} axisType;
+typedef enum {AXIS_UNDEF, AXIS_L, AXIS_B, AXIS_A} axisType;
 
 typedef std::map<ColorLAB, unsigned long> FrequencyTable;
 
@@ -175,7 +175,6 @@ void Box::UpdateError()
 {
     ColorLAB& c = labColor;
 
-    /* Now scan remaining volume of box and compute population */
     Lerror = 0;
     Aerror = 0;
     Berror = 0;
@@ -190,8 +189,8 @@ void Box::UpdateError()
         Berror += freq_here * (c.b - color.b) * (c.b - color.b);
     }
 
-    Lerror *= R_SCALE * R_SCALE;
-    Aerror *= G_SCALE * G_SCALE;
+    Lerror *= L_SCALE * L_SCALE;
+    Aerror *= A_SCALE * A_SCALE;
     Berror *= B_SCALE * B_SCALE;
 }
 
@@ -233,17 +232,17 @@ void Box::Split(Box& b2, axisType which_axis)
     int lb;
     switch (which_axis)
     {
-        case AXIS_RED:
+        case AXIS_L:
             lb = Lsplit;
             Lmax = lb;
             b2.Lmin = lb+1;
             break;
-        case AXIS_GREEN:
+        case AXIS_A:
             lb = Asplit;
             Amax = lb;
             b2.Amin = lb+1;
             break;
-        case AXIS_BLUE:
+        case AXIS_B:
             lb = Bsplit;
             Bmax = lb;
             b2.Bmin = lb+1;
@@ -277,7 +276,6 @@ static Box* find_split_candidate(const std::list<Box>& boxlist, const int desire
     if (desired_colors <= 16)
     {
         double numboxes = boxlist.size();
-        /* we bias towards splitting across L* for first few colors */
         Lbias = (numboxes > BIAS_NUMBER) ? 1.0F : (BIAS_NUMBER - numboxes + 1) * BIAS_FACTOR / BIAS_NUMBER;
     }
 
@@ -292,27 +290,28 @@ static Box* find_split_candidate(const std::list<Box>& boxlist, const int desire
         {
             which = const_cast<Box*>(&box);
             maxc = Lbias * lpe;
-            *which_axis = AXIS_RED;
+            *which_axis = AXIS_L;
         }
 
         if (ape > maxc && box.Amin < box.Amax)
         {
             which = const_cast<Box*>(&box);
             maxc = ape;
-            *which_axis = AXIS_GREEN;
+            *which_axis = AXIS_A;
         }
 
         if (bpe > maxc && box.Bmin < box.Bmax)
         {
             which = const_cast<Box*>(&box);
             maxc = bpe;
-            *which_axis = AXIS_BLUE;
+            *which_axis = AXIS_B;
         }
     }
 
     return which;
 }
 
+// From https://en.wikipedia.org/wiki/Relative_luminance
 #define LUMINANCE(r, g, b) (0.2126 * (r) + 0.7152 * (g) + 0.0722 * (b))
 
 class PaletteSort
@@ -378,7 +377,6 @@ void GetPalette(const std::vector<Color16>& pixels, unsigned int num_colors, con
 {
     EventLog l(__func__);
 
-    //BUG HERE
     Histogram hist(pixels);
 
     std::vector<Color16> paletteArray;

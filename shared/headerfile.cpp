@@ -54,6 +54,8 @@ void HeaderFile::Write(std::ostream& file)
         if (name_frames[name][0]->HasPalette() && params.split)
             WriteExtern(file, "const unsigned short*", name, "_palette_frames", frames);
         WriteDefine(file, name, "_FRAMES", frames);
+        WriteNewLine(file);
+
         // Write the common #defines here.
         name_frames[name][0]->WriteCommonExport(file);
         WriteNewLine(file);

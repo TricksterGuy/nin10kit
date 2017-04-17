@@ -2,6 +2,8 @@
 #include "logger.hpp"
 #include <algorithm>
 
+#include "export_params.hpp"
+
 #ifdef MAGICK7_SUPPORT
 // Moan... Apparently these guys can be negative or outside quantum range
 unsigned int clamp_quantum(Magick::Quantum q, size_t depth)
@@ -105,7 +107,10 @@ void CopyMagickPixels(const Magick::Image& image, std::vector<Color>& out)
     {
         unsigned char r, g, b, a;
         imageData.getPixel(i, r, g, b, a);
-        out.emplace_back(r, g, b, a);
+        if (a == 0 && params.transparent_given)
+            out.emplace_back(params.transparent_color);
+        else
+            out.emplace_back(r, g, b, a);
     }
 }
 

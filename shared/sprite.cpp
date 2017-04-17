@@ -96,7 +96,7 @@ void Sprite::WriteExport(std::ostream& file) const
 {
     if (params.for_devkitpro && params.device == "NDS")
     {
-        WriteDefine(file, export_name, "_PALETTE", palette_bank);
+        WriteDefine(file, export_name, "_PALETTE_ID", palette_bank == -1 ? 0 : palette_bank);
         if (!animated)
         {
             WriteDefineCast(file, export_name, "_SPRITE_SHAPE", shape, "ObjShape");
@@ -105,7 +105,7 @@ void Sprite::WriteExport(std::ostream& file) const
     }
     else
     {
-        WriteDefine(file, export_name, "_PALETTE", palette_bank, 12);
+        WriteDefine(file, export_name, "_PALETTE_ID", palette_bank == -1 ? 0 : palette_bank, 12);
         if (!animated)
         {
             WriteDefine(file, export_name, "_SPRITE_SHAPE", shape, 14);

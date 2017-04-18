@@ -124,8 +124,8 @@ void Map::WriteData(std::ostream& file) const
 
 void Map::WriteCommonExport(std::ostream& file) const
 {
-    WriteDefine(file, name, "_WIDTH", width);
-    WriteDefine(file, name, "_HEIGHT", height);
+    WriteDefine(file, name, "_MAP_WIDTH", width);
+    WriteDefine(file, name, "_MAP_HEIGHT", height);
     WriteDefine(file, name, "_MAP_SIZE", data.size() * 2);
     WriteDefine(file, name, "_MAP_LENGTH", data.size());
     WriteDefine(file, name, "_MAP_TYPE", (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1, 14);
@@ -140,8 +140,8 @@ void Map::WriteExport(std::ostream& file) const
     WriteExtern(file, "const unsigned short", export_name, "", data.size());
     if (!animated)
     {
-        WriteDefine(file, export_name, "_WIDTH", width);
-        WriteDefine(file, export_name, "_HEIGHT", height);
+        WriteDefine(file, export_name, "_MAP_WIDTH", width);
+        WriteDefine(file, export_name, "_MAP_HEIGHT", height);
         WriteDefine(file, export_name, "_MAP_SIZE", data.size() * 2);
         WriteDefine(file, export_name, "_MAP_LENGTH", data.size());
         WriteDefine(file, export_name, "_MAP_TYPE", (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1, 14);

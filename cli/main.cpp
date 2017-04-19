@@ -349,7 +349,9 @@ void Nin10KitApp::OnHelp(const std::string& topic)
         {
             const auto& flag = flag_desc.first;
             const auto& desc = flag_desc.second;
+#ifndef _WIN32
             printf(EMPH);
+#endif
             if (desc.usage.empty())
                 printf("-");
             printf("%s" ENDEMPH, flag.c_str());

@@ -4,12 +4,32 @@
 A set of tools for doing homebrew game development, includes look up table generators and and image to C exporter for Nintendo's Gameboy Advance, DS, and 3DS systems. In addition the GUI version of the program allows you to see what the image would look like on real hardware before exporting.
 
 __Table of Contents__
+* [Features](#features)
 * [Installation](#installation)
   * [Ubuntu/Debian](#ubuntudebian-based-systems)
   * [Windows](#windows)
   * [macOS / OSX](#macos--osx)
 * [Usage](#usage)
 * [License](#license)
+
+## Features
+
+Methodology, the image export tool should be smart, there is a lot of artificial difficulty for new users to developing homebrew applications.  Things such as knowing the correct flags to set in the Graphics Registers, calculating tile id offsets, or whatever your data would overflow a section of memory should be the tools job.  This tool was developed out of my frustration of working with tiled backgrounds, sprites, palettes, and bitmaps.
+
+* Support for practically any image format via ImageMagick.
+* Supports resizing images before you export them.
+* Support for animated image file types (or filetypes with multiple frames).  nin10kit is smart enough to detect an animated image and will also generate an array of pointers to each frame.
+* Supports generating a palette (or palette banks) given any image. Can fine tune to generate less colors for palette for a given image.
+* Supports passing in custom palettes with a set of images to use the color palette passed in.
+* Supports setting a color to be transparent, and any pixels in the image that were originally transparent.
+* Supports batch exporting of images, in the case of exporting tiles and/or a palette.  The tiles and palette will work for all images exported.
+* Automatically can form 1D or 2D tile mapping for sprites.  Will calculate the tile ids for each sprite exported for you, along with the proper shape/size/palette bank id flags.
+* Supports generating tiles from a set of background/map images. Along with the proper flags to pass the Background control registers.
+* Supports "tilesets", that is an image with the tiles you will use in all maps and exporting against a set of background/map images. Easier to manipulate maps, since you know exactly what tile-id belongs to what tile.
+* Automatically error if the amount of graphics data / tiles / sprites  would overflow their respective areas of memory. (For instance your image was composed of more than 1023 tiles).
+* Supports generating look up tables for any function in math.h along with fixed point support.
+* GUI version also can view what the images would look like on real hardware (pretty much).
+
 
 ## Installation
 ### Ubuntu/Debian Based Systems

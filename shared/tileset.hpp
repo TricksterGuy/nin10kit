@@ -33,8 +33,6 @@ class Tileset : public Exportable
         // Only one max will be used bpp = 4: paletteBanks 8: palette 16: neither
         std::shared_ptr<Palette> palette;
         PaletteBankManager paletteBanks;
-        // Only valid for bpp = 4 and 8
-        std::vector<int> offsets;
     private:
         void Init4bpp(const std::vector<Image16Bpp>& images);
         void Init8bpp(const std::vector<Image16Bpp>& images);

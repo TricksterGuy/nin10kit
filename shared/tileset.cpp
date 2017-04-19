@@ -71,7 +71,7 @@ bool Tileset::Match(const ImageTile& tile, int& tile_id, int& pal_id) const
         std::stringstream oss;
         oss << tile;
         if (!tile_id)
-            VerboseLog("%s %d %d", oss.str().c_str(), tile_id, pal_id);
+            VerboseLog("Tileset::Match %s %d %d", oss.str().c_str(), tile_id, pal_id);
         return true;
     }
 
@@ -248,11 +248,9 @@ void Tileset::Init8bpp(const std::vector<Image16Bpp>& images16)
 
     for (unsigned int k = 0; k < images16.size(); k++)
     {
-        bool disjoint_error = false;
         const Image8Bpp& image = scene.GetImage(k);
         const Image16Bpp& image16 = images16[k];
 
-        offsets.push_back(tiles.size());
         unsigned int tilesX = image.width / tile_width;
         unsigned int tilesY = image.height / tile_width;
         unsigned int totalTiles = tilesX * tilesY;
@@ -272,11 +270,6 @@ void Tileset::Init8bpp(const std::vector<Image16Bpp>& images16)
                 // Add matcher data
                 ImageTile imageTile(image16, tilex, tiley, params.border);
                 matcher.insert(std::pair<ImageTile, Tile>(imageTile, tile));
-            }
-            else if (offsets.size() > 1 && !disjoint_error)
-            {
-                WarnLog("Tiles found in tileset image %s are not disjoint, offset calculations may be off", image.name.c_str());
-                disjoint_error = true;
             }
         }
     }

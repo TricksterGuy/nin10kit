@@ -35,7 +35,7 @@ Methodology, the image export tool should be smart, there is a lot of artificial
 ### Ubuntu/Debian Based Systems
 #### Installing via apt-get
 
-These instructions will only work on non EOL'd versions of Ubuntu and derivatives starting with trusty.
+This set of instructions will only work on Ubuntu 16.04 and derivatives.
 
 Execute these commands:
 ```bash

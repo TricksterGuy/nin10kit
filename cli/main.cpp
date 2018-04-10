@@ -102,11 +102,13 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
     {wxCMD_LINE_SWITCH, "", "split",             ""},
     {wxCMD_LINE_SWITCH, "", "no_split",          ""},
 
-    // Mode 0 exclusive options
+    // Mode 0/1/2 exclusive options
     {wxCMD_LINE_SWITCH, "", "split_sbb",         ""},
     {wxCMD_LINE_SWITCH, "", "no_split_sbb",      ""},
     {wxCMD_LINE_OPTION, "", "tileset_image",     "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
     {wxCMD_LINE_OPTION, "", "border",            "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "", "affine",            ""},
+    {wxCMD_LINE_SWITCH, "", "no_affine",         ""},
     {wxCMD_LINE_SWITCH, "", "force",             ""},
     {wxCMD_LINE_SWITCH, "", "no_force",          ""},
 
@@ -231,6 +233,9 @@ const std::map<std::string, HelpDesc> help_text = {
                                                      "\tExport the images using -mode=mode with -palette_image=palette_image")},
 {"border", HelpDesc("number", "Border around each tile in tileset image\n"
                               "Only for use with -mode=tiles")},
+{"affine", HelpDesc("", "For use with -mode=tiles,map,0,tilemap.\n"
+                        "Exports the map for use with affine backgrounds.\n"
+                        "Ensures the palette generated is 8 bpp")},
 {"export_2d", HelpDesc("", "Exports sprites for use in sprite 2d mode. Default 0.")},
 {"for_bitmap", HelpDesc("", "Exports sprites for use in modes 3 and 4. Default 0.")},
 {"for_devkitpro", HelpDesc("", "Exported definitions in header file are friendly with devkitpro libraries.\n"
@@ -480,6 +485,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     params.split_sbb = parse.GetSwitch("split_sbb");
     params.tilesets = parse.GetListString("tileset_image");
     params.border = parse.GetInt("border", 0, 0);
+    params.affine = parse.GetSwitch("affine");
     params.force = parse.GetSwitch("force");
 
     params.export_2d = parse.GetSwitch("export_2d");

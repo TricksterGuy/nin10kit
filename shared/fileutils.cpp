@@ -56,6 +56,20 @@ void WriteShortArray(std::ostream& file, const std::string& name, const std::str
     file << "\n};\n";
 }
 
+void WriteShortArrayAsChars(std::ostream& file, const std::string& name, const std::string& append, const std::vector<unsigned short>& data, unsigned int items_per_row)
+{
+    unsigned int size = data.size() / 2;
+    VerboseLog("Writing short array with chars %s%s size %zd", name.c_str(), append.c_str(), size);
+    char buffer[7];
+    file << "const unsigned short " << name << append << "[" << size << "] =\n{\n\t";
+    for (unsigned int i = 0; i < size; i++)
+    {
+        snprintf(buffer, 7, "0x%02x%02x", data[2 * i + 1] & 0xFF, data[2 * i] & 0xFF);
+        WriteElement(file, buffer, size, i, items_per_row);
+    }
+    file << "\n};\n";
+}
+
 void WriteShortArray(std::ostream& file, const std::string& name, const std::string& append, const std::vector<unsigned char>& data, unsigned int items_per_row)
 {
     VerboseLog("Writing short array (from char) %s%s size %zd", name.c_str(), append.c_str(), data.size() / 2);

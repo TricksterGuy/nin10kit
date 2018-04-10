@@ -35,6 +35,9 @@ void DoGBAExport(const std::vector<Image32Bpp>& images32, const std::vector<Imag
         palette = scene.palette;
     }
 
+    if (params.affine && params.bpp == 4 && (params.mode == "0" || params.mode == "MAP" || params.mode == "TILES" || params.mode == "TILEMAP"))
+        FatalLog("GBA Affine Maps are 8 bpp only.");
+
     if (params.mode == "0" || params.mode == "TILEMAP")
         DoMode0Export(images);
     else if (params.mode == "3" || params.mode == "BITMAP")
@@ -60,14 +63,14 @@ void DoMode0Export(const std::vector<Image16Bpp>& images)
     {
         for (const auto& image : images)
         {
-            std::shared_ptr<Exportable> map_ptr(new Map(image, params.bpp));
+            std::shared_ptr<Exportable> map_ptr(new Map(image, params.bpp, params.affine));
             header.Add(map_ptr);
             implementation.Add(map_ptr);
         }
     }
     else
     {
-        std::shared_ptr<Exportable> scene(new MapScene(images, params.symbol_base_name, params.bpp));
+        std::shared_ptr<Exportable> scene(new MapScene(images, params.symbol_base_name, params.bpp, params.affine));
         header.Add(scene);
         implementation.Add(scene);
     }
@@ -132,7 +135,7 @@ void DoSpriteExport(const std::vector<Image16Bpp>& images, const std::shared_ptr
 void DoTilesetExport(const std::vector<Image16Bpp>& images, const std::shared_ptr<Palette>& palette)
 {
     // Form the tileset and then add it to header and implementation
-    std::shared_ptr<Exportable> tileset(new Tileset(images, params.symbol_base_name, params.bpp, palette));
+    std::shared_ptr<Exportable> tileset(new Tileset(images, params.symbol_base_name, params.bpp, params.affine, palette));
 
     header.Add(tileset);
     implementation.Add(tileset);
@@ -144,11 +147,11 @@ void DoMapExport(const std::vector<Image16Bpp>& images, const std::vector<Image1
         FatalLog("Map export specified however -tileset not given");
 
     // Form the tileset from the images given this is a dummy
-    std::shared_ptr<Tileset> tileset(new Tileset(tilesets, "", params.bpp));
+    std::shared_ptr<Tileset> tileset(new Tileset(tilesets, "", params.bpp, params.affine));
 
     for (const auto& image : images)
     {
-        std::shared_ptr<Exportable> map_ptr(new Map(image, tileset));
+        std::shared_ptr<Exportable> map_ptr(new Map(image, tileset, params.affine));
         header.Add(map_ptr);
         implementation.Add(map_ptr);
     }

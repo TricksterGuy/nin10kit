@@ -5,13 +5,23 @@
 #include "image16.hpp"
 #include "tileset.hpp"
 
-Map::Map(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
-    data(width * height), tileset(NULL), export_shared_info(true)
+void ValidateMapSize(const Image16Bpp& image, bool affine)
 {
     if ((image.width != 256 && image.width != 512) || (image.height != 256 && image.height != 512))
         FatalLog("Invalid map size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
+    else if (affine)
+    {
+        if (!((image.width == 128 && image.height == 128) || (image.width == 256 && image.height == 256) || (image.width == 512 && image.height == 512) || (image.width == 1024 && image.height == 1024)))
+            FatalLog("Invalid affine map size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
+    }
+}
+
+Map::Map(const Image16Bpp& image, int bpp, bool _affine) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
+    data(width * height), tileset(NULL), export_shared_info(true), affine(_affine)
+{
+    ValidateMapSize(image, affine);
     // Create tileset according to bpp
-    tileset.reset(Tileset::FromImage(image, bpp));
+    tileset.reset(Tileset::FromImage(image, bpp, affine));
 
     // Tile match each tile in image
     switch(bpp)
@@ -25,11 +35,10 @@ Map::Map(const Image16Bpp& image, int bpp) : Image(image.width / 8, image.height
     }
 }
 
-Map::Map(const Image16Bpp& image, std::shared_ptr<Tileset>& global_tileset) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
-    data(width * height), tileset(global_tileset), export_shared_info(false)
+Map::Map(const Image16Bpp& image, std::shared_ptr<Tileset>& global_tileset, bool _affine) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
+    data(width * height), tileset(global_tileset), export_shared_info(false), affine(_affine)
 {
-    if ((image.width != 256 && image.width != 512) || (image.height != 256 && image.height != 512))
-        FatalLog("Invalid map size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
+    ValidateMapSize(image, affine);
 
     switch(tileset->bpp)
     {
@@ -85,6 +94,20 @@ void Map::WriteData(std::ostream& file) const
     if (export_shared_info)
         tileset->WriteData(file);
 
+    if (affine)
+        WriteAffineData(file);
+    else
+        WriteSbbData(file);
+}
+
+void Map::WriteAffineData(std::ostream& file) const
+{
+    WriteShortArrayAsChars(file, export_name, "", data, 16);
+    WriteNewLine(file);
+}
+
+void Map::WriteSbbData(std::ostream& file) const
+{
     char buffer[7];
     int type = (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1;
     int num_blocks = (type == 0 ? 1 : (type < 3 ? 2 : 4));
@@ -124,11 +147,16 @@ void Map::WriteData(std::ostream& file) const
 
 void Map::WriteCommonExport(std::ostream& file) const
 {
+    unsigned int size = data.size() / (affine ? 2 : 1);
+
     WriteDefine(file, name, "_MAP_WIDTH", width);
     WriteDefine(file, name, "_MAP_HEIGHT", height);
-    WriteDefine(file, name, "_MAP_SIZE", data.size() * 2);
-    WriteDefine(file, name, "_MAP_LENGTH", data.size());
-    WriteDefine(file, name, "_MAP_TYPE", (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1, 14);
+    WriteDefine(file, name, "_MAP_SIZE", size * 2);
+    WriteDefine(file, name, "_MAP_LENGTH", size);
+    if (affine)
+        WriteDefine(file, name, "_MAP_TYPE", log2(width) - 4, 14);
+    else
+        WriteDefine(file, name, "_MAP_TYPE", (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1, 14);
 }
 
 void Map::WriteExport(std::ostream& file) const
@@ -137,36 +165,37 @@ void Map::WriteExport(std::ostream& file) const
     if (export_shared_info)
         tileset->WriteExport(file);
 
-    WriteExtern(file, "const unsigned short", export_name, "", data.size());
+    unsigned int size = data.size() / (affine ? 2 : 1);
+    WriteExtern(file, "const unsigned short", export_name, "", size);
     if (!animated)
     {
         WriteDefine(file, export_name, "_MAP_WIDTH", width);
         WriteDefine(file, export_name, "_MAP_HEIGHT", height);
-        WriteDefine(file, export_name, "_MAP_SIZE", data.size() * 2);
-        WriteDefine(file, export_name, "_MAP_LENGTH", data.size());
-        WriteDefine(file, export_name, "_MAP_TYPE", (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1, 14);
-    }
+        WriteDefine(file, export_name, "_MAP_SIZE", size * 2);
+        WriteDefine(file, export_name, "_MAP_LENGTH", size);
+        if (affine)
+            WriteDefine(file, export_name, "_MAP_TYPE", log2(width) - 4, 14);
+        else
+            WriteDefine(file, export_name, "_MAP_TYPE", (width > 32 ? 1 : 0) | (height > 32 ? 1 : 0) << 1, 14);
+        }
     WriteNewLine(file);
 }
 
-MapScene::MapScene(const std::vector<Image16Bpp>& images16, const std::string& _name, int bpp) : Scene(_name), tileset(NULL)
+MapScene::MapScene(const std::vector<Image16Bpp>& images16, const std::string& _name, int bpp, bool affine) : Scene(_name), tileset(NULL)
 {
     for (const auto& image : images16)
-    {
-        if ((image.width != 256 && image.width != 512) || (image.height != 256 && image.height != 512))
-            FatalLog("Invalid map size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
-    }
+        ValidateMapSize(image, affine);
 
-    tileset.reset(new Tileset(images16, name, bpp));
+    tileset.reset(new Tileset(images16, name, bpp, affine));
 
     for (const auto& image : images16)
-        images.emplace_back(new Map(image, tileset));
+        images.emplace_back(new Map(image, tileset, affine));
 }
 
-MapScene::MapScene(const std::vector<Image16Bpp>& images16, const std::string& _name, std::shared_ptr<Tileset>& _tileset) : Scene(_name), tileset(_tileset)
+MapScene::MapScene(const std::vector<Image16Bpp>& images16, const std::string& _name, std::shared_ptr<Tileset>& _tileset, bool affine) : Scene(_name), tileset(_tileset)
 {
     for (const auto& image : images16)
-        images.emplace_back(new Map(image, tileset));
+        images.emplace_back(new Map(image, tileset, affine));
 }
 
 const Map& MapScene::GetMap(int index) const

@@ -13,8 +13,8 @@ class Image16Bpp;
 class Tileset : public Exportable
 {
     public:
-        Tileset(const std::vector<Image16Bpp>& images, const std::string& name, int bpp, const std::shared_ptr<Palette>& palette = nullptr);
-        static Tileset* FromImage(const Image16Bpp& image, int bpp);
+        Tileset(const std::vector<Image16Bpp>& images, const std::string& name, int bpp, bool affine, const std::shared_ptr<Palette>& palette = nullptr);
+        static Tileset* FromImage(const Image16Bpp& image, int bpp, bool affine);
         int Search(const Tile& tile) const;
         int Search(const ImageTile& tile) const;
         // Match Imagetile to Tile (only for bpp = 4)
@@ -23,6 +23,7 @@ class Tileset : public Exportable
         void WriteData(std::ostream& file) const;
         void WriteExport(std::ostream& file) const;
         int bpp;
+        bool affine;
         // Only one of two will be used bpp = 4 or 8: tiles 16: itiles
         std::set<Tile> tiles;
         std::set<ImageTile> itiles;

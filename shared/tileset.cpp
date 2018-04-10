@@ -8,13 +8,17 @@
 #include "image8.hpp"
 #include "shared.hpp"
 
-Tileset::Tileset(const std::vector<Image16Bpp>& images, const std::string& name, int _bpp, const std::shared_ptr<Palette>& global_palette) :
-    Exportable(name), bpp(_bpp), palette(global_palette), paletteBanks(name), export_shared_data(global_palette == nullptr)
+Tileset::Tileset(const std::vector<Image16Bpp>& images, const std::string& name, int _bpp, bool _affine, const std::shared_ptr<Palette>& global_palette) :
+    Exportable(name), bpp(_bpp), affine(_affine), palette(global_palette), paletteBanks(name), export_shared_data(global_palette == nullptr)
 {
     switch(bpp)
     {
         case 4:
-            if (palette)
+            if (affine)
+            {
+                FatalLog("Affine can not be set on a 4 bpp tilset");
+            }
+            else if (palette)
             {
                 paletteBanks.Copy(*global_palette);
             }
@@ -34,11 +38,11 @@ Tileset::Tileset(const std::vector<Image16Bpp>& images, const std::string& name,
     }
 }
 
-Tileset* Tileset::FromImage(const Image16Bpp& image, int bpp)
+Tileset* Tileset::FromImage(const Image16Bpp& image, int bpp, bool affine)
 {
     std::vector<Image16Bpp> images;
     images.push_back(image);
-    return new Tileset(images, "", bpp);
+    return new Tileset(images, "", bpp, affine);
 }
 
 int Tileset::Search(const Tile& tile) const
@@ -124,7 +128,7 @@ void Tileset::WriteExport(std::ostream& file) const
 void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
 {
     // Tile image into 16 bit tiles
-    Tileset tileset16bpp(images, name, 16);
+    Tileset tileset16bpp(images, name, 16, affine);
     std::set<ImageTile> imageTiles = tileset16bpp.itiles;
 
     const Tile& nullTile = Tile::GetNullTile4();
@@ -221,7 +225,7 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
     int tile_size = TILE_SIZE_BYTES_4BPP;
     int memory_b = tiles.size() * tile_size;
     if (tiles.size() >= 1024)
-        FatalLog("Too many tiles found %d tiles. Please make the image simpler.", tiles.size());
+        FatalLog("Too many tiles. Found %d tiles. Please make the image simpler.", tiles.size());
 
     // Delicious infos
     int cbbs = tiles.size() * tile_size / SIZE_CBB_BYTES;
@@ -277,9 +281,10 @@ void Tileset::Init8bpp(const std::vector<Image16Bpp>& images16)
     // Checks
     int tile_size = TILE_SIZE_BYTES_8BPP;
     int memory_b = tiles.size() * tile_size;
-    if (tiles.size() >= 1024)
-        FatalLog("Too many tiles found %d tiles. Please make the image simpler.", tiles.size());
-
+    if (!affine && tiles.size() >= 1024)
+        FatalLog("Too many tiles. Found %d tiles. Please make the image simpler.", tiles.size());
+    else if (affine && tiles.size() >= 256)
+        FatalLog("Too many tiles found for affine. Found %d tiles.  Please make the map/tileset simpler", tiles.size());
 
     // Delicious infos
     int cbbs = tiles.size() * tile_size / SIZE_CBB_BYTES;

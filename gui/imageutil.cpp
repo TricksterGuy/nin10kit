@@ -59,7 +59,7 @@ void ConvertToMode0(std::map<std::string, ImageInfo>& images, std::vector<Map>& 
     params.bpp = bpp;
     std::vector<Image16Bpp> images16;
     ConvertToMode3(images, images16);
-    MapScene scene(images16, "", bpp);
+    MapScene scene(images16, "", bpp, false);
     for (unsigned int i = 0; i < scene.NumImages(); i++)
         maps.emplace_back(scene.GetMap(i));
 }

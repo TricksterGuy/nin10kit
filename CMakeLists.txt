@@ -94,6 +94,10 @@ set(SRC_NIN10KITGUI
     gui/nin10kitgui.cpp
     gui/nin10kitviewergui.cpp
     gui/nin10kitviewer.cpp
+    #gui/tilemap/nin10kitmap.cpp
+    #gui/tilemap/nin10kitmapgui.cpp
+    #gui/tilemap/mapcanvas.cpp
+    #gui/tilemap/tilechooser.cpp
     gui/imageutil.cpp
     gui/exporter.cpp
     gui/wxlogger.cpp

@@ -46,6 +46,7 @@ struct ExportParams
     float dither_level;
     unsigned int palette_size;
     bool split;
+    bool affine;
     int bpp;
 
     // Tile/map stuff

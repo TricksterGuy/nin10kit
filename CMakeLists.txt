@@ -7,6 +7,7 @@ project (nin10kit)
 include(FindPkgConfig)
 
 option(ENABLE_MAGICK7_SUPPORT "Support ImageMagick7 API instead of ImageMagick6" OFF)
+option(ENABLE_NIN10EDIT "Enable nin10kit bitmap editor" OFF)
 
 # Require C++11 build
 if(NOT CMAKE_CXX_FLAGS MATCHES "-std=(c|gnu)\\+\\+11")
@@ -48,6 +49,22 @@ ELSE()
     add_definitions(-DMAGICK6_SUPPORT)
     add_definitions(-DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16)
 ENDIF(ENABLE_MAGICK7_SUPPORT)
+
+find_package(wxWidgets REQUIRED core base)
+include(${wxWidgets_USE_FILE})
+
+if(APPLE OR WIN32)
+    message(STATUS "The platform appears to be macOS or windows, so using pkg-config to find ImageMagick.")
+    pkg_check_modules(ImageMagick Magick++ MagickWand MagickCore)
+else()
+    find_package(ImageMagick COMPONENTS Magick++ MagickWand MagickCore REQUIRED)
+endif(APPLE OR WIN32)
+
+include_directories(${nin10kit_SOURCE_DIR}/shared)
+include_directories(${nin10kit_SOURCE_DIR}/gui/logging)
+include_directories(${nin10kit_SOURCE_DIR}/gui/shared)
+include_directories(${ImageMagick_INCLUDE_DIRS})
+link_directories(${nin10kit_SOURCE_DIR}/shared)
 
 
 set(CMAKE_SKIP_RPATH TRUE)
@@ -105,6 +122,7 @@ set(SRC_NIN10KITGUI
     gui/logging/wxlogger.cpp
 )
 
+if (ENABLE_NIN10EDIT)
 set(SRC_NIN10EDIT
 	gui/bitmap/nin10edit.cpp
 	gui/bitmap/nin10editgui.cpp
@@ -121,21 +139,21 @@ set(SRC_NIN10EDIT
     gui/logging/wxlogger.cpp
 )
 
-find_package(wxWidgets REQUIRED core base)
-include(${wxWidgets_USE_FILE})
+add_executable(
+    nin10edit
+    ${SRC_NIN10EDIT}
+)
 
-if(APPLE OR WIN32)
-    message(STATUS "The platform appears to be macOS or windows, so using pkg-config to find ImageMagick.")
-    pkg_check_modules(ImageMagick Magick++ MagickWand MagickCore)
-else()
-    find_package(ImageMagick COMPONENTS Magick++ MagickWand MagickCore REQUIRED)
-endif(APPLE OR WIN32)
+target_link_libraries(
+    nin10edit
+    m
+    shared_files
+    ${ImageMagick_LIBRARIES}
+    ${wxWidgets_LIBRARIES}
+)
+endif(ENABLE_NIN10EDIT)
 
-include_directories(${nin10kit_SOURCE_DIR}/shared)
-include_directories(${nin10kit_SOURCE_DIR}/gui/logging)
-include_directories(${nin10kit_SOURCE_DIR}/gui/shared)
-include_directories(${ImageMagick_INCLUDE_DIRS})
-link_directories(${nin10kit_SOURCE_DIR}/shared)
+
 
 add_library(
     shared_files
@@ -168,19 +186,6 @@ add_executable(
 
 target_link_libraries(
     nin10kitgui
-    m
-    shared_files
-    ${ImageMagick_LIBRARIES}
-    ${wxWidgets_LIBRARIES}
-)
-
-add_executable(
-    nin10edit
-    ${SRC_NIN10EDIT}
-)
-
-target_link_libraries(
-    nin10edit
     m
     shared_files
     ${ImageMagick_LIBRARIES}

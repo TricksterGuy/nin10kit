@@ -34,6 +34,8 @@ class ColorArray
         void Clear();
         /** Sets array to contain colors passed in */
         void Set(const std::vector<Color16>& _colors);
+        /** Sets a color in the array */
+        bool Set(unsigned int index, const Color16& color);
         /** Gets color at palette index */
         const Color16& At(int index) const {return colors[index];}
         /** Search palette for color passed in returns the closest palette index that matches the color */

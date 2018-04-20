@@ -33,6 +33,34 @@ void ColorArray::Set(const std::vector<Color16>& _colors)
         labColors.push_back(ColorLAB(color));
 }
 
+bool ColorArray::Set(unsigned int index, const Color16& color)
+{
+    if (index >= 256)
+        return false;
+
+    if (index >= colors.size())
+    {
+        colors.resize(index + 1);
+        labColors.resize(index + 1);
+        colorSet.insert(colors.begin(), colors.end());
+    }
+
+    Color16 old = colors[index];
+
+    if (old == color)
+        return true;
+
+    if (colorSet.find(color) != colorSet.end())
+        return false;
+
+    colors[index] = color;
+    colorSet.erase(old);
+    colorSet.insert(color);
+    labColors[index] = ColorLAB(color);
+
+    return true;
+}
+
 int ColorArray::Search(const Color16& color) const
 {
     unsigned long bestd = 0x7FFFFFFF;

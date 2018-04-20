@@ -1,8 +1,8 @@
-#include "nin10kitapp.hpp"
+#include "nin10editapp.hpp"
 #include "cmd-line-parser-helper.hpp"
 #include "wxlogger.hpp"
 
-IMPLEMENT_APP_NO_MAIN(Nin10KitApp);
+IMPLEMENT_APP_NO_MAIN(Nin10EditApp);
 
 static const wxCmdLineEntryDesc cmd_descriptions[] =
 {
@@ -15,16 +15,16 @@ static const wxCmdLineEntryDesc cmd_descriptions[] =
     {wxCMD_LINE_NONE}
 };
 
-void Nin10KitApp::OnInitCmdLine(wxCmdLineParser& parser)
+void Nin10EditApp::OnInitCmdLine(wxCmdLineParser& parser)
 {
-    parser.SetLogo(wxString::Format(_("Nin10kit GUI")));
+    parser.SetLogo(wxString::Format(_("Nin10Edit GUI")));
     parser.SetDesc(cmd_descriptions);
     parser.SetSwitchChars (_("-"));
 }
 
-bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
+bool Nin10EditApp::OnCmdLineParsed(wxCmdLineParser& parser)
 {
     CmdLineParserHelper parse(parser);
-    logger->SetLogLevel((LogLevel)parse.GetInt("log", 3, 0, 4));
+    logger->SetLogLevel((LogLevel)parse.GetInt("log", 4, 0, 4));
     return true;
 }

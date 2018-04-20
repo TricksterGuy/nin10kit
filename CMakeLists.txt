@@ -98,9 +98,27 @@ set(SRC_NIN10KITGUI
     #gui/tilemap/nin10kitmapgui.cpp
     #gui/tilemap/mapcanvas.cpp
     #gui/tilemap/tilechooser.cpp
-    gui/imageutil.cpp
     gui/exporter.cpp
-    gui/wxlogger.cpp
+    gui/shared/colorutil.cpp
+    gui/shared/imageutil.cpp
+    gui/shared/nin10app.cpp
+    gui/logging/wxlogger.cpp
+)
+
+set(SRC_NIN10EDIT
+	gui/bitmap/nin10edit.cpp
+	gui/bitmap/nin10editgui.cpp
+	gui/bitmap/nin10editapp.cpp
+	gui/bitmap/color_chooser_gui.cpp
+	gui/bitmap/color_chooser_dialog.cpp
+	gui/bitmap/color_info_panel.cpp
+	gui/bitmap/palette_editor_panel.cpp
+	gui/bitmap/graphics_editor_panel.cpp
+    gui/exporter.cpp
+    gui/shared/colorutil.cpp
+    gui/shared/imageutil.cpp
+    gui/shared/nin10app.cpp
+    gui/logging/wxlogger.cpp
 )
 
 find_package(wxWidgets REQUIRED core base)
@@ -114,6 +132,8 @@ else()
 endif(APPLE OR WIN32)
 
 include_directories(${nin10kit_SOURCE_DIR}/shared)
+include_directories(${nin10kit_SOURCE_DIR}/gui/logging)
+include_directories(${nin10kit_SOURCE_DIR}/gui/shared)
 include_directories(${ImageMagick_INCLUDE_DIRS})
 link_directories(${nin10kit_SOURCE_DIR}/shared)
 
@@ -148,6 +168,19 @@ add_executable(
 
 target_link_libraries(
     nin10kitgui
+    m
+    shared_files
+    ${ImageMagick_LIBRARIES}
+    ${wxWidgets_LIBRARIES}
+)
+
+add_executable(
+    nin10edit
+    ${SRC_NIN10EDIT}
+)
+
+target_link_libraries(
+    nin10edit
     m
     shared_files
     ${ImageMagick_LIBRARIES}

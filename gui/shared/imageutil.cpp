@@ -26,6 +26,15 @@ ImageInfo::ImageInfo(const std::string& _filename) : filename(_filename)
     thumbnail = MagickToBitmap(images[0], THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT);
 }
 
+EditImageInfo::EditImageInfo(const std::string& filename) : filename(_filename)
+{
+    std::string name = Format(filename);
+    std::vector<Magick::Image> images
+    readImages(&images, filename);
+    for (auto image : info.GetImages())
+        images16.emplace_back(Image32Bpp(image, name, filename, image.scene(), images.size() > 1));
+}
+
 void ConvertToMode3(std::map<std::string, ImageInfo>& images, std::vector<Image16Bpp>& images16)
 {
     DefaultParams();

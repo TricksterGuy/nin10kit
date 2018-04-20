@@ -32,6 +32,17 @@ class ImageInfo
         std::vector<Magick::Image> images;
 };
 
+class EditImageInfo
+{
+    public:
+        EditImageInfo(const std::string& filename);
+        ~EditImageInfo() {}
+        const std::vector<Image16Bpp>& GetImages() const {return images;}
+    private:
+        std::string filename;
+        std::vector<Image16Bpp> images;
+};
+
 wxBitmap MagickToBitmap(Magick::Image, int width, int height);
 
 void ConvertToMode3(std::map<std::string, ImageInfo>& images, std::vector<Image16Bpp>& images16);

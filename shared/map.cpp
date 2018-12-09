@@ -8,11 +8,11 @@
 void ValidateMapSize(const Image16Bpp& image, bool affine)
 {
     if ((image.width != 256 && image.width != 512) || (image.height != 256 && image.height != 512))
-        FatalLog("Invalid map size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
+        FatalLog("Invalid map size for image %s, (%d %d). Please fix.", image.name.c_str(), image.width, image.height);
     else if (affine)
     {
         if (!((image.width == 128 && image.height == 128) || (image.width == 256 && image.height == 256) || (image.width == 512 && image.height == 512) || (image.width == 1024 && image.height == 1024)))
-            FatalLog("Invalid affine map size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
+            FatalLog("Invalid affine map size for image %s, (%d %d). Please fix.", image.name.c_str(), image.width, image.height);
     }
 }
 

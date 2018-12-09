@@ -147,7 +147,7 @@ struct HelpDesc
 
 // Help text
 const std::map<std::string, HelpDesc> help_text = {
-{"help", HelpDesc("one of command_line_flag, formats, basic, all","Display help on command line option.")},
+{"help", HelpDesc("one of command_line_flag, formats, basic, flags, all","Display help on command line option.")},
 {"log", HelpDesc("number [0-4]", "Logging level (0=fatal,1=error,2=warn,3=info,4=verbose). Default 3\n"
                                  "Any logging messages above the logging level will not be displayed.")},
 {"mode", HelpDesc("one of 0, 3, 4, palette, tiles, map, sprites, bitmap, indexed, tilemap, lut",
@@ -282,7 +282,7 @@ int main(int argc, char** argv)
   */
 bool Nin10KitApp::OnInit()
 {
-    logger->SetLogLevel(LogLevel::INFO);
+    logger->SetLogLevel(LogLevel::WARNING);
     VerboseLog("Init");
 
     if (argc <= 1)
@@ -342,12 +342,31 @@ void Nin10KitApp::ShowBasicHelp()
     printf(RED "list_of_image_files_or_urls" END " is a list of image files or URLs of images.\n"
            "\tTo see what image formats are supported use command nin10kit -h=formats\n\n");
     printf("For more detailed help use command nin10kit -h\n"
-           "nin10kit -h=" RED "command_line_flag" END " for a more detailed description of what command_line_flag does.\n");
+           "\tnin10kit -h=" RED "flag" END " for a detailed description of what flag does\n"
+           "\tnin10kit -h=flags for a list of all of the flags\n"
+           "\tnin10kit -h=all for each flag and a description.\n");
 }
 
 void Nin10KitApp::OnHelp(const std::string& topic)
 {
     if (topic == "all" || topic.empty())
+    {
+        for (const auto& help_desc : help_text)
+        {
+            const auto& desc = help_desc.second;
+            printf("Flag %s\n"
+                   "-----------------\n", help_desc.first.c_str());
+
+            printf("Usage: " EMPH);
+            if (desc.usage.empty())
+                printf("-");
+            printf("%s" ENDEMPH, help_desc.first.c_str());
+            if (!desc.usage.empty())
+                printf("=%s", desc.usage.c_str());
+            printf("\n%s\n\n", desc.text.c_str());
+        }
+    }
+    else if (topic == "flags")
     {
         printf("Available command line flags are as follows\n");
         for (const auto& flag_desc : help_text)

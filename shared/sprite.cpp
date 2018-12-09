@@ -25,15 +25,52 @@ const int sprite_sizes[16] =
      -1, -1, 3,  3  // width = 8
 };
 
+const std::set<int> valid_sprite_sizes = {1, 2, 4, 8};
+
+std::pair<int, int> CalculateSpriteSize(const Image16Bpp& image)
+{
+    std::pair<int, int> ret = {-1, -1};
+
+    if (image.width & 7 || image.height & 7)
+    {
+        if (params.force)
+            FatalLog("For --force exported sprites, image %s, (%d %d) dimensions must be divisible by 8. Please fix.", image.name.c_str(), image.width, image.height);
+        else
+            FatalLog("Invalid sprite size for image %s (%d %d), Dimensions must be divisible by 8. Please fix.", image.name.c_str(), image.width, image.height);
+    }
+
+    unsigned int width = image.width / 8;
+    unsigned int height = image.height / 8;
+    unsigned int key = (log2(width) << 2) | log2(height);
+
+    if (!params.force &&
+        valid_sprite_sizes.find(width) != valid_sprite_sizes.end() &&
+        valid_sprite_sizes.find(height) != valid_sprite_sizes.end() &&
+        sprite_sizes[key] != -1 &&
+        sprite_shapes[key] != -1)
+    {
+        ret.first = sprite_shapes[key];
+        ret.second = sprite_sizes[key];
+    }
+
+    if (ret.first == -1 || ret.second == -1)
+    {
+        if (params.force)
+            WarnLog("Invalid sprite size for image %s, (%d %d). Note that only a tile-id offset will be emitted.", image.name.c_str(), image.width, image.height);
+        else
+            FatalLog("Invalid sprite size for image %s, (%d %d). Please fix.", image.name.c_str(), image.width, image.height);
+    }
+
+    return ret;
+}
+
 Sprite::Sprite(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette) :
     Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated), palette(global_palette),
-    palette_bank(-1), size(0), shape(0), offset(0), bpp(8)
+    palette_bank(-1), size(-1), shape(-1), offset(0), bpp(8)
 {
-    unsigned int key = (log2(width) << 2) | log2(height);
-    if (key > 15 || sprite_sizes[key] == -1 || image.width & 7 || image.height & 7)
-        FatalLog("Invalid sprite size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
-    shape = sprite_shapes[key];
-    size = sprite_sizes[key];
+    auto shape_size = CalculateSpriteSize(image);
+    shape = shape_size.first;
+    size = shape_size.second;
 
     // Is actually an 8 or 4bpp image
     Image8Bpp image8(image, palette);
@@ -44,15 +81,14 @@ Sprite::Sprite(const Image16Bpp& image, std::shared_ptr<Palette>& global_palette
 }
 
 Sprite::Sprite(const Image16Bpp& image, int _bpp) : Image(image.width / 8, image.height / 8, image.name, image.filename, image.frame, image.animated),
-    palette(new Palette()), palette_bank(-1), size(0), shape(0), offset(0), bpp(_bpp)
+    palette(new Palette()), palette_bank(-1), size(-1), shape(-1), offset(0), bpp(_bpp)
 {
-    unsigned int key = (log2(width) << 2) | log2(height);
-    if (key > 15 || sprite_sizes[key] == -1 || image.width & 7 || image.height & 7)
-        FatalLog("Invalid sprite size for image %s, (%d %d) Please fix", image.name.c_str(), image.width, image.height);
-    shape = sprite_shapes[key];
-    size = sprite_sizes[key];
+    auto shape_size = CalculateSpriteSize(image);
+    shape = shape_size.first;
+    size = shape_size.second;
 
     GetPalette(image.pixels, 1 << bpp, params.transparent_color, 0, *palette);
+
     // Is actually an 8 or 4bpp image
     Image8Bpp image8(image, palette);
 
@@ -80,6 +116,7 @@ void Sprite::WriteTile(unsigned char* arr, int x, int y) const
 
 void Sprite::WriteCommonExport(std::ostream& file) const
 {
+    if (shape == -1 || size == -1) return;
     if (params.for_devkitpro && params.device == "NDS")
     {
         WriteDefineCast(file, name, "_SPRITE_SHAPE", shape, "ObjShape");
@@ -97,7 +134,7 @@ void Sprite::WriteExport(std::ostream& file) const
     if (params.for_devkitpro && params.device == "NDS")
     {
         WriteDefine(file, export_name, "_PALETTE_ID", palette_bank == -1 ? 0 : palette_bank);
-        if (!animated)
+        if (!animated && shape != -1 && size != -1)
         {
             WriteDefineCast(file, export_name, "_SPRITE_SHAPE", shape, "ObjShape");
             WriteDefineCast(file, export_name, "_SPRITE_SIZE", size, "ObjSize");
@@ -106,7 +143,7 @@ void Sprite::WriteExport(std::ostream& file) const
     else
     {
         WriteDefine(file, export_name, "_PALETTE_ID", palette_bank == -1 ? 0 : palette_bank, 12);
-        if (!animated)
+        if (!animated && shape != -1 && size != -1)
         {
             WriteDefine(file, export_name, "_SPRITE_SHAPE", shape, 14);
             WriteDefine(file, export_name, "_SPRITE_SIZE", size, 14);
@@ -286,14 +323,14 @@ void SpriteSheet::PlaceSprites()
             continue;
 
         if (size.IsBiggestSize())
-            FatalLog("Out of sprite memory could not allocate sprite %s size (%d,%d)", sprite.name.c_str(), sprite.width, sprite.height);
+            FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d)", sprite.name.c_str(), sprite.width, sprite.height);
 
         slice.push_front(size);
         while (!HasAvailableBlock(size))
         {
             std::vector<BlockSize> sizes = BlockSize::BiggerSizes(size);
             if (sizes.empty())
-                FatalLog("Out of sprite memory could not allocate sprite %s size (%d,%d)", sprite.name.c_str(), sprite.width, sprite.height);
+                FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d)", sprite.name.c_str(), sprite.width, sprite.height);
 
             // Default next search size will be last.
             size = sizes.back();
@@ -310,7 +347,7 @@ void SpriteSheet::PlaceSprites()
         }
 
         if (!HasAvailableBlock(size))
-            FatalLog("Out of sprite memory could not allocate sprite %s size (%d,%d)", sprite.name.c_str(), sprite.width, sprite.height);
+            FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d)", sprite.name.c_str(), sprite.width, sprite.height);
 
         SliceBlock(size, slice);
 
@@ -319,7 +356,7 @@ void SpriteSheet::PlaceSprites()
         if (AssignBlockIfAvailable(size, sprite, i))
             continue;
         else
-            FatalLog("Out of sprite memory could not allocate sprite %s size (%d,%d)", sprite.name.c_str(), sprite.width, sprite.height);
+            FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d)", sprite.name.c_str(), sprite.width, sprite.height);
     }
 }
 
@@ -372,7 +409,7 @@ void SpriteGraphicsMemoryCheck(const std::vector<Image16Bpp>& images, int bpp)
         current += imagetiles;
     }
     if (current > maxtiles && !params.force)
-        FatalLog("Found %d tiles, you can only have maximum %d tiles. You may pass in -force to override this.", current, maxtiles);
+        FatalLog("Found %d tiles, you can only have maximum %d tiles. You may pass in --force to override this.", current, maxtiles);
 }
 
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, int _bpp, const std::shared_ptr<Palette>& global_palette) :
@@ -423,6 +460,10 @@ void SpriteScene::Build()
         {
             Sprite* sprite = dynamic_cast<Sprite*>(image.get());
             if (!sprite) FatalLog("Could not cast Image to Sprite. This shouldn't happen");
+            // It is an error if using --force and non standard sprite sizes.
+            // This is because the max size here will be 8x8 in tiles and modifying this code would be a pain for variable sized sprites.
+            if (sprite->size == -1 || sprite->shape == -1)
+                FatalLog("Invalid sprite dimensions (%d %d) found for sprite %s, --force doesn't allow you to have a 2D sprite mapping with non-standard size sprites use 1D mode instead.", sprite->width, sprite->height, sprite->name.c_str());
             sprites.push_back(sprite);
         }
         spriteSheet.reset(new SpriteSheet(sprites, name, bpp));
@@ -547,7 +588,7 @@ void SpriteScene::Init4bpp(const std::vector<Image16Bpp>& images16)
     }
 
     if (bigPalette.size() > 256 && !params.force)
-        FatalLog("Image after reducing sprites to 4bpp still contains more than 256 distinct colors.  Found %d colors. Please fix.", bigPalette.size());
+        FatalLog("Image after reducing sprites to 4bpp still contains more than 256 distinct colors. Found %d colors. Please fix.", bigPalette.size());
 
     // Greedy approach deal with tiles with largest palettes first.
     std::sort(sprites.begin(), sprites.end(), SpritePaletteSizeComp);

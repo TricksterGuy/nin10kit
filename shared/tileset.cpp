@@ -151,7 +151,7 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
     }
 
     if (bigPalette.size() > 256 && !params.force)
-        FatalLog("Image after reducing tiles to 4bpp still contains more than 256 distinct colors.  Found %d colors. Please fix.", bigPalette.size());
+        FatalLog("Image after reducing tiles to 4bpp still contains more than 256 distinct colors. Found %d colors. Please fix.", bigPalette.size());
 
     // Greedy approach deal with tiles with largest palettes first.
     std::sort(gbaTiles.begin(), gbaTiles.end(), TilesPaletteSizeComp);

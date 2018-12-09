@@ -13,7 +13,7 @@ Image8Bpp::Image8Bpp(const Image16Bpp& image, std::shared_ptr<Palette> global_pa
 {
     // If the image width is odd error out
     if (width & 1)
-        FatalLog("Image: %s width is not a multiple of 2. Found (%d, %d). Please fix", name.c_str(), width, height);
+        FatalLog("Image: %s width is not a multiple of 2. Found (%d, %d). Please fix.", name.c_str(), width, height);
 
     if (!palette)
     {
@@ -63,7 +63,7 @@ Image8BppScene::Image8BppScene(const std::vector<Image16Bpp>& images16, const st
     for (const auto& image : images16)
     {
         if (image.width & 1)
-            FatalLog("Image: %s width is not a multiple of 2.  Found (%d %d). Please fix", name.c_str(), image.width, image.height);
+            FatalLog("Image: %s width is not a multiple of 2. Found (%d %d). Please fix.", name.c_str(), image.width, image.height);
     }
 
     if (!palette)

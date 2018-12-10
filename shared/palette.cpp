@@ -257,6 +257,18 @@ void PaletteBankManager::Copy(const Palette& palette)
     }
 }
 
+unsigned int PaletteBankManager::NumEntries() const
+{
+    unsigned int total = 0;
+    for (const auto& bank : banks)
+    {
+        if (!bank.Used())
+            break;
+        total += 16;
+    }
+    return std::max(total, 16U);
+}
+
 int PaletteBankManager::FindBestMatch(const ColorArray& palette) const
 {
     unsigned long min = 0x7FFFFFFF;
@@ -275,21 +287,25 @@ int PaletteBankManager::FindBestMatch(const ColorArray& palette) const
 
 void PaletteBankManager::WriteData(std::ostream& file) const
 {
-    file << "const unsigned short " << name << "_palette[256] =\n{\n\t";
-    for (unsigned int i = 0; i < 16; i++)
+    WriteBeginArray(file, "const unsigned short", name, "_palette", NumEntries());
+    file << banks[0];
+    for (unsigned int i = 1; i < 16; i++)
     {
+        if (!banks[i].Used())
+            break;
+        file << ",\n\t";
         file << banks[i];
-        if (i != 16 - 1)
-            file << ",\n\t";
     }
-    file << "\n};\n";
+
+    WriteEndArray(file);
     WriteNewLine(file);
 }
 
 void PaletteBankManager::WriteExport(std::ostream& file) const
 {
-    WriteExtern(file, "const unsigned short", name, "_palette", 256);
-    WriteDefine(file, name, "_PALETTE_SIZE", 512);
-    WriteDefine(file, name, "_PALETTE_LENGTH", 256);
+    unsigned int entries = NumEntries();
+    WriteExtern(file, "const unsigned short", name, "_palette", entries);
+    WriteDefine(file, name, "_PALETTE_SIZE", entries * 2);
+    WriteDefine(file, name, "_PALETTE_LENGTH", entries);
     WriteNewLine(file);
 }

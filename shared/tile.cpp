@@ -170,7 +170,7 @@ std::ostream& operator<<(std::ostream& file, const Tile& tile)
     {
         for (unsigned int i = 0; i < TILE_SIZE_SHORTS_4BPP; i++)
         {
-            snprintf(buffer, 7, "0x%01x%01x%01x%01x", pixels[4 * i + 3], pixels[4 * i + 2], pixels[4 * i + 1], pixels[4 * i]);
+            snprintf(buffer, 7, "0x%01x%01x%01x%01x", pixels[4 * i + 3] & 0xF, pixels[4 * i + 2] & 0xF, pixels[4 * i + 1] & 0xF, pixels[4 * i] & 0xF);
             WriteElement(file, buffer, TILE_SIZE_SHORTS_4BPP, i, 8);
         }
     }

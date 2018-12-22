@@ -10,7 +10,7 @@ bool CmdLineParserHelper::GetSwitch(const std::string& param, bool def_value)
     auto found_switch = parser.FoundSwitch(param);
     auto no_found_switch = parser.FoundSwitch(no_param);
     if (found_switch != wxCMD_SWITCH_NOT_FOUND && no_found_switch != wxCMD_SWITCH_NOT_FOUND)
-        FatalLog("-%s and -no_%s provided at the same time, only one of these switches can be given", param.c_str(), param.c_str());
+        FatalLog("--%s and --no_%s provided at the same time, only one of these switches can be given", param.c_str(), param.c_str());
 
     if (found_switch == wxCMD_SWITCH_NOT_FOUND && no_found_switch == wxCMD_SWITCH_NOT_FOUND) return def_value;
 
@@ -102,7 +102,7 @@ std::vector<int> CmdLineParserHelper::GetListInt(const std::string& param, const
     {
         int var;
         if (!scan.Next(var))
-            FatalLog("Error parsing param %s", param.c_str());
+            FatalLog("Error parsing flag %s", param.c_str());
         ret.push_back(var);
     }
 
@@ -120,7 +120,7 @@ std::vector<std::string> CmdLineParserHelper::GetListString(const std::string& p
     {
         std::string var;
         if (!scan.Next(var))
-            FatalLog("Error parsing param %s", param.c_str());
+            FatalLog("Error parsing flag %s", param.c_str());
         ret.push_back(var);
     }
 

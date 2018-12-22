@@ -144,7 +144,7 @@ void DoTilesetExport(const std::vector<Image16Bpp>& images, const std::shared_pt
 void DoMapExport(const std::vector<Image16Bpp>& images, const std::vector<Image16Bpp>& tilesets)
 {
     if (tilesets.empty())
-        FatalLog("Map export specified however -tileset not given");
+        FatalLog("Map export specified however --tileset not given");
 
     // Form the tileset from the images given this is a dummy
     std::shared_ptr<Tileset> tileset(new Tileset(tilesets, "", params.bpp, params.affine));

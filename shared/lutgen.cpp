@@ -195,7 +195,7 @@ FixedLutGenerator::FixedLutGenerator(const std::string& name, const std::string&
     if (begin >= end)
         FatalLog("Begin must be less than end");
     if ((end - begin) / step > LUT_ENTRIES_MAX && !params.force)
-        FatalLog("Will generate %d entries in look up table. If you are sure about this use -force.", end - begin / step);
+        FatalLog("Will generate %d entries in look up table. If you are sure about this use --force.", end - begin / step);
 }
 
 FixedLutGenerator::~FixedLutGenerator()

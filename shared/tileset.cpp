@@ -16,7 +16,7 @@ Tileset::Tileset(const std::vector<Image16Bpp>& images, const std::string& name,
         case 4:
             if (affine)
             {
-                FatalLog("Affine can not be set on a 4 bpp tilset");
+                FatalLog("Affine can not be used with a 4 bpp tileset");
             }
             else if (palette)
             {
@@ -151,7 +151,9 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
     }
 
     if (bigPalette.size() > 256 && !params.force)
-        FatalLog("Image after reducing tiles to 4bpp still contains more than 256 distinct colors. Found %d colors. Please fix.", bigPalette.size());
+        FatalLog("Image after reducing tiles to 4 bpp still contains more than 256 distinct colors. Found %d colors. Please fix. Use --force to override.", bigPalette.size());
+    else if (bigPalette.size() > 256 && params.force)
+        WarnLog("Image after reducing tiles to 4 bpp still contains more than 256 distinct colors. Found %d colors. Potential for image color quality loss.");
 
     // Greedy approach deal with tiles with largest palettes first.
     std::sort(gbaTiles.begin(), gbaTiles.end(), TilesPaletteSizeComp);
@@ -188,7 +190,9 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
 
         // Cry and die for now. Unless you tell me to keep going.
         if (pbank == -1 && !params.force)
-            FatalLog("More than 16 distinct palettes found, please use 8bpp mode.");
+            FatalLog("More than 16 distinct palettes found, please use 8bpp mode. Use --force to override.");
+        else if (pbank == -1 && params.force)
+            WarnLog("More than 16 distinct palettes found. Huge potential for image color quality loss.");
 
         // Alright...
         if (pbank == -1)
@@ -281,10 +285,20 @@ void Tileset::Init8bpp(const std::vector<Image16Bpp>& images16)
     // Checks
     int tile_size = TILE_SIZE_BYTES_8BPP;
     int memory_b = tiles.size() * tile_size;
-    if (!affine && tiles.size() >= 1024)
-        FatalLog("Too many tiles. Found %d tiles. Please make the image simpler.", tiles.size());
-    else if (affine && tiles.size() >= 256)
-        FatalLog("Too many tiles found for affine. Found %d tiles.  Please make the map/tileset simpler", tiles.size());
+    if (params.force)
+    {
+        if (!affine && tiles.size() >= 1024)
+            WarnLog("Too many tiles. Found %d tiles. Maximum is 1024", tiles.size());
+        else if (affine && tiles.size() >= 256)
+            WarnLog("Too many tiles found for affine. Found %d tiles. Maximum is 256", tiles.size());
+    }
+    else
+    {
+        if (!affine && tiles.size() >= 1024)
+            FatalLog("Too many tiles. Found %d tiles. Maximum is 1024. Please make the map/tileset simpler. Use --force to override this.", tiles.size());
+        else if (affine && tiles.size() >= 256)
+            FatalLog("Too many tiles found for affine. Found %d tiles. Maximum is 256. Please make the map/tileset simpler. Use --force to override this.", tiles.size());
+    }
 
     // Delicious infos
     int cbbs = tiles.size() * tile_size / SIZE_CBB_BYTES;

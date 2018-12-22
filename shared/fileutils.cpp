@@ -16,7 +16,7 @@ void InitFiles(std::ofstream& file_c, std::ofstream& file_h, const std::string& 
     file_h.open(filename_h.c_str());
 
     if (!file_c.good() || !file_h.good())
-        FatalLog("Could not open files for writing");
+        FatalLog("Could not open output files (%s, %s) for writing", filename_c.c_str(), filename_h.c_str());
 }
 
 void WriteBeginArray(std::ostream& file, const std::string& type, const std::string& name, const std::string& append, unsigned int size)

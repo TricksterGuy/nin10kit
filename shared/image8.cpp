@@ -12,8 +12,10 @@ Image8Bpp::Image8Bpp(const Image16Bpp& image, std::shared_ptr<Palette> global_pa
     Image(image), pixels(width * height), palette(global_palette), export_shared_info(global_palette == nullptr)
 {
     // If the image width is odd error out
-    if (width & 1)
-        FatalLog("Image: %s width is not a multiple of 2. Found (%d, %d). Please fix.", name.c_str(), width, height);
+    if (width & 1 && !params.force)
+        FatalLog("Image: %s width is not a multiple of 2. Found (%d, %d). Please fix. Use --force to override this.", name.c_str(), width, height);
+    else if (width & 1 && params.force)
+        WarnLog("Image: %s width is not a multiple of 2. Found (%d %d). Image data can't be written to the screen with DMA.", name.c_str(), width, height);
 
     if (!palette)
     {
@@ -62,8 +64,10 @@ Image8BppScene::Image8BppScene(const std::vector<Image16Bpp>& images16, const st
 {
     for (const auto& image : images16)
     {
-        if (image.width & 1)
+        if (image.width & 1 && !params.force)
             FatalLog("Image: %s width is not a multiple of 2. Found (%d %d). Please fix.", name.c_str(), image.width, image.height);
+        else if (image.width & 1 && params.force)
+            WarnLog("Image: %s width is not a multiple of 2. Found (%d %d). Image data can't be written to the screen with DMA.", name.c_str(), image.width, image.height);
     }
 
     if (!palette)

@@ -203,11 +203,13 @@ const std::map<std::string, HelpDesc> help_text = {
                     "\tSecond image is not resized.\n"
                     "\tThird image is resized to width 72 height 42.")},
 {"transparent", HelpDesc("color value using hex notation",
-                         "Marks the color RRGGBB as transparent.\n"
-                         "Example --transparent=FFFFFF marks the color white as transparent.\n"
+                         "Marks the color RRGGBB as transparent / backdrop.\n"
+                         "Example --transparent=FFFFFF marks the color white as transparent / backdrop.\n"
                          "\tIn mode 3 a #define is given with the color so you can use it to ignore those pixels when drawing.\n"
                          "\tIn mode 4 this color will become palette entry 0 and also the background color.\n"
-                         "\tIn any other GBA mode it will become palette entry 0 and the gba hardware will colorkey the color.")},
+                         "\tIn any other GBA mode it will become palette entry 0 and the gba hardware will colorkey the color.\n"
+                         "\tWhen passing an indexed color that is not used in the image, the color will be added to palette entry 0\n"
+                         "\tand the indices of all image pixels will be increased by 1.\n")},
 {"dither", HelpDesc("", "Enables dithering for mode 4.\n"
                               "Dithering makes the image look better by minimizing large areas of one color,\n"
                               "due to reducing the number of colors in the image by adding noise. default on\n"

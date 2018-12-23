@@ -59,6 +59,16 @@ Once you have that done, cd into the repository folder and follow these instruct
 3. Then run make to build the binaries: `make`
 4. Then run make install to install the binaries: `sudo make install`
 
+#### Compiling with Visual Studio Code / CMake
+
+* **Must:** Install the "C/C++ extension" by Microsoft.
+* **Recommended:** If you want intellisense functionality install the "C++ intellisense" extension by austin.
+* **Must:** Install the "CMake Tools" extension by vector-of-bool.
+* Restart / Reload Visual Studio Code if you have installed extensions.
+* Open nin10kit folder using "Open folder...".
+* Choose the proper active CMake kit if asked. On my system this is "GCC for x86_x64-linux-gnu ...".
+* You should be able to build now using F7 and build + run / debug using F5. To run without debugging, use Shift+F5.
+
 ### Windows
 #### Using precompiled binaries.
 Available in [Releases](https://github.com/TricksterGuy/nin10kit/releases).  Binaries are compiled in msys2+mingw and compiler gcc.

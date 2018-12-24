@@ -29,11 +29,13 @@
 
 #ifndef _WIN32
 #define RED "\033[1;31m"
+#define GREEN "\033[1;32m"
 #define EMPH "\033[1;33m"
 #define END "\033[0m"
 #define ENDEMPH END
 #else
 #define RED "<"
+#define GREEN " "
 #define END ">"
 #define EMPH ""
 #define ENDEMPH ""
@@ -67,14 +69,16 @@ class Nin10KitApp : public wxAppConsole
 static const wxCmdLineEntryDesc help_description[] =
 {
     // Help
-    {wxCMD_LINE_OPTION, "h", "help", "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "h", "h",       "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "help", "help", "", wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP},
     {wxCMD_LINE_NONE}
 };
 
 static const wxCmdLineEntryDesc cmd_descriptions[] =
 {
     // Help
-    {wxCMD_LINE_OPTION, "h", "help",             "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_OPTION, "h", "h",                "", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL},
+    {wxCMD_LINE_SWITCH, "help", "help",          "", wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP},
     // Debugging
     {wxCMD_LINE_OPTION, "",  "log",              "", wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL},
 
@@ -181,7 +185,7 @@ const std::map<std::string, HelpDesc> help_text = {
                   "step: The step between values in the look up table.\n"
                   "\tThe value for step should evenly divide (end - start).\n"
                   "in_degrees: Inputs are specified in degrees default is false.\n\n"
-                  "Example: -func=sin,short.8,0,360,0.25,true\n"
+                  "Example: --func=sin,short.8,0,360,0.25,true\n"
                   "\tThis will generate a lut for sin whose values are expressed as 16 bit fixed point\n"
                   "\twith 8 bits for the fractional part of the number\n"
                   "\tStarting with 0 ending with 360 in steps of 0.25\n"
@@ -194,16 +198,18 @@ const std::map<std::string, HelpDesc> help_text = {
                                     "\tIf not given then the file names of the images will be used to generate the array name.")},
 {"resize", HelpDesc("list of strings format numberxnumber",
                     "Resize images to wxh must be given for ALL images.\n"
-                    "Example: -resize=10x12,,72x42\n"
+                    "Example: --resize=10x12,,72x42\n"
                     "\tFirst image will be resized to width 10 height 12.\n"
                     "\tSecond image is not resized.\n"
                     "\tThird image is resized to width 72 height 42.")},
 {"transparent", HelpDesc("color value using hex notation",
-                         "Marks the color RRGGBB as transparent.\n"
-                         "Example -transparent=FFFFFF marks the color white as transparent.\n"
+                         "Marks the color RRGGBB as transparent / backdrop.\n"
+                         "Example --transparent=FFFFFF marks the color white as transparent / backdrop.\n"
                          "\tIn mode 3 a #define is given with the color so you can use it to ignore those pixels when drawing.\n"
                          "\tIn mode 4 this color will become palette entry 0 and also the background color.\n"
-                         "\tIn any other GBA mode it will become palette entry 0 and the gba hardware will colorkey the color.")},
+                         "\tIn any other GBA mode it will become palette entry 0 and the gba hardware will colorkey the color.\n"
+                         "\tWhen passing an indexed color that is not used in the image, the color will be added to palette entry 0\n"
+                         "\tand the indices of all image pixels will be increased by 1.\n")},
 {"dither", HelpDesc("", "Enables dithering for mode 4.\n"
                               "Dithering makes the image look better by minimizing large areas of one color,\n"
                               "due to reducing the number of colors in the image by adding noise. default on\n"
@@ -212,28 +218,28 @@ const std::map<std::string, HelpDesc> help_text = {
 {"start", HelpDesc("number [0-255]", "Starts the palette off at index X.\n"
                                      "Useful if you have another image already exported that has X entries.\n"
                                      "This option is only available for mode 4.\n"
-                                     "See also -palette")},
+                                     "See also --palette")},
 {"palette", HelpDesc("number [1-256]", "Restricts the palette to X colors.\n"
                                        "Useful for specifying the number of colors for each image.\n"
                                        "This option is only available for mode 4.\n"
-                                       "See also -start")},
+                                       "See also --start")},
 {"split", HelpDesc("", "Exports each individual image as if the program was called with just that one image.\n"
                              "In mode 4 using this will export each image with its own palette instead of a global palette.\n"
                              "In mode 0 using this will export each map with its own palette and tileset instead of a global tileset/palette.\n"
                              "In all other modes this option is ignored.")},
-{"tileset_image", HelpDesc("list_of_images_or_urls", "Tileset image(s) to match tiles against when using -mode=map.\n"
+{"tileset_image", HelpDesc("list_of_images_or_urls", "Tileset image(s) to match tiles against when using --mode=map.\n"
                                                      "\tTo use form an image with the tileset you will use.\n"
-                                                     "\tExport the tileset using -mode=tiles\n"
+                                                     "\tExport the tileset using --mode=tiles\n"
                                                      "\tThen form map images using the tiles in your tileset\n"
-                                                     "\tThen export the maps using -mode=map with -tileset_image=tileset_image")},
-{"palette_image", HelpDesc("list_of_images_or_urls", "Palette images(s) to match image against when using -mode=(4, tiles, sprites).\n"
+                                                     "\tThen export the maps using --mode=map with --tileset_image=tileset_image")},
+{"palette_image", HelpDesc("list_of_images_or_urls", "Palette images(s) to match image against when using --mode=(4, tiles, sprites).\n"
                                                      "\tTo use form an image with the palette you will use.\n"
-                                                     "\tAlternative just use -mode=palette and give it a set of images.\n"
+                                                     "\tAlternative just use --mode=palette and give it a set of images.\n"
                                                      "\tThen form images using the colors in your palette.\n"
-                                                     "\tExport the images using -mode=mode with -palette_image=palette_image")},
+                                                     "\tExport the images using --mode=mode with --palette_image=palette_image")},
 {"border", HelpDesc("number", "Border around each tile in tileset image\n"
-                              "Only for use with -mode=tiles")},
-{"affine", HelpDesc("", "For use with -mode=tiles,map,0,tilemap.\n"
+                              "Only for use with --mode=tiles")},
+{"affine", HelpDesc("", "For use with --mode=tiles,map,0,tilemap.\n"
                         "Exports the map for use with affine backgrounds.\n"
                         "Ensures the palette generated is 8 bpp")},
 {"export_2d", HelpDesc("", "Exports sprites for use in sprite 2d mode. Default 0.")},
@@ -296,8 +302,9 @@ bool Nin10KitApp::OnInit()
       wxCmdLineParser help_parser(argc, argv);
       help_parser.SetDesc(help_description);
       help_parser.Parse(false);
+      help_parser.SetSwitchChars (_("-"));
       wxString help_topic;
-      if (help_parser.Found("help", &help_topic))
+      if (help_parser.Found("h", &help_topic) || help_parser.Found("help", &help_topic))
       {
           OnHelp(help_topic.ToStdString());
           return false;
@@ -335,16 +342,16 @@ void Nin10KitApp::ShowBasicHelp()
     printf("nin10kit version %s\n", AutoVersion::FULLVERSION_STRING);
     printf("Basic usage\n");
     printf("-----------\n");
-    printf("nin10kit --mode=" RED "mode" END " " RED "export_file_to" END " " RED "list_of_image_files_or_urls" END "\n");
-    printf(RED "mode" END " is one of 0, 3, 4, palette, tiles, map, sprites, or lut\n");
-    printf(RED "export_file_to" END " is the filename to export to (can include directories)\n"
+    printf("nin10kit --mode=" GREEN "mode" END " " GREEN "export_file_to" END " " GREEN "list_of_image_files_or_urls" END "\n");
+    printf(GREEN "mode" END " is one of 0, 3, 4, palette, tiles, map, sprites, or lut\n");
+    printf(GREEN "export_file_to" END " is the filename to export to (can include directories)\n"
            "\tex: my_images will create my_images.c and my_images.h in the current directory.\n");
-    printf(RED "list_of_image_files_or_urls" END " is a list of image files or URLs of images.\n"
-           "\tTo see what image formats are supported use command nin10kit -h=formats\n\n");
-    printf("For more detailed help use command nin10kit -h\n"
-           "\tnin10kit -h=" RED "flag" END " for a detailed description of what flag does\n"
-           "\tnin10kit -h=flags for a list of all of the flags\n"
-           "\tnin10kit -h=all for each flag and a description.\n");
+    printf(GREEN "list_of_image_files_or_urls" END " is a list of image files or URLs of images.\n"
+           "\tTo see what image formats are supported use command nin10kit --h=formats\n\n");
+    printf("For more detailed help use command nin10kit --h or --help\n"
+           "\tnin10kit --h=" GREEN "flag" END " for a detailed description of what flag does\n"
+           "\tnin10kit --h=flags for a list of all of the flags\n"
+           "\tnin10kit --h=all or --help for all flags and their descriptions.\n");
 }
 
 void Nin10KitApp::OnHelp(const std::string& topic)
@@ -359,7 +366,7 @@ void Nin10KitApp::OnHelp(const std::string& topic)
 
             printf("Usage: " EMPH);
             if (desc.usage.empty())
-                printf("-");
+                printf("--");
             printf("%s" ENDEMPH, help_desc.first.c_str());
             if (!desc.usage.empty())
                 printf("=%s", desc.usage.c_str());
@@ -377,7 +384,7 @@ void Nin10KitApp::OnHelp(const std::string& topic)
             printf(EMPH);
 #endif
             if (desc.usage.empty())
-                printf("-");
+                printf("--");
             printf("%s" ENDEMPH, flag.c_str());
             if (!desc.usage.empty())
                 printf("=%s", desc.usage.c_str());
@@ -404,7 +411,7 @@ void Nin10KitApp::OnHelp(const std::string& topic)
 
         printf("Usage: " EMPH);
         if (desc.usage.empty())
-            printf("-");
+            printf("--");
         printf("%s" ENDEMPH, topic.c_str());
         if (!desc.usage.empty())
             printf("=%s", desc.usage.c_str());
@@ -412,7 +419,7 @@ void Nin10KitApp::OnHelp(const std::string& topic)
     }
     else
     {
-        printf("No help available for %s please use -help=all for a list of flags\n", topic.c_str());
+        printf("No help available for %s please use --h=all or --help for a list of flags\n", topic.c_str());
     }
 }
 
@@ -437,7 +444,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     VerboseLog("OnCmdLineParsed");
 
     wxString help_topic;
-    if (parser.Found("help", &help_topic))
+    if (parser.Found("h", &help_topic) || parser.Found("help", &help_topic))
     {
         OnHelp(help_topic.ToStdString());
         return false;
@@ -593,7 +600,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     {
         if (!params.resizes.empty())
         {
-            WarnLog("Ignoring -resize when in tileset export mode, please resize manually.");
+            WarnLog("Ignoring --resize when in tileset export mode, please resize manually.");
             params.resizes.clear();
         }
         header.SetTilesets(params.files);

@@ -303,7 +303,7 @@ class PaletteSort
         }
 };
 
-bool MedianCut(Histogram& hist, unsigned int desired_colors, std::vector<Color16>& palette)
+void MedianCut(Histogram& hist, unsigned int desired_colors, std::vector<Color16>& palette)
 {
     EventLog l(__func__);
 
@@ -311,8 +311,11 @@ bool MedianCut(Histogram& hist, unsigned int desired_colors, std::vector<Color16
     {
         palette.reserve(hist.Size());
         hist.GetColors(palette);
+        VerboseLog("Not running palette generating algorithm since we found %zd colors. Requested %zd colors", hist.Size(), desired_colors);
         return false;
     }
+
+    VerboseLog("Running palette generating algorithm since we found %zd colors. Reducing to %zd colors", hist.Size(), desired_colors);
 
     ColorRefSet refset;
     std::list<Box> boxlist;

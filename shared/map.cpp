@@ -202,7 +202,7 @@ const Map& MapScene::GetMap(int index) const
 {
     const Image* image = images[index].get();
     const Map* map = dynamic_cast<const Map*>(image);
-    if (!map) FatalLog("Could not cast Image to Map. This shouldn't happen");
+    if (!map) FatalLog("Internal Error could not cast Image to Map. This shouldn't happen");
     return *map;
 }
 

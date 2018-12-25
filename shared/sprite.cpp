@@ -231,7 +231,7 @@ Block Block::Split(const BlockSize& to_this_size)
     else if (size.height == to_this_size.height)
         return HSplit();
     else
-        FatalLog("Error Block::Split this shouldn't happen");
+        FatalLog("Internal Error Block::Split this shouldn't happen");
 
     return Block();
 }
@@ -461,7 +461,7 @@ void SpriteScene::Build()
         for (const auto& image : images)
         {
             Sprite* sprite = dynamic_cast<Sprite*>(image.get());
-            if (!sprite) FatalLog("Could not cast Image to Sprite. This shouldn't happen");
+            if (!sprite) FatalLog("Internal Error could not cast Image to Sprite. This shouldn't happen");
             // It is an error if using --force and non standard sprite sizes.
             // This is because the max size here will be 8x8 in tiles and modifying this code would be a pain for variable sized sprites.
             if (sprite->size == -1 || sprite->shape == -1)
@@ -477,7 +477,7 @@ void SpriteScene::Build()
         for (unsigned int k = 0; k < images.size(); k++)
         {
             Sprite* sprite = dynamic_cast<Sprite*>(images[k].get());
-            if (!sprite) FatalLog("Could not cast Image to Sprite. This shouldn't happen");
+            if (!sprite) FatalLog("Internal Error could not cast Image to Sprite. This shouldn't happen");
             sprite->offset = offset;
             offset += sprite->width * sprite->height * (bpp == 8 ? 2 : 1);
         }

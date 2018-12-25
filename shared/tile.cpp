@@ -145,7 +145,7 @@ void Tile::UsePalette(const PaletteBank& bank)
     for (unsigned int i = 0; i < TILE_SIZE; i++)
     {
         if (remapping.find(pixels[i]) == remapping.end())
-            FatalLog("Somehow tile contains invalid indicies. This shouldn't happen");
+            FatalLog("Internal Error somehow tile contains invalid indicies. This shouldn't happen");
 
         pixels[i] = remapping[pixels[i]];
     }

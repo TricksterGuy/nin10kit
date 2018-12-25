@@ -29,7 +29,7 @@ unsigned int GetArraySize3DS(unsigned int base_size, const std::string& pixel_fo
     {
         return base_size;
     }
-    FatalLog("Invalid pixel format %s given (this shouldn't happen)", pixel_format.c_str());
+    FatalLog("Internal Error invalid pixel format %s given (this shouldn't happen)", pixel_format.c_str());
     return 0;
 }
 
@@ -43,7 +43,7 @@ ArrayDataType3DS GetArrayDataType3DS(const std::string& pixel_format)
     {
         return SHORT_DATA;
     }
-    FatalLog("Invalid pixel format %s given (this shouldn't happen)", pixel_format.c_str());
+    FatalLog("Internal Error invalid pixel format %s given (this shouldn't happen)", pixel_format.c_str());
     return INVALID_DATA;
 }
 

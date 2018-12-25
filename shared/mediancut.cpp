@@ -228,7 +228,7 @@ void Box::Split(Box& b2, axisType which_axis)
             b2.Bmin = lb+1;
             break;
         default:
-            FatalLog("Code error incorrect axis %d, this shouldn't happen", which_axis);
+            FatalLog("Internal error incorrect axis %d, this shouldn't happen", which_axis);
     }
 
     std::vector<ColorLAB> del;

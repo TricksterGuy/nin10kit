@@ -85,7 +85,7 @@ const Image8Bpp& Image8BppScene::GetImage(int index) const
 {
     const Image* image = images[index].get();
     const Image8Bpp* image8 = dynamic_cast<const Image8Bpp*>(image);
-    if (!image8) FatalLog("Could not cast Image to Image8Bpp. This shouldn't happen");
+    if (!image8) FatalLog("Internal Error could not cast Image to Image8Bpp. This shouldn't happen");
     return *image8;
 }
 

@@ -429,7 +429,6 @@ void Nin10KitApp::OnHelp(const std::string& topic)
   */
 void Nin10KitApp::OnInitCmdLine(wxCmdLineParser& parser)
 {
-    VerboseLog("OnInitCmdLine");
     parser.SetLogo(wxString::Format(_("nin10kit version %s"), AutoVersion::FULLVERSION_STRING));
     parser.SetDesc(cmd_descriptions);
     parser.SetSwitchChars (_("-"));

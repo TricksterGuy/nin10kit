@@ -588,7 +588,9 @@ void SpriteScene::Init4bpp(const std::vector<Image16Bpp>& images16)
     }
 
     if (bigPalette.size() > 256 && !params.force)
-        FatalLog("Image after reducing sprites to 4bpp still contains more than 256 distinct colors. Found %d colors. Please fix.", bigPalette.size());
+        FatalLog("Image after reducing tiles to 4 bpp still contains more than 256 distinct colors. Found %d colors. Please fix. Use --force to override.", bigPalette.size());
+    else if (bigPalette.size() > 256 && params.force)
+        WarnLog("Image after reducing tiles to 4 bpp still contains more than 256 distinct colors. Found %d colors. Potential for image color quality loss.");
 
     // Greedy approach deal with tiles with largest palettes first.
     std::sort(sprites.begin(), sprites.end(), SpritePaletteSizeComp);

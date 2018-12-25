@@ -131,7 +131,7 @@ void Tile::UsePalette(const PaletteBank& bank)
 {
     if (bpp == 8)
     {
-        FatalLog("Calling UsePalette on a tile whose bpp is 8. This shouldn't happen");
+        FatalLog("Internal Error calling UsePalette on a tile whose bpp is 8. This shouldn't happen");
         return;
     }
 

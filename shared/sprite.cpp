@@ -323,14 +323,14 @@ void SpriteSheet::PlaceSprites()
             continue;
 
         if (size.IsBiggestSize())
-            FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d)", sprite.name.c_str(), sprite.width, sprite.height);
+            FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d). 1D mapping map with --force should be used instead.", sprite.name.c_str(), sprite.width, sprite.height);
 
         slice.push_front(size);
         while (!HasAvailableBlock(size))
         {
             std::vector<BlockSize> sizes = BlockSize::BiggerSizes(size);
             if (sizes.empty())
-                FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d)", sprite.name.c_str(), sprite.width, sprite.height);
+                FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d). 1D mapping map with --force should be used instead.", sprite.name.c_str(), sprite.width, sprite.height);
 
             // Default next search size will be last.
             size = sizes.back();
@@ -347,7 +347,7 @@ void SpriteSheet::PlaceSprites()
         }
 
         if (!HasAvailableBlock(size))
-            FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d)", sprite.name.c_str(), sprite.width, sprite.height);
+            FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d). 1D mapping map with --force should be used instead.", sprite.name.c_str(), sprite.width, sprite.height);
 
         SliceBlock(size, slice);
 
@@ -356,7 +356,7 @@ void SpriteSheet::PlaceSprites()
         if (AssignBlockIfAvailable(size, sprite, i))
             continue;
         else
-            FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d)", sprite.name.c_str(), sprite.width, sprite.height);
+            FatalLog("Out of sprite memory could not allocate sprite %s size (%d %d). 1D mapping map with --force should be used instead.", sprite.name.c_str(), sprite.width, sprite.height);
     }
 }
 
@@ -409,7 +409,9 @@ void SpriteGraphicsMemoryCheck(const std::vector<Image16Bpp>& images, int bpp)
         current += imagetiles;
     }
     if (current > maxtiles && !params.force)
-        FatalLog("Found %d tiles, you can only have maximum %d tiles. You may pass in --force to override this.", current, maxtiles);
+        FatalLog("Found %d tiles. Maximum %d tiles. Use --force to override.", current, maxtiles);
+    else if (current > maxtiles && params.force)
+        WarnLog("Found %d tiles. Maximum %d tiles. Sprite tile offsets will overflow.", current, maxtiles);
 }
 
 SpriteScene::SpriteScene(const std::vector<Image16Bpp>& images, const std::string& _name, bool _is2d, int _bpp, const std::shared_ptr<Palette>& global_palette) :

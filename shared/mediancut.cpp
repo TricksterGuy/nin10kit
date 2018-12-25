@@ -312,7 +312,6 @@ void MedianCut(Histogram& hist, unsigned int desired_colors, std::vector<Color16
         palette.reserve(hist.Size());
         hist.GetColors(palette);
         VerboseLog("Not running palette generating algorithm since we found %zd colors. Requested %zd colors", hist.Size(), desired_colors);
-        return false;
     }
 
     VerboseLog("Running palette generating algorithm since we found %zd colors. Reducing to %zd colors", hist.Size(), desired_colors);
@@ -352,8 +351,6 @@ void MedianCut(Histogram& hist, unsigned int desired_colors, std::vector<Color16
     refset.GetColors(palette);
     // Could be the case we get n + 1 colors due to two new colors being added.
     palette.resize(desired_colors);
-
-    return true;
 }
 
 void GetPalette(const std::vector<Color16>& pixels, unsigned int num_colors, const Color16& transparent, unsigned int offset, Palette& palette)

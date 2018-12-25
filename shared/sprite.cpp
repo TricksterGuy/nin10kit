@@ -625,10 +625,22 @@ void SpriteScene::Init4bpp(const std::vector<Image16Bpp>& images16)
 
         // Cry and die for now. Unless you tell me to keep going.
         if (pbank == -1 && !params.force)
-            FatalLog("More than 16 distinct palettes found, please use 8bpp mode.");
+            FatalLog("More than 16 distinct palettes found, please use 8bpp mode. Last processed image: %s. Use --force to override.", sprite->name.c_str());
+        else if (pbank == -1 && params.force)
+            WarnLog("More than 16 distinct palettes found. Current image: %s. Huge potential for image color quality loss.", sprite->name.c_str());
 
-        // Merge step and assign palette bank
-        paletteBanks[pbank].Merge(*sprite->palette);
+        // Alright...
+        if (pbank == -1)
+        {
+            pbank = paletteBanks.FindBestMatch(*sprite->palette);
+            paletteBanks[pbank].BestMerge(*sprite->palette);
+        }
+        else
+        {
+            // Merge step and assign palette bank
+            paletteBanks[pbank].Merge(*sprite->palette);
+        }
+
         sprite->palette_bank = pbank;
         sprite->UsePalette(paletteBanks[pbank]);
 

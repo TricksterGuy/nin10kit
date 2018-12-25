@@ -228,10 +228,11 @@ void Tileset::Init4bpp(const std::vector<Image16Bpp>& images)
 
     int tile_size = TILE_SIZE_BYTES_4BPP;
     int memory_b = tiles.size() * tile_size;
+    // 4bpp mode so !affine can be assumed here. Affine maps have a max of 256 tiles.
     if (tiles.size() >= 1024 && !params.force)
-        FatalLog("Too many tiles. Found %d tiles, maximum is 1024. Please make the image simpler. Use --force to override.", tiles.size());
+        FatalLog("Too many tiles. Found %d tiles. Maximum is 1024. Please make the image simpler. Use --force to override.", tiles.size());
     else if (tiles.size() >= 1024 && params.force)
-        WarnLog("Too many tiles. Found %d tiles, maximum is 1024. Associated maps exported against this tileset will be incorrect.", tiles.size());
+        WarnLog("Too many tiles. Found %d tiles. Maximum is 1024. Associated maps exported against this tileset may be incorrect.", tiles.size());
 
     // Delicious infos
     int cbbs = tiles.size() * tile_size / SIZE_CBB_BYTES;
@@ -290,9 +291,9 @@ void Tileset::Init8bpp(const std::vector<Image16Bpp>& images16)
     if (params.force)
     {
         if (!affine && tiles.size() >= 1024)
-            WarnLog("Too many tiles. Found %d tiles. Maximum is 1024", tiles.size());
+            WarnLog("Too many tiles. Found %d tiles. Maximum is 1024. Associated maps exported against this tileset may be incorrect.", tiles.size());
         else if (affine && tiles.size() >= 256)
-            WarnLog("Too many tiles found for affine. Found %d tiles. Maximum is 256", tiles.size());
+            WarnLog("Too many tiles found for affine. Found %d tiles. Maximum is 256. Associated maps exported against this tileset may be incorrect.", tiles.size());
     }
     else
     {

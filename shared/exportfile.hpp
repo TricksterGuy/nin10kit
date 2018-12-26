@@ -25,7 +25,7 @@ class ExportFile
         void AddLine(const std::string& line);
         void AddImageInfo(const std::string& filename, int scene, int width, int height, bool frame);
         void AddLutInfo(const LutSpecification& spec);
-        void Add(std::shared_ptr<Exportable>& image);
+        void Add(std::shared_ptr<Exportable> image);
 
         void Clear();
 

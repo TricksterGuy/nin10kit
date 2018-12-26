@@ -92,7 +92,7 @@ void ExportFile::AddLutInfo(const LutSpecification& spec)
     luts.push_back(spec);
 }
 
-void ExportFile::Add(std::shared_ptr<Exportable>& image)
+void ExportFile::Add(std::shared_ptr<Exportable> image)
 {
     exportables.push_back(image);
 }

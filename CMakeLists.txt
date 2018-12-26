@@ -73,6 +73,7 @@ set(CMAKE_SKIP_RPATH TRUE)
 set(SRC_SHARED
     shared/3ds-exporter.cpp
     shared/ds-exporter.cpp
+    shared/direct-exporter.cpp
     shared/gba-exporter.cpp
     shared/cmd-line-parser-helper.cpp
     shared/color.cpp
@@ -85,6 +86,7 @@ set(SRC_SHARED
     shared/image16.cpp
     shared/image32.cpp
     shared/image8.cpp
+    shared/imagedirect.cpp
     shared/implementationfile.cpp
     shared/logger.cpp
     shared/lut-exporter.cpp

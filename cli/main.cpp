@@ -52,6 +52,7 @@ void PrintMagickFormats(void)
 void DoGBAExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets, const std::vector<Image32Bpp>& palettes);
 void DoDSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets, const std::vector<Image32Bpp>& palettes);
 void Do3DSExport(const std::vector<Image32Bpp>& images, const std::vector<Image32Bpp>& tilesets, const std::vector<Image32Bpp>& palettes);
+void DoDirectExport(const std::vector<std::pair<Magick::Image, std::string>>& images);
 void DoLUTExport(const std::vector<LutSpecification>& functions);
 
 class Nin10KitApp : public wxAppConsole
@@ -161,12 +162,16 @@ const std::map<std::string, HelpDesc> help_text = {
                   "4       - Used for GBA Mode 4 Exports a 8 bits per pixel bitmap image with palette.\n"
                   "palette - Exports only a palette from images given.\n"
                   "tiles   - Exports just a palette and tileset from images given.\n"
-                  "map     - Exports a just map given from images. [see -tileset]\n"
+                  "map     - Exports a just map given from images. [see --tileset]\n"
                   "sprites - Exports a bunch of sprites for use with the GBA/NDS.\n"
                   "bitmap  - Export a bitmap for use with the NDS.\n"
                   "indexed - Export a bitmap and palette for use with the NDS.\n"
                   "tilemap - Exports a palette, tileset, and map for use with the NDS.\n"
-                  "lut     - Exports a look up table from a function. [see -func]")},
+                  "direct  - Exports direct image pixel data. Does no color conversion and ignores bpp.\n"
+                  "          Can e.g. be used to export height maps or lookup tables.\n"
+                  "          4bpp and 8bpp images will be converted to 4bpp and 8bpp data.\n"
+                  "          All direct color images are converted to X1R5G5B5 / A1R5G5B5 data."
+                  "lut     - Exports a look up table from a function. [see --func]")},
 {"device", HelpDesc("one of gba nds or 3ds", "Specifies device to output data for default gba.\n"
                                             "GBA uses 16 bit color 0BGR 5 bits each for blue green and red.\n"
                                             "NDS uses 16 bit color ABGR 5 bits each for blue green and red and A is 1 bit of transparency 1=opaque 0=transparent.\n"
@@ -454,9 +459,9 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
 
     // mode params
     const std::set<std::string> valid_3ds_modes {"RGBA8", "RGB8", "RGB5A1", "RGBA5551", "RGB565", "RGBA4", "LUT"};
-    const std::set<std::string> valid_gba_modes {"3", "4", "0", "SPRITES", "TILES", "MAP", "PALETTE", "LUT"};
-    const std::set<std::string> valid_nds_modes {"BITMAP", "INDEXED", "TILEMAP", "SPRITES", "TILES", "MAP", "PALETTE", "LUT"};
-    const std::set<std::string> valid_devices {"GBA", "DS", "NDS", "3DS"};
+    const std::set<std::string> valid_gba_modes {"3", "4", "0", "SPRITES", "TILES", "MAP", "PALETTE", "LUT", "DIRECT"};
+    const std::set<std::string> valid_nds_modes {"BITMAP", "INDEXED", "TILEMAP", "SPRITES", "TILES", "MAP", "PALETTE", "LUT", "DIRECT"};
+    const std::set<std::string> valid_devices {"GBA", "DS", "NDS", "3DS", "DIRECT"};
 
     params.device = ToUpper(parse.GetString("device", "GBA"));
     if (valid_devices.find(params.device) == valid_devices.end())
@@ -469,15 +474,15 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
         FatalLog("No mode set.");
 
     if (params.device == "3DS" && valid_3ds_modes.find(params.mode) == valid_3ds_modes.end())
-        FatalLog("Invalid mode specified %s for 3ds export. Valid modes are [RGBA8, RGB8, RGB5A1, RGB5551, RGB565, RGBA4]. Image not exported", params.mode.c_str());
+        FatalLog("Invalid mode specified %s for 3ds export. Valid modes are [RGBA8, RGB8, RGB5A1, RGB5551, RGB565, RGBA4, DIRECT]. Image not exported", params.mode.c_str());
     if (params.device == "NDS" && valid_nds_modes.find(params.mode) == valid_nds_modes.end())
-        FatalLog("Invalid mode %s specified for nds export. Valid modes are [BITMAP, INDEXED, TILEMAP, SPRITES, TILES, MAP, PALETTE]", params.mode.c_str());
+        FatalLog("Invalid mode %s specified for nds export. Valid modes are [BITMAP, INDEXED, TILEMAP, SPRITES, TILES, MAP, PALETTE, DIRECT]", params.mode.c_str());
     if (params.device == "GBA" && valid_gba_modes.find(params.mode) == valid_gba_modes.end())
-        FatalLog("Invalid mode %s specified for gba export. Valid modes are [3, 4, 0, SPRITES, TILES, MAP, PALETTE]", params.mode.c_str());
+        FatalLog("Invalid mode %s specified for gba export. Valid modes are [3, 4, 0, SPRITES, TILES, MAP, PALETTE, DIRECT]", params.mode.c_str());
 
     params.bpp = parse.GetInt("bpp", 8);
     if (params.bpp != 4 && params.bpp != 8)
-        FatalLog("Invalid bpp given %d.  Bpp must be either 4 or 8", params.bpp);
+        FatalLog("Invalid bpp given %d. Bpp must be either 4 or 8", params.bpp);
 
     std::string function = parse.GetString("func");
 
@@ -683,39 +688,44 @@ bool Nin10KitApp::DoExportImages()
         }
     }
 
-    VerboseLog("Converting to Image32Bpp");
-    for (unsigned int i = 0; i < params.files.size(); i++)
+    // convert image data to 32bit only if no direct export was chosen 
+    if (params.mode != "DIRECT")
     {
-        const std::string& filename = params.files[i];
-        std::vector<Magick::Image>& images = file_images[filename];
-        for (unsigned int j = 0; j < images.size(); j++)
+        VerboseLog("Converting to Image32Bpp");
+        // convert image files
+        for (unsigned int i = 0; i < params.files.size(); i++)
         {
-            auto& image = images[j];
-            if (params.rotate)
-                image.rotate(90);
-            params.images.push_back(Image32Bpp(image, params.names[i], filename, j, images.size() > 1));
+            const std::string& filename = params.files[i];
+            std::vector<Magick::Image>& images = file_images[filename];
+            for (unsigned int j = 0; j < images.size(); j++)
+            {
+                auto& image = images[j];
+                if (params.rotate)
+                    image.rotate(90);
+                params.images.push_back(Image32Bpp(image, params.names[i], filename, j, images.size() > 1));
+            }
         }
-    }
-
-    for (unsigned int i = 0; i < params.tilesets.size(); i++)
-    {
-        const std::string& filename = params.tilesets[i];
-        std::vector<Magick::Image>& images = file_tilesets[filename];
-        for (unsigned int j = 0; j < images.size(); j++)
+        // convert tile set files
+        for (unsigned int i = 0; i < params.tilesets.size(); i++)
         {
-            const auto& image = images[j];
-            params.tileset_images.push_back(Image32Bpp(image, params.names[i], filename, j, images.size() > 1));
+            const std::string& filename = params.tilesets[i];
+            std::vector<Magick::Image>& images = file_tilesets[filename];
+            for (unsigned int j = 0; j < images.size(); j++)
+            {
+                const auto& image = images[j];
+                params.tileset_images.push_back(Image32Bpp(image, params.names[i], filename, j, images.size() > 1));
+            }
         }
-    }
-
-    for (unsigned int i = 0; i < params.palettes.size(); i++)
-    {
-        const std::string& filename = params.palettes[i];
-        std::vector<Magick::Image>& images = file_palettes[filename];
-        for (unsigned int j = 0; j < images.size(); j++)
+        // convert palette files
+        for (unsigned int i = 0; i < params.palettes.size(); i++)
         {
-            const auto& image = images[j];
-            params.palette_images.push_back(Image32Bpp(image, params.names[i], filename, j, images.size() > 1));
+            const std::string& filename = params.palettes[i];
+            std::vector<Magick::Image>& images = file_palettes[filename];
+            for (unsigned int j = 0; j < images.size(); j++)
+            {
+                const auto& image = images[j];
+                params.palette_images.push_back(Image32Bpp(image, params.names[i], filename, j, images.size() > 1));
+            }
         }
     }
 
@@ -727,6 +737,20 @@ bool Nin10KitApp::DoExportImages()
 
     if (params.mode == "LUT")
         DoLUTExport(params.functions);
+    else if (params.mode == "DIRECT")
+    {
+        std::vector<std::pair<Magick::Image, std::string>> images;
+        for (unsigned int i = 0; i < params.files.size(); i++)
+        {
+            const std::string &filename = params.files[i];
+            std::vector<Magick::Image> & magicImages = file_images[filename];
+            for (unsigned int j = 0; j < magicImages.size(); j++)
+            {
+                images.push_back(std::make_pair(magicImages[j], params.names[i]));
+            }
+        }
+        DoDirectExport(images);
+    }
     else if (params.device == "GBA")
         DoGBAExport(params.images, params.tileset_images, params.palette_images);
     else if (params.device == "NDS")

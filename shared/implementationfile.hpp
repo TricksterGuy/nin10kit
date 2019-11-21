@@ -9,7 +9,7 @@
 class ImplementationFile : public ExportFile
 {
     public:
-        ImplementationFile(const std::string& invocation = "") : ExportFile(invocation) {};
+        ImplementationFile() {};
         ~ImplementationFile() {};
         virtual void Write(std::ostream& file);
 };

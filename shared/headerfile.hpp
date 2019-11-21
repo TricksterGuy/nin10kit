@@ -9,7 +9,7 @@
 class HeaderFile : public ExportFile
 {
     public:
-        HeaderFile(const std::string& invocation = "") : ExportFile(invocation) {};
+        HeaderFile(){};
         ~HeaderFile() {};
         virtual void Write(std::ostream& file);
 };

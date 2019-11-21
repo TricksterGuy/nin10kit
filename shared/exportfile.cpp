@@ -9,10 +9,6 @@
 #include "shared.hpp"
 #include "version.h"
 
-/** @brief Write
-  *
-  * @todo: document this function
-  */
 void ExportFile::Write(std::ostream& file)
 {
     char str[1024];
@@ -64,19 +60,11 @@ void ExportFile::Write(std::ostream& file)
     file << " */\n\n";
 }
 
-/** @brief AddLine
-  *
-  * @todo: document this function
-  */
 void ExportFile::AddLine(const std::string& line)
 {
     lines.push_back(line);
 }
 
-/** @brief AddImageInfo
-  *
-  * @todo: document this function
-  */
 void ExportFile::AddImageInfo(const std::string& filename, int scene, int width, int height, bool frame)
 {
     char buffer[1024];
@@ -92,12 +80,12 @@ void ExportFile::AddLutInfo(const LutSpecification& spec)
     luts.push_back(spec);
 }
 
-void ExportFile::Add(std::shared_ptr<Exportable>& image)
+void ExportFile::Add(std::unique_ptr<Exportable> image)
 {
-    exportables.push_back(image);
+    exportables.push_back(std::move(image));
 }
 
-std::map<std::string, std::vector<Image*>> ExportFile::GetAnimatedImages() const
+std::map<std::string, std::vector<Image*>> ExportFile::GetAnimatedImages()
 {
     std::map<std::string, std::vector<Image*>> ret;
     /// TODO possibly sort with frame being key.

@@ -21,6 +21,7 @@ void WriteShortArray(std::ostream& file, const std::string& name, const std::str
                      const std::vector<unsigned short>& data, unsigned int items_per_row);
 void WriteShortArray(std::ostream& file, const std::string& name, const std::string& append,
                      const std::vector<unsigned char>& data, unsigned int items_per_row);
+
 // Like above, but truncates each short to a char and then packs 2 chars to form the short.
 /// TODO get rid of this function.
 void WriteShortArrayAsChars(std::ostream& file, const std::string& name, const std::string& append,

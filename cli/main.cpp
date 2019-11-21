@@ -331,8 +331,7 @@ bool Nin10KitApp::OnInit()
     for (int i = 1; i < argc; i++)
         out << argv[i].ToStdString() << " ";
 
-    header.SetInvocation(out.str());
-    implementation.SetInvocation(out.str());
+    ExportFile::SetInvocation(out.str());
 
     return true;
 }
@@ -590,10 +589,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
     }
 
     if (!params.tilesets.empty())
-    {
-        header.SetTilesets(params.tilesets);
-        implementation.SetTilesets(params.tilesets);
-    }
+        ExportFile::SetTilesets(params.tilesets);
 
     if (params.mode == "tiles")
     {
@@ -602,8 +598,7 @@ bool Nin10KitApp::OnCmdLineParsed(wxCmdLineParser& parser)
             WarnLog("Ignoring --resize when in tileset export mode, please resize manually.");
             params.resizes.clear();
         }
-        header.SetTilesets(params.files);
-        implementation.SetTilesets(params.files);
+        ExportFile::SetTilesets(params.files);
     }
 
     return true;
@@ -678,8 +673,7 @@ bool Nin10KitApp::DoExportImages()
                         "You should resize this image via the --resize parameter.", filename.c_str(), anim_width,
                         anim_height, image.columns(), image.rows());
             }
-            header.AddImageInfo(filename, j, image.columns(), image.rows(), isAnim);
-            implementation.AddImageInfo(filename, j, image.columns(), image.rows(), isAnim);
+            ExportFile::AddImageInfo(filename, j, image.columns(), image.rows(), isAnim);
         }
     }
 
@@ -722,8 +716,7 @@ bool Nin10KitApp::DoExportImages()
     VerboseLog("DoExportImages");
     InfoLog("Using %s exporter mode %s", params.device.c_str(), params.mode.c_str());
 
-    header.SetMode(params.mode);
-    implementation.SetMode(params.mode);
+    ExportFile::SetMode(params.mode);
 
     if (params.mode == "LUT")
         DoLUTExport(params.functions);

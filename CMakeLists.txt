@@ -9,10 +9,10 @@ include(FindPkgConfig)
 option(ENABLE_MAGICK7_SUPPORT "Support ImageMagick7 API instead of ImageMagick6" OFF)
 option(ENABLE_NIN10EDIT "Enable nin10kit bitmap editor" OFF)
 
-# Require C++11 build
-if(NOT CMAKE_CXX_FLAGS MATCHES "-std=(c|gnu)\\+\\+11")
-    message(STATUS "This project requires C++11. Adding -std=c++11 to CXXFLAGS.")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" CACHE STRING "Flags used by the compiler during all build types." FORCE)
+# Require C++17 build
+if(NOT CMAKE_CXX_FLAGS MATCHES "-std=(c|gnu)\\+\\+17")
+    message(STATUS "This project requires C++17. Adding -std=c++17 to CXXFLAGS.")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17" CACHE STRING "Flags used by the compiler during all build types." FORCE)
 endif()
 
 # Additional debug flags
@@ -53,12 +53,12 @@ ENDIF(ENABLE_MAGICK7_SUPPORT)
 find_package(wxWidgets REQUIRED core base)
 include(${wxWidgets_USE_FILE})
 
-if(APPLE OR WIN32)
+if(APPLE)
     message(STATUS "The platform appears to be macOS or windows, so using pkg-config to find ImageMagick.")
     pkg_check_modules(ImageMagick Magick++ MagickWand MagickCore)
 else()
     find_package(ImageMagick COMPONENTS Magick++ MagickWand MagickCore REQUIRED)
-endif(APPLE OR WIN32)
+endif(APPLE)
 
 include_directories(${nin10kit_SOURCE_DIR}/shared)
 include_directories(${nin10kit_SOURCE_DIR}/gui/logging)

@@ -7,6 +7,7 @@
 #include "logger.hpp"
 #include "shared.hpp"
 
+// Implemented in gba-exporter.cpp
 void DoMode0Export(const std::vector<Image16Bpp>& images);
 void DoMode3Export(const std::vector<Image16Bpp>& images);
 void DoMode4Export(const std::vector<Image16Bpp>& images, const std::shared_ptr<Palette>& palette);

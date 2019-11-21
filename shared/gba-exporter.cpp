@@ -63,16 +63,12 @@ void DoMode0Export(const std::vector<Image16Bpp>& images)
     {
         for (const auto& image : images)
         {
-            std::shared_ptr<Exportable> map_ptr(new Map(image, params.bpp, params.affine));
-            header.Add(map_ptr);
-            implementation.Add(map_ptr);
+            ExportFile::Add(std::make_unique<Map>(image, params.bpp, params.affine));
         }
     }
     else
     {
-        std::shared_ptr<Exportable> scene(new MapScene(images, params.symbol_base_name, params.bpp, params.affine));
-        header.Add(scene);
-        implementation.Add(scene);
+        ExportFile::Add(std::make_unique<MapScene>(images, params.symbol_base_name, params.bpp, params.affine));
     }
 }
 
@@ -80,9 +76,7 @@ void DoMode3Export(const std::vector<Image16Bpp>& images)
 {
     for (const auto& image : images)
     {
-        std::shared_ptr<Exportable> image_ptr(new Image16Bpp(image));
-        header.Add(image_ptr);
-        implementation.Add(image_ptr);
+        ExportFile::Add(std::make_unique<Image16Bpp>(image));
     }
 }
 
@@ -95,16 +89,12 @@ void DoMode4Export(const std::vector<Image16Bpp>& images, const std::shared_ptr<
     {
         for (const auto& image : images)
         {
-            std::shared_ptr<Exportable> image_ptr(new Image8Bpp(image, palette));
-            header.Add(image_ptr);
-            implementation.Add(image_ptr);
+            ExportFile::Add(std::make_unique<Image8Bpp>(image, palette));
         }
     }
     else
     {
-        std::shared_ptr<Exportable> scene(new Image8BppScene(images, params.symbol_base_name, palette));
-        header.Add(scene);
-        implementation.Add(scene);
+        ExportFile::Add(std::make_unique<Image8BppScene>(images, params.symbol_base_name, palette));
     }
 }
 
@@ -112,33 +102,25 @@ void DoPaletteExport(const std::vector<Image16Bpp>& images)
 {
     // Dummy scene
     Image8BppScene scene(images, params.symbol_base_name);
-
-    auto exportable = std::static_pointer_cast<Exportable>(scene.palette);
-    header.Add(exportable);
-    implementation.Add(exportable);
+    ExportFile::Add(std::make_unique<Palette>(*scene.palette));
 }
 
 void DoSpriteExport(const std::vector<Image16Bpp>& images, const std::shared_ptr<Palette>& palette)
 {
     // Do the work of sprite conversion.
     // Form the sprite scene and then add it to header and implementation
-    SpriteScene* scene(new SpriteScene(images, params.symbol_base_name, params.export_2d, params.bpp, palette));
-    std::shared_ptr<Exportable> exportable(scene);
+    auto scene = std::make_unique<SpriteScene>(images, params.symbol_base_name, params.export_2d, params.bpp, palette);
 
     // Build the sprite scene and place all sprites. (If applicable)
     scene->Build();
 
-    header.Add(exportable);
-    implementation.Add(exportable);
+    ExportFile::Add(std::move(scene));
 }
 
 void DoTilesetExport(const std::vector<Image16Bpp>& images, const std::shared_ptr<Palette>& palette)
 {
     // Form the tileset and then add it to header and implementation
-    std::shared_ptr<Exportable> tileset(new Tileset(images, params.symbol_base_name, params.bpp, params.affine, palette));
-
-    header.Add(tileset);
-    implementation.Add(tileset);
+    ExportFile::Add(std::make_unique<Tileset>(images, params.symbol_base_name, params.bpp, params.affine, palette));
 }
 
 void DoMapExport(const std::vector<Image16Bpp>& images, const std::vector<Image16Bpp>& tilesets)
@@ -147,12 +129,10 @@ void DoMapExport(const std::vector<Image16Bpp>& images, const std::vector<Image1
         FatalLog("Map export specified however --tileset not given");
 
     // Form the tileset from the images given this is a dummy
-    std::shared_ptr<Tileset> tileset(new Tileset(tilesets, "", params.bpp, params.affine));
+    auto tileset = std::make_shared<Tileset>(tilesets, "", params.bpp, params.affine);
 
     for (const auto& image : images)
     {
-        std::shared_ptr<Exportable> map_ptr(new Map(image, tileset, params.affine));
-        header.Add(map_ptr);
-        implementation.Add(map_ptr);
+        ExportFile::Add(std::make_unique<Map>(image, tileset, params.affine));
     }
 }

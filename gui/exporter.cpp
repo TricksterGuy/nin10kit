@@ -102,8 +102,7 @@ void DoExport(int mode, const std::string& filename, const std::vector<std::stri
     params.palette_size = 256;
     params.border = 0;
 
-    header.SetMode(params.mode);
-    implementation.SetMode(params.mode);
+    ExportFile::SetMode(params.mode);
 
     wxFileName file(filename);
 
@@ -135,8 +134,7 @@ void DoExport(int mode, const std::string& filename, const std::vector<std::stri
             geom.aspect(true);
             image.resize(geom);
             params.images.push_back(Image32Bpp(image, info.GetName(), filename, image.scene(), info.IsAnimated()));
-            header.AddImageInfo(filename, image.scene(), image.columns(), image.rows(), info.IsAnimated());
-            implementation.AddImageInfo(filename, image.scene(), image.columns(), image.rows(), info.IsAnimated());
+            ExportFile::AddImageInfo(filename, image.scene(), image.columns(), image.rows(), info.IsAnimated());
         }
     }
 
@@ -166,6 +164,5 @@ void DoExport(int mode, const std::string& filename, const std::vector<std::stri
     file_h.close();
     file_c.close();
 
-    header.Clear();
-    implementation.Clear();
+    ExportFile::Clear();
 }

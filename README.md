@@ -35,11 +35,11 @@ Methodology, the image export tool should be smart, there is a lot of artificial
 ### Ubuntu/Debian Based Systems
 #### Installing via apt-get
 
-This set of instructions will only work on Ubuntu 16.04 and derivatives.
+This set of instructions will only work on Ubuntu 16.04 and newer.
 
 Execute these commands:
 ```bash
-sudo add-apt-repository ppa:tricksterguy87/ppa-gt-cs2110
+sudo add-apt-repository ppa:tricksterguy87/nin10kit
 sudo apt-get update
 sudo apt-get install nin10kit
 ```
@@ -50,8 +50,10 @@ These instructions will work only on Linux based systems, instructions assume a 
 
 To compile this program you will need the following things installed:
 * CMake (`sudo apt-get install cmake`)
-* wxWidgets 3.0 (`sudo apt-get install libwxgtk3.0-dev`)
-* ImageMagick (`sudo apt-get install libmagick++-dev libmagickcore-dev libmagickwand-dev`)
+* wxWidgets 3.0 (`sudo apt-get install libwxgtk3.0-gtk3-dev`)
+* ImageMagick (`sudo apt-get install libmagick++-6.q16-dev`)
+
+note: The packages may be named libmagick++-dev or libwxgtk3.0-dev on earlier versions of Ubuntu
 
 Once you have that done, cd into the repository folder and follow these instructions:
 1. Create a build directory and go into that directory: `mkdir build && cd build`

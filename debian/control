@@ -2,7 +2,7 @@ Source: nin10kit
 Section: graphics
 Priority: optional
 Maintainer: Brandon Whitehead <tricksterguy87@gmail.com>
-Build-Depends: debhelper (>= 9), cmake, libmagick++-dev, libmagickwand-dev, libmagickcore-dev, libwxgtk3.0-dev
+Build-Depends: debhelper (>= 9), cmake, libmagick++-6.q16-dev | libmagick++-dev, libwxgtk3.0-dev | libwxgtk3.0-gtk3-dev
 Standards-Version: 3.9.6
 Homepage: https://github.com/TricksterGuy/nin10kit
 Vcs-Git: https://github.com/TricksterGuy/nin10kit.git

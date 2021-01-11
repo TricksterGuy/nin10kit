@@ -1,0 +1,2 @@
+?package(nin10kit):needs="X11" section="Applications/Programming"\
+  title="nin10kit (GUI)" command="/usr/bin/nin10kitgui"

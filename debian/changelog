@@ -1,0 +1,66 @@
+nin10kit (1.7.1-0ubuntu1~ppa1~bionic1) bionic; urgency=low
+
+  * Package for bionic
+
+ -- Brandon Whitehead <tricksterguy87@gmail.com>  Thu, 11 Oct 2018 10:27:00 -0800
+
+nin10kit (1.7.0-0ubuntu1~ppa1~bionic1) bionic; urgency=low
+
+  * Removed warning about tileset offsets being off
+  * Changed generated #defines to be more consistent
+  * Transparent pixels were not being set to palette entry 0
+
+ -- Brandon Whitehead <tricksterguy87@gmail.com>  Tue, 18 Apr 2017 21:30:00 -0800
+
+nin10kit (1.6.0-0ubuntu1~ppa1~bionic1) bionic; urgency=low
+
+  * Fixed issues with ImageMagick7
+  * Fix Assertion failed errors on Linux Build
+  * Fix blank thumbnails in GUI version
+  * Expose NDS exporting modes in GUI
+  * Hide Image Info panel until an image is selected.
+
+ -- Brandon Whitehead <tricksterguy87@gmail.com>  Tue, 11 Apr 2017 16:18:00 -0800
+
+nin10kit (1.4.1-0ubuntu1~ppa1~bionic1) bionic; urgency=low
+
+  * Build failure
+
+ -- Brandon Whitehead <tricksterguy87@gmail.com>  Sun, 26 Mar 2017 21:46:00 -0800
+
+nin10kit (1.4.0-0ubuntu1~ppa1~bionic1) bionic; urgency=low
+
+  * ImageMagick7 support
+  * Transparent pixels weren't fully ignored
+  * Warning message on GUI
+
+ -- Brandon Whitehead <tricksterguy87@gmail.com>  Sun, 26 Mar 2017 21:10:00 -0800
+
+nin10kit (1.3.0-0ubuntu1~ppa1~bionic1) bionic; urgency=low
+
+  * Support for most 3ds texture formats
+  * New option -3ds_rotate which accounts for the 3ds framebuffer
+  * DS support
+
+ -- Brandon Whitehead <tricksterguy87@gmail.com>  Fri, 15 Jan 2016 23:53:13 -0800
+ 
+nin10kit (1.2.0-0ubuntu1~ppa1~bionic1) bionic; urgency=low
+
+  * In 1D mode errors were not reported when the amount of sprite graphics exported was too large with given settings.
+  * Warning if an animated image's frames are all not the same dimensions
+  * Fix -resize paramter not allowing empty resizes
+  * Fix for multiple palette exports using -transparent
+  * In gui version add prompt for overwriting files
+  * Better logging in some areas.
+  * New mode -palette which allows you to export just a palette
+  * For mode 4, tiles, and sprites you can now export against a custom palette.
+
+ -- Brandon Whitehead <tricksterguy87@gmail.com>  Tue, 03 Nov 2015 21:24:13 -0800
+
+nin10kit (1.1.0-0ubuntu1~ppa1~bionic1) bionic; urgenhcy=low
+
+  * Adds the ability to export sprites for mode 3 in the GUI version
+  * Fix out of bounds read if a sprite bigger than 64x64 was passed in
+  * Fix fake error messages being thrown.
+
+ -- Brandon Whitehead <tricksterguy87@gmail.com>  Tue, 03 Nov 2015 21:24:13 -0800

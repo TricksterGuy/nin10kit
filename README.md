@@ -35,7 +35,7 @@ Methodology, the image export tool should be smart, there is a lot of artificial
 ### Ubuntu/Debian Based Systems
 #### Installing via apt-get
 
-This set of instructions will only work on Ubuntu 16.04 and newer.
+This set of instructions will only work on Ubuntu 18.04 and newer.
 
 Execute these commands:
 ```bash
